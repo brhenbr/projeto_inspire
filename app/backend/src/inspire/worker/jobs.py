@@ -9,14 +9,16 @@ from inspire.config import Settings
 from inspire.extraction.errors import PortalAuthError
 from inspire.extraction.portal_client import PortalClient
 from inspire.extraction.runner import ExtractionRunner
+from inspire.llm import service as llm_service
 
 
 def requeue_interrupted(engine: Engine) -> int:
     """Ao iniciar, devolve à fila o que ficou 'em andamento' por queda do processo (retomada por fase)."""
     with engine.begin() as conn:
-        return conn.execute(
+        resumed = conn.execute(
             text("UPDATE raw.execucao SET estado = 'enfileirada' WHERE estado = 'em_andamento'")
         ).rowcount
+    return resumed + llm_service.requeue_interrupted(engine)
 
 
 def claim_next_extraction(engine: Engine) -> int | None:
@@ -44,7 +46,7 @@ def process_next(engine: Engine, settings: Settings, *, after_extraction=None) -
     log = structlog.get_logger("worker")
     run_id = claim_next_extraction(engine)
     if run_id is None:
-        return False
+        return llm_service.process_next(engine, settings)
     log.info("job_iniciado", tipo="extracao", execucao=run_id)
     try:
         client = PortalClient(

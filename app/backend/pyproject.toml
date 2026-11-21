@@ -58,6 +58,7 @@ ignore = ["E501"]
 "tests/**" = ["S101", "S608"]
 # Busca/painel montam SQL só com nomes de coluna de listas fixas; todo valor vai por parâmetro.
 "src/inspire/discovery/*.py" = ["S608"]
+"src/inspire/api/routes/llm.py" = ["S608"]
 
 [tool.mypy]
 strict = true

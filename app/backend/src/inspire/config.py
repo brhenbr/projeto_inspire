@@ -33,8 +33,15 @@ class Settings(BaseSettings):
     extraction_min_interval_full_min: int = 1440
     extraction_failure_wait_min: int = 5
 
-    # LLM externo: desligado por padrão (ADR-0004)
+    # LLM (ADR-0004 e ADR-0011): desligado por padrão; só hosts da lista; campos públicos apenas
     llm_enabled: bool = False
+    llm_provider: str = "simulado"  # 'simulado' (sem IA, sem rede) ou 'openai-compatible'
+    llm_base_url: str = ""
+    llm_api_key: SecretStr = SecretStr("")
+    llm_model: str = ""
+    llm_allowed_hosts: str = "localhost,127.0.0.1,llm-local"
+    llm_timeout_s: float = 60.0
+    llm_request_interval_s: float = 1.0
 
 
 @lru_cache
