@@ -32,6 +32,7 @@ packages = ["src/inspire"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["tests"]
 addopts = "-ra --strict-markers"
 markers = ["integration: precisa do PostgreSQL do docker compose"]
 

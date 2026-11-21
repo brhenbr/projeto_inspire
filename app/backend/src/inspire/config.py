@@ -25,6 +25,11 @@ class Settings(BaseSettings):
     portal_backoff_base_s: float = 0.5
     portal_backoff_cap_s: float = 30.0
 
+    # Controle de pedidos de extração (ADR-0006)
+    extraction_min_interval_incremental_min: int = 60
+    extraction_min_interval_full_min: int = 1440
+    extraction_failure_wait_min: int = 5
+
     # LLM externo: desligado por padrão (ADR-0004)
     llm_enabled: bool = False
 

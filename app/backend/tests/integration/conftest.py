@@ -3,10 +3,11 @@ from collections.abc import Iterator
 import pytest
 from alembic import command
 from alembic.config import Config
-from sqlalchemy import text
+from sqlalchemy import Engine
 
 from inspire.db import get_engine
 from inspire.extraction.raw_store import RawStore
+from support.helpers import reset_database
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -16,10 +17,13 @@ def migrated_database() -> None:
 
 
 @pytest.fixture
-def store() -> Iterator[RawStore]:
+def db() -> Iterator[Engine]:
+    """Banco limpo para cada teste."""
     engine = get_engine()
-    with engine.begin() as conn:
-        conn.execute(
-            text("TRUNCATE raw.visto, raw.documento, raw.execucao RESTART IDENTITY CASCADE")
-        )
-    yield RawStore(engine)
+    reset_database(engine)
+    yield engine
+
+
+@pytest.fixture
+def store(db: Engine) -> RawStore:
+    return RawStore(db)

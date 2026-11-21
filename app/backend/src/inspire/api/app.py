@@ -3,7 +3,7 @@
 from fastapi import FastAPI
 
 from inspire import __version__
-from inspire.api.routes import saude
+from inspire.api.routes import extracoes, saude
 from inspire.config import get_settings
 from inspire.logging import configure_logging
 
@@ -16,6 +16,7 @@ def create_app() -> FastAPI:
         description="API de extração, discovery e curadoria do catálogo do dados.gov.br.",
     )
     app.include_router(saude.router, prefix="/v1")
+    app.include_router(extracoes.router, prefix="/v1")
     return app
 
 
