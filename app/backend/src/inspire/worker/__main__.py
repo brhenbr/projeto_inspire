@@ -8,6 +8,7 @@ from types import FrameType
 import structlog
 
 from inspire import __version__
+from inspire.analytics.pipeline import rebuild_after_extraction
 from inspire.config import get_settings
 from inspire.db import get_engine
 from inspire.logging import configure_logging
@@ -49,7 +50,14 @@ def main() -> None:
     requeued = jobs.requeue_interrupted(engine)
     if requeued:
         structlog.get_logger("worker").info("execucoes_retomadas", quantidade=requeued)
-    run(stop, lambda: jobs.process_next(engine, settings))
+    run(
+        stop,
+        lambda: jobs.process_next(
+            engine,
+            settings,
+            after_extraction=lambda run_id: rebuild_after_extraction(engine, run_id),
+        ),
+    )
 
 
 if __name__ == "__main__":

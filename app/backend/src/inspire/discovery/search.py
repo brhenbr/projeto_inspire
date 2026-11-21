@@ -173,10 +173,10 @@ class SearchService:
         with self._engine.connect() as conn:
             total = conn.execute(
                 text(f"SELECT count(*) FROM analitico.conjunto_busca b WHERE {where}"), params
-            ).scalar_one()  # noqa: S608
+            ).scalar_one()
             rows = conn.execute(
                 text(
-                    f"SELECT b.id, b.titulo, left(b.descricao, 300) AS resumo, b.organizacao_slug, b.organizacao_titulo, "  # noqa: S608
+                    f"SELECT b.id, b.titulo, left(b.descricao, 300) AS resumo, b.organizacao_slug, b.organizacao_titulo, "
                     f"b.esfera, b.uf, b.temas, b.formatos, b.tags, b.licenca, b.periodicidade, b.nota_qualidade, b.prioridade, "
                     f"b.estado_curadoria, b.curado, b.selo_portal, b.sem_detalhe, b.removido, b.qtd_recursos, "
                     f"b.metadados_atualizados_em, {rank_sql} AS rank FROM analitico.conjunto_busca b "
@@ -193,6 +193,24 @@ class SearchService:
             "facetas": self._facets(f, query, approximate),
         }
 
+    def ids(self, f: Filters, limit: int = 100000) -> list[str]:
+        """Todos os ids que a busca devolveria (para coleções e operações em lote)."""
+        params: dict[str, Any] = {}
+        clauses = self._where(f, params)
+        query = (f.q or "").strip()
+        if query:
+            params["q"] = query
+            clauses.append("b.tsv @@ websearch_to_tsquery('portuguese', public.f_busca(:q))")
+        where = " AND ".join(clauses) or "true"
+        with self._engine.connect() as conn:
+            rows = conn.execute(
+                text(
+                    f"SELECT b.id FROM analitico.conjunto_busca b WHERE {where} ORDER BY b.id LIMIT :n"
+                ),
+                {**params, "n": limit},
+            )
+            return [r.id for r in rows]
+
     def _count(self, clauses: list[str], params: dict[str, Any]) -> int:
         where = " AND ".join(clauses) or "true"
         with self._engine.connect() as conn:
@@ -200,7 +218,7 @@ class SearchService:
                 conn.execute(
                     text(f"SELECT count(*) FROM analitico.conjunto_busca b WHERE {where}"), params
                 ).scalar_one()
-            )  # noqa: S608
+            )
 
     # ------------------------------------------------------------------ facetas
 
@@ -221,12 +239,12 @@ class SearchService:
                 label_sql = label or "NULL"
                 if is_array:
                     sql = (
-                        f"SELECT v AS valor, NULL AS rotulo, count(*) AS n FROM analitico.conjunto_busca b, "  # noqa: S608
+                        f"SELECT v AS valor, NULL AS rotulo, count(*) AS n FROM analitico.conjunto_busca b, "
                         f"unnest({col}) v WHERE {where} GROUP BY v ORDER BY n DESC, v LIMIT {FACET_LIMIT}"
                     )
                 else:
                     sql = (
-                        f"SELECT {col} AS valor, {label_sql} AS rotulo, count(*) AS n FROM analitico.conjunto_busca b "  # noqa: S608
+                        f"SELECT {col} AS valor, {label_sql} AS rotulo, count(*) AS n FROM analitico.conjunto_busca b "
                         f"WHERE {where} AND {col} IS NOT NULL GROUP BY {col} ORDER BY n DESC, {col} LIMIT {FACET_LIMIT}"
                     )
                 result[name] = [

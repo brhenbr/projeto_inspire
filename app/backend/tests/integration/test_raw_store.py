@@ -14,7 +14,7 @@ DOC = {"id": "abc", "titulo": "Planos de saúde", "temResponsavel": True}
 
 def count(table: str) -> int:
     with get_engine().connect() as conn:
-        return int(conn.execute(text(f"SELECT count(*) FROM raw.{table}")).scalar_one())  # noqa: S608
+        return int(conn.execute(text(f"SELECT count(*) FROM raw.{table}")).scalar_one())
 
 
 def test_primeiro_documento_e_novo(store: RawStore) -> None:

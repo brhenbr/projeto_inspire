@@ -192,7 +192,7 @@ def list_organizations(
         params["esfera"] = esfera
     size = max(1, min(size, 100))
     base = (
-        "SELECT b.organizacao_slug AS slug, min(b.organizacao_titulo) AS titulo, min(b.esfera) AS esfera, "  # noqa: S608
+        "SELECT b.organizacao_slug AS slug, min(b.organizacao_titulo) AS titulo, min(b.esfera) AS esfera, "
         "min(b.uf) AS uf, count(*) AS conjuntos, round(avg(b.nota_qualidade), 1) AS nota_media, "
         "count(*) FILTER (WHERE b.curado) AS curados, "
         "count(*) FILTER (WHERE b.estado_curadoria = 'aprovado') AS aprovados, "
@@ -200,9 +200,9 @@ def list_organizations(
         f"FROM analitico.conjunto_busca b WHERE {' AND '.join(where)} GROUP BY b.organizacao_slug"
     )
     with engine.connect() as conn:
-        total = conn.execute(text(f"SELECT count(*) FROM ({base}) t"), params).scalar_one()  # noqa: S608
+        total = conn.execute(text(f"SELECT count(*) FROM ({base}) t"), params).scalar_one()
         rows = conn.execute(
-            text(f"SELECT * FROM ({base}) t ORDER BY {order} LIMIT :n OFFSET :o"),  # noqa: S608
+            text(f"SELECT * FROM ({base}) t ORDER BY {order} LIMIT :n OFFSET :o"),
             {**params, "n": size, "o": (max(1, page) - 1) * size},
         ).all()
     return {
@@ -276,9 +276,9 @@ def dashboard(engine: Engine) -> dict[str, Any]:
 
         def group(col: str, array: bool = False, limit: int = 12) -> list[dict[str, Any]]:
             if array:
-                sql = f"SELECT v AS valor, count(*) AS n FROM analitico.conjunto_busca, unnest({col}) v WHERE NOT removido GROUP BY v ORDER BY n DESC LIMIT {limit}"  # noqa: S608
+                sql = f"SELECT v AS valor, count(*) AS n FROM analitico.conjunto_busca, unnest({col}) v WHERE NOT removido GROUP BY v ORDER BY n DESC LIMIT {limit}"
             else:
-                sql = f"SELECT {col} AS valor, count(*) AS n FROM analitico.conjunto_busca WHERE NOT removido AND {col} IS NOT NULL GROUP BY 1 ORDER BY n DESC LIMIT {limit}"  # noqa: S608
+                sql = f"SELECT {col} AS valor, count(*) AS n FROM analitico.conjunto_busca WHERE NOT removido AND {col} IS NOT NULL GROUP BY 1 ORDER BY n DESC LIMIT {limit}"
             return [dict(r._mapping) for r in conn.execute(text(sql))]
 
         buckets = conn.execute(

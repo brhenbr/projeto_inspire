@@ -54,7 +54,11 @@ def reset_database(engine: Engine) -> None:
                 "TRUNCATE raw.fila_detalhe, raw.visto, raw.documento, raw.execucao, "
                 "catalogo.conjunto_historico, catalogo.conjunto_associado, catalogo.conjunto_tag, "
                 "catalogo.conjunto_tema, catalogo.recurso, catalogo.conjunto, catalogo.tag, "
-                "catalogo.observancia_legal, catalogo.formato, catalogo.tema, catalogo.organizacao "
+                "catalogo.observancia_legal, catalogo.formato, catalogo.tema, catalogo.organizacao, "
+                "curadoria.alteracao, curadoria.status_conjunto, curadoria.colecao_item, curadoria.colecao, "
+                "curadoria.llm_proposta, curadoria.llm_execucao, curadoria.llm_tarefa, "
+                "analitico.conjunto_busca, analitico.qualidade_conjunto, analitico.qualidade_historico, "
+                "analitico.regra_qualidade "
                 "RESTART IDENTITY CASCADE"
             )
         )

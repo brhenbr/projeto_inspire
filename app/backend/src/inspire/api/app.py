@@ -1,10 +1,12 @@
 """Aplicação FastAPI. A API é versionada em /v1 e documentada em OpenAPI."""
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 
 from inspire import __version__
-from inspire.api.routes import descoberta, extracoes, qualidade, saude
+from inspire.api.routes import curadoria, descoberta, extracoes, qualidade, saude
 from inspire.config import get_settings
+from inspire.curation.service import CurationError, NotFoundError
 from inspire.logging import configure_logging
 
 
@@ -15,10 +17,17 @@ def create_app() -> FastAPI:
         version=__version__,
         description="API de extração, discovery e curadoria do catálogo do dados.gov.br.",
     )
-    app.include_router(saude.router, prefix="/v1")
-    app.include_router(extracoes.router, prefix="/v1")
-    app.include_router(descoberta.router, prefix="/v1")
-    app.include_router(qualidade.router, prefix="/v1")
+
+    @app.exception_handler(CurationError)
+    async def _invalid(_: Request, exc: CurationError) -> JSONResponse:
+        return JSONResponse(status_code=422, content={"detail": str(exc)})
+
+    @app.exception_handler(NotFoundError)
+    async def _missing(_: Request, exc: NotFoundError) -> JSONResponse:
+        return JSONResponse(status_code=404, content={"detail": f"Não encontrado: {exc}"})
+
+    for module in (saude, extracoes, descoberta, qualidade, curadoria):
+        app.include_router(module.router, prefix="/v1")
     return app
 
 

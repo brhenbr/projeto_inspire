@@ -15,6 +15,7 @@ from typing import Any
 import structlog
 from sqlalchemy import Engine, text
 
+from inspire.curation.service import on_source_changed
 from inspire.extraction import normalizer
 from inspire.extraction.errors import (
     PortalAuthError,
@@ -233,6 +234,8 @@ class ExtractionRunner:
                 doc_hash=saved.hash,
                 listing_change=summary.get("ultimaAlteracaoMetadados"),
             )
+        if event == "alterado":
+            on_source_changed(self._engine, cid)
         self._mark_item(run_id, cid, "concluido", None)
         emails = find_email_like(clean)
         if emails:

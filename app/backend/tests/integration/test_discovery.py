@@ -1,38 +1,13 @@
-from collections.abc import Iterator
-
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine
 
 from inspire.analytics.read_model import refresh_read_model
-from inspire.api.app import create_app
-from inspire.api.deps import get_db
 from inspire.discovery.search import Filters, SearchService
 from inspire.quality import service as quality
-from support.fake_portal import FakePortal
-from support.helpers import run_extraction, scalar
+from support.helpers import scalar
 
 pytestmark = pytest.mark.integration
-
-
-@pytest.fixture
-def populated(db: Engine) -> Engine:
-    portal = FakePortal(n_datasets=60, n_orgs=3)
-    portal.add("ds-saude", "orgao-1", 1)
-    portal.update_title("ds-saude", "Saúde da População Brasileira")
-    portal.datasets["ds-saude"]["descricao"] = (
-        "Indicadores de mortalidade e internações hospitalares por município. " * 3
-    )
-    run_extraction(db, portal)
-    quality.recompute(db)
-    return db
-
-
-@pytest.fixture
-def api(populated: Engine) -> Iterator[TestClient]:
-    app = create_app()
-    app.dependency_overrides[get_db] = lambda: populated
-    yield TestClient(app)
 
 
 def test_modelo_de_leitura_tem_uma_linha_por_conjunto(populated: Engine) -> None:

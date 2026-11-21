@@ -57,6 +57,11 @@ def evaluate(
     return QualityResult(round(100 * all_p / all_w, 1) if all_w else 0.0, dims, details)
 
 
+def refresh_for(engine: Engine, ids: list[str]) -> None:
+    """Atualiza só o modelo de leitura (ex.: mudou o status de curadoria, a nota não muda)."""
+    refresh_read_model(engine, ids)
+
+
 def seed_rules(engine: Engine) -> None:
     """Cadastra as regras. Pesos e ativação já ajustados no banco são preservados."""
     with engine.begin() as conn:

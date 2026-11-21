@@ -55,7 +55,9 @@ select = ["E", "F", "I", "B", "UP", "S", "SIM", "RUF"]
 ignore = ["E501"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S101"]
+"tests/**" = ["S101", "S608"]
+# Busca/painel montam SQL só com nomes de coluna de listas fixas; todo valor vai por parâmetro.
+"src/inspire/discovery/*.py" = ["S608"]
 
 [tool.mypy]
 strict = true

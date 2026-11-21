@@ -73,6 +73,8 @@ def upgrade() -> None:
             responsavel  text,
             tipo         text NOT NULL CHECK (tipo IN ('manual', 'dinamica')),
             regra_filtro jsonb NOT NULL DEFAULT '{}'::jsonb,
+            ultimos_membros text[] NOT NULL DEFAULT '{}',
+            ultimo_diff  jsonb,
             criada_em    timestamptz NOT NULL DEFAULT now()
         )
         """
