@@ -9,17 +9,17 @@ Gerado por `kit/scripts/backlog_to_jira.py` a partir de `backlog.json`. Não edi
 Espelhar os metadados do catálogo do dados.gov.br (só públicos; recursos apenas com link), de forma manual, retomável e incremental. Plano de trabalho: A4.
 
 - **US-001** (Story, Highest, mvp, extracao) — Coletar dimensões (organizações, temas, tags, formatos, ODS, observância legal)
-- **US-002** (Story, Highest, mvp, extracao, tecnico) — Cliente HTTP resiliente para a API do portal
+- **US-002** (Story, Highest, mvp, extracao, tecnico) — Cliente HTTP resiliente para a API do portal ✔ Concluído
 - **US-003** (Story, Highest, mvp, extracao) — Coletar listagem de conjuntos (fase 1)
 - **US-004** (Story, Highest, mvp, extracao) — Coletar detalhe de cada conjunto e recursos (fase 2)
 - **US-016** (Story, High, mvp, extracao) — Extração incremental pela data de alteração
-- **US-005** (Story, High, mvp, extracao) — Guardar snapshot bruto e hash por conjunto
+- **US-005** (Story, High, mvp, extracao) — Guardar snapshot bruto e hash por conjunto ✔ Em andamento (gravação com hash pronta; falta ligar à coleta)
 - **US-006** (Story, High, mvp, extracao, web) — Botão de extração na interface, com estado e controle
 - **US-007** (Story, Medium, mvp, extracao, tecnico) — Disparar extração por linha de comando
 - **US-017** (Story, Medium, fase-2, extracao) — Agendamento automático de extrações
 - **US-015** (Story, Highest, mvp, extracao, tecnico) — Controle de pedidos de extração no backend (ADR-0006)
 - **US-008** (Story, Highest, mvp, extracao, tecnico) — Normalizador raw para catálogo, reexecutável
-- **US-009** (Story, Highest, mvp, extracao, seguranca) — Remover dados pessoais na ingestão
+- **US-009** (Story, Highest, mvp, extracao, seguranca) — Remover dados pessoais na ingestão ✔ Concluído
 
 ## EP-02 — Discovery do catálogo
 

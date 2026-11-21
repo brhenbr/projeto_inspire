@@ -5,6 +5,11 @@ x-hardening: &hardening
   security_opt: ["no-new-privileges:true"]
   cap_drop: ["ALL"]
 
+# api, worker e migrate usam o MESMO código: uma única imagem, para nunca ficarem em versões diferentes.
+x-backend: &backend
+  image: inspire-backend:dev
+  build: ./app/backend
+
 services:
   db:
     image: postgres:16
@@ -22,8 +27,7 @@ services:
     restart: unless-stopped
 
   migrate:
-    build: ./app/backend
-    <<: *hardening
+    <<: [*backend, *hardening]
     command: ["alembic", "upgrade", "head"]
     environment: &db-env
       DATABASE_URL: postgresql+psycopg://inspire:${POSTGRES_PASSWORD:-inspire_dev}@db:5432/inspire
@@ -34,8 +38,7 @@ services:
     restart: "no"
 
   api:
-    build: ./app/backend
-    <<: *hardening
+    <<: [*backend, *hardening]
     environment: *db-env
     depends_on:
       migrate:
@@ -52,8 +55,7 @@ services:
     restart: unless-stopped
 
   worker:
-    build: ./app/backend
-    <<: *hardening
+    <<: [*backend, *hardening]
     command: ["python", "-m", "inspire.worker"]
     environment:
       <<: *db-env

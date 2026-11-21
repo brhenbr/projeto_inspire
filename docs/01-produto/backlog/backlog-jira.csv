@@ -19,7 +19,8 @@ US-004,Story,Coletar detalhe de cada conjunto e recursos (fase 2),"Uma chamada d
 
 Critérios de aceite:
 - Interrupção e retomada sem refazer o já coletado.
-- Tempo total da primeira carga medido e registrado.",Highest,mvp,extracao,,,,EP-01
+- Tempo total da primeira carga medido e registrado.
+- Conjunto cujo detalhe devolve 400 de forma definitiva (achado real: ~1 em 60) é gravado como `conjunto_sem_detalhe` com o resumo da listagem e o motivo, não interrompe a extração e aparece no relatório como divergência.",Highest,mvp,extracao,,,,EP-01
 US-016,Story,Extração incremental pela data de alteração,"Percorre a listagem completa e busca o detalhe só dos conjuntos novos ou com data de alteração diferente da guardada.
 
 Critérios de aceite:

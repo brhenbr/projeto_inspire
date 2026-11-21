@@ -37,11 +37,22 @@ Sair do desenho e ter o sistema inteiro subindo em Docker, com testes e portão 
 - Backlog: US-015 (controle), US-016 (incremental), US-017 (agendamento, fase 2); US-006 refeita. 76 itens.
 - Fluxo 1.1 adicionado em `fluxos.md`; 10 diagramas renderizados sem erro.
 
-## Verificação
+## Continuação: base da extração
+- Construídos cliente do portal resiliente, remoção de dados pessoais, hash e gaveta bruta (`raw`), com a regra
+  de uma execução ativa por vez garantida pelo banco. Detalhes em
+  [Implementação 02](../04-implementacao/02-base-da-extracao.md).
+- Teste real contra o portal: 311 organizações e 20.700 conjuntos conferem; 59 detalhes gravados, segunda rodada
+  toda "inalterado"; zero campos pessoais no banco.
+- **Achados:** (1) alguns conjuntos têm detalhe que devolve sempre HTTP 400 (1 em 60); (2) corrigi uma afirmação
+  minha: nome e e-mail do responsável NÃO vêm em todo conjunto (nome em 30 de 59); (3) a imagem do serviço de
+  migração era separada e ficou velha: agora os três serviços do backend usam uma só imagem.
+- Portão: 58 testes, cobertura 92%.
+
+## Verificação (esqueleto)
 Backend: ruff, mypy, 9 testes, cobertura 84%. Frontend: eslint, tsc, 3 testes. Sistema completo no Docker
 conferido de fora (página, API pelo nginx, OpenAPI, portas, logs sem a chave) e a página foi vista renderizada.
 
 ## Pendências / próximos passos
-- EP-01: extração (US-002 cliente HTTP resiliente, US-001 dimensões, US-003 listagem, US-004 detalhe,
-  US-009 remoção de dados pessoais, US-005 snapshot e hash, US-008 normalizador, US-006 botão na web).
+- EP-01: US-001 dimensões, US-003 listagem, US-004 detalhe (tolerando o 400), US-008 normalizador,
+  US-015/016 controle e incremental ligados ao worker, US-006 botão na web.
 - Medir o tempo real da primeira carga (~20,7 mil chamadas).

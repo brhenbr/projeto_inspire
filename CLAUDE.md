@@ -58,8 +58,8 @@ Protótipo web, monousuário porém com arquitetura desacoplada, para **extraç�
 
 ## Fatos do payload real (conferidos em 2026-11-21)
 - Datas em texto `dd/mm/aaaa`; muitos campos nulos; no detalhe a organização vem como slug; há `conjuntoDadosAssociados`
-  fora do Swagger; o portal já traz `selo` e `atualizado`. Nome e e-mail do responsável vêm em todo detalhe:
-  remover na ingestão (modelo-de-dados.md, seção 2).
+  fora do Swagger; o portal já traz `selo` e `atualizado`. Nome e/ou e-mail do responsável vêm em boa parte dos detalhes
+  (amostra de 59: nome em 30, nome+e-mail em 16): remover na ingestão (modelo-de-dados.md, seção 2).
 
 ## Regras de trabalho
 - Documentação em **português**; código e identificadores em inglês. O cliente achou os C4 técnicos demais:
@@ -81,6 +81,8 @@ Protótipo web, monousuário porém com arquitetura desacoplada, para **extraç�
   metadados completos exigem chamada de detalhe por dataset.
 - **A API é intermitente: a mesma consulta pode devolver lista vazia e logo depois 15 itens.** Página
   vazia NÃO significa fim; sempre tentar de novo e conferir contra o total por organização.
+- **Alguns conjuntos aparecem na listagem mas o detalhe devolve sempre HTTP 400** ("Erro ao executar a consulta"):
+  1 em 60 na amostra (um do IPEA). Não aborta a extração: registrar o item como indisponível e listar no relatório.
 - Tamanho medido: ~20.700 conjuntos em 311 organizações (soma de `qtdConjuntoDeDados`).
 - A chave do cliente está em `.env` e foi validada (200). Nunca imprimir seu valor.
 

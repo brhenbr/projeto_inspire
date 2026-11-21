@@ -15,12 +15,15 @@ Este é o desenho lógico. Nomes de colunas e tipos exatos saem na implementaç�
   versão, visibilidade, descontinuado, reuso, `recursos`, `conjuntoDadosAssociados`, datas, `atualizado`
   ("Atualizado"/"Desatualizado" calculado pelo portal), `selo` (ex.: Nenhum, Bronze), `dadosAbertos`,
   `observanciaLegal`, `origemCadastro`, e o responsável (nome e e-mail).
-- **Cuidados:** datas vêm como texto `dd/mm/aaaa`; várias propriedades vêm nulas (cobertura espacial,
+- **Cuidados:** alguns conjuntos aparecem na listagem mas o **detalhe devolve sempre HTTP 400** (1 em 60 na
+  amostra); eles são gravados como `conjunto_sem_detalhe`, com o resumo da listagem e o motivo, e entram no
+  relatório. Datas vêm como texto `dd/mm/aaaa`; várias propriedades vêm nulas (cobertura espacial,
   observância legal etc.); no detalhe a organização vem como *slug* (`nome`), enquanto a listagem traz o
   nome de exibição; o Swagger não lista `conjuntoDadosAssociados`.
 
 ## 2. Dados pessoais (ADR-0002, item 7)
-Nome e e-mail do responsável pelo conjunto vêm em **todos** os detalhes públicos. Decisão de desenho:
+Nome e/ou e-mail do responsável pelo conjunto vêm em muitos detalhes públicos (em uma amostra de 59,
+nome em 30 e nome com e-mail em 16). Decisão de desenho:
 - São **removidos na ingestão**, antes de gravar o bruto e antes de calcular o hash. Guarda-se apenas a
   informação de que existiam (`tem_responsavel`, `tem_email_responsavel`), útil para a regra de
   completude.

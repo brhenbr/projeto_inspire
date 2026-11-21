@@ -50,6 +50,8 @@ src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "S", "SIM", "RUF"]
+# E501: comprimento de linha em comentários e textos em português fica a critério; o formatador cuida do código.
+ignore = ["E501"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S101"]
