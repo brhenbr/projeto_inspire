@@ -34,7 +34,12 @@ Protótipo web, monousuário porém com arquitetura desacoplada, para **extraç�
 - OpenAPI: `https://dados.gov.br/v3/api-docs` (cópia em `docs/00-descoberta/`).
 - **Todas as rotas de dados retornam 401 sem o header `chave-api-dados-abertos`**, inclusive as
   "públicas". A especificação técnica do cliente diz que seriam abertas; isso não se confirmou.
-- Listagem paginada devolve só resumo; os metadados completos exigem chamada de detalhe por dataset.
+- Listagem paginada devolve só resumo (15 itens por página, `pagina` começa em 1, sem total); os
+  metadados completos exigem chamada de detalhe por dataset.
+- **A API é intermitente: a mesma consulta pode devolver lista vazia e logo depois 15 itens.** Página
+  vazia NÃO significa fim; sempre tentar de novo e conferir contra o total por organização.
+- Tamanho medido: ~20.700 conjuntos em 311 organizações (soma de `qtdConjuntoDeDados`).
+- A chave do cliente está em `.env` e foi validada (200). Nunca imprimir seu valor.
 
 ## Estrutura do repositório
 - `app/` — código do produto.
