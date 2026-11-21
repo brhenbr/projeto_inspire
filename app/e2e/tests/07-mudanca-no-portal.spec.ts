@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { aguardarExtracaoTerminar, aguardarQualidade, comoCurador, FAKE_PORTAL } from "./helpers";
+import { aguardarExtracaoTerminar, aguardarTitulo, comoCurador, FAKE_PORTAL } from "./helpers";
 
 test.beforeEach(async ({ page }) => comoCurador(page));
 
@@ -18,7 +18,7 @@ test.describe("7. O portal muda: extração incremental, curadoria preservada", 
     await page.getByRole("button", { name: "Atualizar catálogo" }).click();
     await expect(page.getByText(/Extração #2 \(incremental\)/)).toBeVisible();
     await aguardarExtracaoTerminar(request);
-    await aguardarQualidade(request);
+    await aguardarTitulo(request, "ds-0010", "Conjunto 10 com título novo no portal");
 
     await page.reload();
     await page.getByRole("button", { name: "Relatório" }).first().click();
@@ -54,6 +54,7 @@ test.describe("7. O portal muda: extração incremental, curadoria preservada", 
       expect([200, 202]).toContain(r.status());
     }).toPass();
     await aguardarExtracaoTerminar(request);
+    await aguardarTitulo(request, "ds-0007", "Conjunto 7 mudou no portal");
 
     const d = await (await request.get("/api/v1/conjuntos/ds-0007")).json();
     expect(d.propostas_pendentes).toBe(0);

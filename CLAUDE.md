@@ -65,6 +65,7 @@ Protótipo web, monousuário porém com arquitetura desacoplada, para **extraç�
 - Testes de integração rodam no banco `inspire_test` (criado pelo conftest) e RECUSAM rodar em outro banco. Nunca no
   banco da aplicação: um teste já deixou um job na fila e o worker o executou de verdade.
 - `bash scripts/formatar.sh` formata/corrige o backend; `bash scripts/qualidade.sh` é o portão completo.
+- E2E: `bash scripts/e2e.sh` (Playwright + portal falso, pilha descartável em `docker-compose.e2e.yml`). Ver docs/05-testes/e2e.md.
 - Parâmetro de saída da exportação é `saida` (não `formato`, que é filtro de recurso).
 - LLM: modo `simulado` (sem IA, sem rede) por padrão no compose; provedor real só por configuração (ADR-0011).
 

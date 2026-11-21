@@ -64,11 +64,13 @@ test.describe("2. Descoberta (busca, filtros, detalhe)", () => {
 
   test("a paginação navega entre páginas sem repetir resultados", async ({ page }) => {
     await page.goto("/conjuntos?ordem=titulo");
+    await expect(page.locator("article.resultado").first()).toBeVisible();
     const primeira = await page.locator("article.resultado h3").allTextContents();
     expect(primeira.length).toBe(20);
 
     await page.getByRole("button", { name: "Próxima →" }).click();
     await expect(page).toHaveURL(/pagina=2/);
+    await expect(page.locator("article.resultado h3").first()).not.toHaveText(primeira[0]);
     const segunda = await page.locator("article.resultado h3").allTextContents();
     expect(segunda.filter((t) => primeira.includes(t))).toEqual([]);
   });

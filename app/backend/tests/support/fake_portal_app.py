@@ -4,6 +4,7 @@ Também expõe /_teste/* para os testes alterarem o "portal" durante o cenário.
 """
 
 import os
+from datetime import datetime
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, Response
@@ -26,7 +27,8 @@ app = FastAPI(title="Portal falso")
 
 @app.post("/_teste/titulo/{dataset_id}")
 def mudar_titulo(dataset_id: str, titulo: str) -> dict[str, str]:
-    portal.update_title(dataset_id, titulo)
+    # o portal real atualiza a data de alteração dos metadados junto com o conteúdo
+    portal.update_title(dataset_id, titulo, when=datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
     return {"ok": "sim"}
 
 

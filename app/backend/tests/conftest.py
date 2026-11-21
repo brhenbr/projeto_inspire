@@ -37,4 +37,13 @@ def _use_test_database() -> None:
         pass  # sem banco, só os testes de integração falham (e dizem por quê)
 
 
+def _hermetic_environment() -> None:
+    """O compose define LLM_* e PORTAL_* no contêiner; os testes devem enxergar os PADRÕES do código."""
+    for key in [
+        k for k in os.environ if k.startswith(("LLM_", "PORTAL_", "EXTRACTION_", "DADOS_GOV_"))
+    ]:
+        del os.environ[key]
+
+
+_hermetic_environment()
 _use_test_database()

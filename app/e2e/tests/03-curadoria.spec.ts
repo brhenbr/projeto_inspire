@@ -38,9 +38,10 @@ test.describe("3. Curadoria humana", () => {
     await abrirConjunto(page, "população brasileira curado", CURADO);
     const antes = await notaDoCabecalho(page);
 
-    await page.getByRole("button", { name: "Reverter ao valor do portal" }).first().click(); // palavras-chave ou licença
+    // o último botão é o da licença (os botões seguem a ordem dos campos: título, palavras-chave, licença)
+    await page.getByRole("button", { name: "Reverter ao valor do portal" }).last().click();
 
-    await expect(page.getByText(/voltou ao valor do portal/)).toBeVisible();
+    await expect(page.getByText("“Licença” voltou ao valor do portal.")).toBeVisible();
     await expect.poll(() => notaDoCabecalho(page)).toBeLessThan(antes);
 
     await page.getByRole("tab", { name: "Histórico" }).click();
@@ -95,7 +96,7 @@ test.describe("3. Curadoria humana", () => {
     await page.getByRole("tab", { name: "Histórico" }).click();
 
     await expect(page.getByRole("heading", { name: "Alterações da curadoria" })).toBeVisible();
-    await expect(page.getByText("Padronização do projeto")).toBeVisible();
+    await expect(page.getByText("Padronização do projeto").first()).toBeVisible(); // um por campo alterado
     await expect(page.getByText("humano", { exact: true }).first()).toBeVisible();
     await expect(page.getByRole("heading", { name: "Mudanças vindas do portal" })).toBeVisible();
     await expect(page.getByRole("cell", { name: "novo", exact: true })).toBeVisible();

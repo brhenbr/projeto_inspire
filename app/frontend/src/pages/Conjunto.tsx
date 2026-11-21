@@ -53,7 +53,7 @@ export default function ConjuntoPage() {
           { key: "llm", label: `Sugestões de LLM${d.propostas_pendentes ? ` (${d.propostas_pendentes})` : ""}` },
         ]}
       />
-      {aba === "metadados" && <Metadados d={d} onChanged={dados.reload} />}
+      {aba === "metadados" && <Metadados key={JSON.stringify([d.efetivo, d.estado_curadoria])} d={d} onChanged={dados.reload} />}
       {aba === "qualidade" && <Qualidade d={d} />}
       {aba === "recursos" && <Recursos d={d} />}
       {aba === "historico" && <Historico d={d} />}

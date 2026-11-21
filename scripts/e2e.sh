@@ -4,8 +4,15 @@
 # Relatório HTML: app/e2e/reports/html/index.html
 set -uo pipefail
 cd "$(dirname "$0")/.."
+C="docker compose -f docker-compose.e2e.yml"
 mkdir -p app/e2e/reports
-docker compose -f docker-compose.e2e.yml up --build --abort-on-container-exit --exit-code-from playwright
+$C down -v --remove-orphans >/dev/null 2>&1
+if ! $C up -d --build --wait db migrate fake-portal api worker web; then
+  echo "A pilha E2E não subiu."; $C logs --tail 40; $C down -v --remove-orphans >/dev/null 2>&1; exit 1
+fi
+$C build playwright || { echo "Falha ao construir a imagem dos testes."; $C down -v --remove-orphans >/dev/null 2>&1; exit 1; }
+$C run --rm playwright
 code=$?
-docker compose -f docker-compose.e2e.yml down -v --remove-orphans >/dev/null 2>&1
+if [ $code -ne 0 ]; then echo "--- logs do worker (últimas linhas)"; $C logs --tail 30 worker; fi
+$C down -v --remove-orphans >/dev/null 2>&1
 exit $code

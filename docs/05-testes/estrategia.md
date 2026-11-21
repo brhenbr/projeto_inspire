@@ -7,7 +7,7 @@ não quebre por coisa boba, sem exagerar para um MVP.
 |---|---|---|---|
 | Unidade | Regras e funções isoladas (config, filtros, regras de qualidade) | pytest, Vitest | A cada mudança |
 | Integração | Código com PostgreSQL real e a API do portal simulada | pytest, respx | Portão local |
-| Ponta a ponta (E2E) | Fluxos do usuário no navegador: extração, busca, curadoria, LLM | Playwright | Antes de cada demonstração; o cliente participa |
+| Ponta a ponta (E2E) | Fluxos do usuário no navegador: extração, busca, curadoria, LLM | Playwright, portal falso | `bash scripts/e2e.sh` antes de cada demonstração (ver [e2e.md](e2e.md)) |
 
 ## Regras
 - **Portão local:** `bash scripts/qualidade.sh` roda lint, tipos, testes e cobertura. Cobertura mínima de 80% no backend.

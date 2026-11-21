@@ -74,8 +74,11 @@ export function ColecaoPage() {
   }
   async function apagar() {
     if (!window.confirm(`Apagar a coleção “${c!.nome}”? Os conjuntos não são apagados.`)) return;
-    const r = await acao.run(() => api.del(`/colecoes/${id}`));
-    if (r === undefined && !acao.error) navigate("/colecoes");
+    const apagou = await acao.run(async () => {
+      await api.del(`/colecoes/${id}`);
+      return true;
+    });
+    if (apagou) navigate("/colecoes");
   }
   async function remover(item: string) {
     const r = await acao.run(() => api.post(`/colecoes/${id}/itens/remover`, { ids: [item] }));

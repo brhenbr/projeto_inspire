@@ -29,6 +29,17 @@ export async function aguardarQualidade(request: APIRequestContext): Promise<voi
     .not.toBeNull();
 }
 
+/** Espera o título EFETIVO de um conjunto mudar (a reconstrução do modelo de leitura roda após a extração). */
+export async function aguardarTitulo(request: APIRequestContext, id: string, titulo: string): Promise<void> {
+  await expect
+    .poll(async () => (await (await request.get(`/api/v1/conjuntos/${id}`)).json()).efetivo?.titulo, {
+      message: `o título de ${id} deveria virar "${titulo}"`,
+      timeout: 60_000,
+      intervals: [1000],
+    })
+    .toBe(titulo);
+}
+
 export async function painel(request: APIRequestContext) {
   return (await request.get("/api/v1/painel")).json();
 }

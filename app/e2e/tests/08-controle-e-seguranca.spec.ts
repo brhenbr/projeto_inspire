@@ -66,7 +66,7 @@ test.describe("8. Controle de pedidos de extração e segurança", () => {
     await aguardarExtracaoTerminar(request);
 
     await page.goto("/extracao");
-    await expect(page.getByRole("row").filter({ hasText: new RegExp(`^${id}\\b`) }).first()).toBeVisible();
+    await expect(page.getByRole("row").filter({ hasText: new RegExp(`^${id}(?!\\d)`) }).first()).toBeVisible();
   });
 
   test("segurança: cabeçalhos do servidor web e documentação da API", async ({ request }) => {

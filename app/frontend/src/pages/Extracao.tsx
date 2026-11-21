@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
 import { ApiError, api, type Disponibilidade, type Extracao, type EstadoExtracao } from "../api";
 import { ESTADOS_EXECUCAO, fmtDate, fmtNum, minutesUntil } from "../format";
@@ -114,8 +114,8 @@ export default function ExtracaoPage() {
             <thead><tr><th>#</th><th>Tipo</th><th>Situação</th><th>Início</th><th>Fim</th><th /></tr></thead>
             <tbody>
               {historico.data.map((x) => (
-                <>
-                  <tr key={x.id}>
+                <Fragment key={x.id}>
+                  <tr>
                     <td>{x.id}</td>
                     <td>{x.tipo === "completa" ? "Completa" : "Incremental"}{x.forcada && <Badge tone="medio">forçada</Badge>}</td>
                     <td><Badge tone={x.estado === "concluida" ? "bom" : x.estado === "falhou" ? "ruim" : ATIVOS.has(x.estado) ? "azul" : "medio"}>{ESTADOS_EXECUCAO[x.estado] ?? x.estado}</Badge></td>
@@ -123,8 +123,8 @@ export default function ExtracaoPage() {
                     <td>{fmtDate(x.finalizada_em, true)}</td>
                     <td><button type="button" className="botao botao-sec botao-peq" onClick={() => setAberta(aberta === x.id ? null : x.id)}>{aberta === x.id ? "Ocultar relatório" : "Relatório"}</button></td>
                   </tr>
-                  {aberta === x.id && <tr key={`${x.id}-r`}><td colSpan={6}><Relatorio x={x} /></td></tr>}
-                </>
+                  {aberta === x.id && <tr><td colSpan={6}><Relatorio x={x} /></td></tr>}
+                </Fragment>
               ))}
             </tbody>
           </table>

@@ -32,7 +32,7 @@ test.describe("5. Curadoria assistida por LLM", () => {
 
     await expect(page.getByText(/Execução #\d+ enfileirada para 4 conjunto/)).toBeVisible();
     await aguardarExecucaoConcluida(page, "sugerir-tags");
-    await expect(page.getByText("Aguardando revisão").first()).toBeVisible();
+    await expect(page.getByRole("article", { name: /^Proposta/ }).first().getByText("Aguardando revisão")).toBeVisible();
     await expect(page.getByRole("article", { name: /^Proposta/ }).first()).toBeVisible();
   });
 
