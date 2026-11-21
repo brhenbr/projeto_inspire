@@ -30,6 +30,17 @@ Entender o pedido, fechar as primeiras premissas com o cliente e validar a API r
   conjuntos / 311 organizações. Detalhes em `docs/01-produto/visao-e-escopo.md`, seção 8.
 - Redigida a versão 0.1 do documento de visão e escopo, com 6 perguntas abertas.
 
+## Continuação: plano de trabalho UFSCar/CPQD e backlog
+- Lido o Plano de Trabalho nº 1 (UFSCar/CPQD). Partes acadêmicas ignoradas, a pedido. O produto
+  atende A1, A4, A6 e A7; A5 (DCAT-BR/DQV) vira fase 2; A9 vira futuro; A10 fica fora.
+- O plano tem dados contratuais e financeiros: o PDF foi movido para `docs/00-descoberta/restrito/`,
+  ignorado pelo git. O repositório pode ficar público.
+- Respostas do cliente: produto complementar ao CND; verificação de links na fase 2; AIE no backlog;
+  avaliadores atuais são professores da UFSCar.
+- Criado o backlog (62 itens, 15 épicos) em `docs/01-produto/backlog/`, com gerador genérico em
+  `kit/scripts/backlog_to_jira.py` e CSV para Jira (importação não testada em Jira real).
+- Visão e escopo atualizados para a versão 0.2.
+
 ## Pendências / próximos passos
 - Cliente cria a chave de API e a coloca no `.env` local.
 - Redigir visão e escopo do MVP (`docs/01-produto/`) para aprovação.

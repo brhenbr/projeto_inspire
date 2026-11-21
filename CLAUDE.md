@@ -19,6 +19,14 @@ Protótipo web, monousuário porém com arquitetura desacoplada, para **extraç�
 - Portal é **somente leitura** no curto/médio prazo; a arquitetura deve permitir propor alterações de
   volta no futuro (não implementar agora).
 
+## Contexto institucional
+- Frente UFSCar do Inspire, sob acordo UFSCar/CPQD. O cliente é pesquisador da UFSCar; o protótipo é
+  avaliado primeiro por professores da UFSCar e depois por órgãos públicos (MGI, CPQD).
+- Produto atende as atividades A1, A4, A6 e A7 do plano; DCAT-BR/DQV (A5) é fase 2; foco ignora a parte acadêmica.
+- `docs/00-descoberta/restrito/` guarda documentos contratuais e é ignorado pelo git. Não resumir
+  valores, bolsas ou desembolsos em arquivos versionados. O repositório pode se tornar público.
+- Backlog: `docs/01-produto/backlog/backlog.json` é a fonte; `.md` e `.csv` são gerados.
+
 ## Regras de trabalho
 - Documentação em **português**; código e identificadores em inglês.
 - Todo o ciclo (concepção, desenho, implementação, testes, deploy) é registrado em `docs/`.

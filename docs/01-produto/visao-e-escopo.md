@@ -1,8 +1,10 @@
 # Visão e escopo do MVP — Inspire Catálogo
 
-- **Versão:** 0.1 (proposta para aprovação do cliente)
+- **Versão:** 0.2 (proposta para aprovação do cliente)
 - **Data:** 2026-11-21
 - **Status:** aguardando revisão. Itens marcados com **[?]** dependem de resposta do cliente.
+- **Mudanças desde a 0.1:** respostas do cliente incorporadas; alinhamento ao Plano de Trabalho
+  UFSCar/CPQD; verificação de links e AIE movidas para o backlog; backlog completo criado.
 
 ## 1. Contexto
 
@@ -10,96 +12,113 @@ O Projeto INSPIRE (ver [dossiê](../00-descoberta/Projeto_INSPIRE_Dossie_Detalha
 melhorar serviços e dados do governo federal. Este trabalho se encaixa principalmente na **Camada 3
 (plataformas e modelos de IA, incluindo LLMs em português)** e na **Camada 4 (aplicações inteligentes)**.
 
-O Portal Brasileiro de Dados Abertos (dados.gov.br) é um catálogo **federado**: guarda os metadados
-e aponta para os arquivos, que ficam nos órgãos publicadores. A qualidade desses metadados limita o
-quanto o portal é encontrável, compreensível e reutilizável.
+A frente da UFSCar, sob acordo com o CPQD, tem como objetivo central uma **API de catalogação de
+metadados com uso intensivo de IA**. Este produto é o veículo prático para parte dessa frente:
 
-Medimos o catálogo em 2026-11-21: **cerca de 20.700 conjuntos de dados em 311 organizações**
-(soma dos totais por organização; os maiores são BCB, IPEA e INPI).
+| Atividade do plano | O que este produto entrega |
+|---|---|
+| A1 Mapeamento das bases | Espelho completo do catálogo público, com coleções (ex.: bases sociais de saúde, assistência e educação) |
+| A4 Coleta de metadados | Extração resiliente, incremental e retomável (conector do dados.gov.br) |
+| A6 Organização e gestão | Busca, curadoria (inserir, alterar, remover) e IA generativa para apoiar a curadoria |
+| A7 API de catalogação | API REST própria, versionada e documentada em OpenAPI |
+| A5 Padrão de metadados | **Fase 2:** mapeamento para DCAT-BR e DQV, quando o padrão for definido com o CPQD |
+| A9 Evolução de taxonomias | **Futuro:** a busca semântica da fase 2 é a base |
+| A10 Ontologias a partir de dados brutos | **Fora:** exige analisar o conteúdo dos arquivos |
+
+O Portal Brasileiro de Dados Abertos (dados.gov.br) é um catálogo **federado**: guarda os metadados e
+aponta para os arquivos, que ficam nos órgãos. Medimos em 2026-11-21 **cerca de 20.700 conjuntos de
+dados em 311 organizações** (soma dos totais por organização; os maiores são BCB, IPEA e INPI).
 
 ## 2. Problema
 
-1. **Descoberta ruim:** é difícil saber o que existe no catálogo, quem publica, com que qualidade e
-   com que cobertura.
+1. **Descoberta ruim:** é difícil saber o que existe, quem publica, com que qualidade e cobertura.
 2. **Metadados inconsistentes:** descrições curtas, tags duplicadas ou vagas, licença e periodicidade
    ausentes, temas mal atribuídos.
 3. **Curadoria manual não escala** com 20 mil conjuntos e dezenas de critérios.
-4. **Sem memória:** o portal mostra o estado atual; não há histórico do que mudou nem trilha do que a
-   curadoria propôs e decidiu.
+4. **Sem memória:** o portal mostra só o estado atual; não há histórico do que mudou nem trilha do
+   que a curadoria propôs e decidiu.
 
 ## 3. Visão do produto
 
-Uma aplicação web para o time do Inspire que **espelha o catálogo, deixa explorá-lo, mede a qualidade
-dos metadados e organiza a curadoria**, em que **humanos definem os critérios e LLMs fazem o trabalho
-repetitivo, sempre com revisão humana**. Em longo prazo é a base de um marketplace de dados abertos.
+Uma aplicação web que **espelha o catálogo, deixa explorá-lo, mede a qualidade dos metadados e
+organiza a curadoria**, em que **humanos definem os critérios e LLMs fazem o trabalho repetitivo,
+sempre com revisão humana**. Em longo prazo é a base de um marketplace de dados abertos.
 
 ### Princípios
-- **Humano no comando (human-in-the-loop):** o LLM propõe, a pessoa aprova. Alinhado ao GuIA do MGI,
-  que exige supervisão humana e auditabilidade.
-- **Espelho separado da camada curada:** o que veio do portal nunca é sobrescrito pela curadoria. Isso
-  também prepara a futura devolução de propostas ao portal.
+- **Humano no comando:** o LLM propõe, a pessoa aprova (supervisão humana e auditabilidade, como pede o GuIA do MGI).
+- **Espelho separado da camada curada:** o que veio do portal nunca é sobrescrito. Isso prepara a futura devolução de propostas ao portal.
 - **Rastreabilidade:** toda sugestão de LLM registra modelo, versão, parâmetros e quem aprovou.
 - **Preparado, não construído:** o que está fora do escopo vira ponto de extensão, não código.
 - **Custo mínimo:** open source e modelos gratuitos ou locais sempre que possível.
+- **Pronto para ser público:** código, testes e documentação em padrão de repositório aberto, como o plano de trabalho prevê para a API.
 
-## 4. Usuários
+## 4. Usuários e avaliadores
 
 O MVP é monousuário, mas o desenho considera os papéis abaixo.
 
 | Papel | O que faz | Necessidade principal |
 |---|---|---|
-| **Curador(a)** | Revisa e melhora metadados | Fila de trabalho priorizada, edição rápida, ajuda do LLM |
+| **Curador(a)** | Revisa e melhora metadados | Fila priorizada, edição rápida, ajuda do LLM |
 | **Coordenação do projeto** | Acompanha a evolução | Indicadores de qualidade por órgão, tema e período |
 | **Explorador(a) de dados** | Busca dados para análise ou produto | Busca boa, filtros, entender o dataset sem sair do app |
 
-## 5. Escopo do MVP (priorização MoSCoW)
+**Quem avalia o protótipo agora:** professores da UFSCar. Depois, órgãos públicos (MGI, CPQD e
+outros). Por isso a demonstração deve mostrar o fluxo completo e o rigor de engenharia, e a
+documentação precisa se sustentar sozinha, sem depender de explicação oral.
 
-### Deve ter (Must)
-| # | Épico | Entrega |
-|---|---|---|
-| E1 | **Extração do catálogo** | Botão/comando que espelha organizações, temas, tags, formatos, conjuntos e recursos. Só metadados; recursos apenas com link. Só públicos. Retomável, com progresso visível e relatório (esperado × coletado). Mantém snapshot bruto e histórico de mudanças (novo, alterado, removido). |
-| E2 | **Discovery** | Busca textual, filtros (organização, esfera, UF, tema, formato, licença, atualidade), página de detalhe do conjunto, visão por organização. |
-| E3 | **Qualidade dos metadados** | Regras determinísticas (completude, formato aberto, atualidade × periodicidade, licença, tags) com pontuação por conjunto e por órgão, explicável regra a regra. |
-| E4 | **Curadoria humana** | Camada curada separada: editar título/descrição/tags/tema, marcar status (pendente, em revisão, aprovado, rejeitado, duplicado), agrupar em coleções, ver histórico de alterações. |
+## 5. Escopo
 
-### Deveria ter (Should)
-| # | Épico | Entrega |
-|---|---|---|
-| E5 | **Curadoria assistida por LLM** | Humano escolhe conjuntos, tarefa e parâmetros (ex.: melhorar descrição, sugerir tags, avaliar qualidade); LLM gera propostas em lote; humano aprova ou rejeita. Registro completo de execução. No MVP, com um provedor gratuito/local (a escolher em ADR). |
-| E6 | **Exportação** | Base curada em CSV e JSON. |
+Detalhamento em [backlog/backlog.md](backlog/backlog.md) (62 itens, 15 épicos), com versão para importar no Jira.
 
-### Poderia ter (Could), preparado mas não necessariamente entregue
-| # | Épico | Observação |
-|---|---|---|
-| E7 | **Exploração em linguagem natural** | A API própria da aplicação será desenhada para servir de ferramenta ao LLM. Entrega só se o custo for baixo. |
-| E8 | **Verificação de links (link rot)** | Worker separado com HEAD nas URLs dos recursos. Não baixa dados, mas faz requisições aos órgãos. **[?]** Entra no MVP ou na fase 2? |
-| E9 | **Reusos e solicitações de dados** | Endpoints existem no portal; úteis para priorizar curadoria por uso real. |
+### MVP — Deve ter
+| Épico | Entrega |
+|---|---|
+| EP-01 **Extração do catálogo** | Botão/comando que espelha organizações, temas, tags, formatos, conjuntos e recursos. Só metadados e só públicos; recursos apenas com link. Retomável, com relatório coletado × esperado. Snapshot bruto e histórico de mudanças (novo, alterado, removido). |
+| EP-02 **Discovery** | Busca textual, filtros combináveis, detalhe do conjunto, visão por organização e painel geral. |
+| EP-03 **Qualidade dos metadados** | Regras determinísticas e configuráveis com pontuação explicável por conjunto e por órgão, e lista priorizada de curadoria. |
+| EP-04 **Curadoria humana** | Camada curada separada do espelho: editar, status, coleções e histórico de alterações. |
+| EP-07 **Fundação técnica** | Docker Compose, CI, testes (unitários, integração, E2E) e documentação contínua. |
 
-### Fora do escopo (agora)
-- Escrita no portal (propor/aplicar alterações de volta). Previsto para o futuro; o modelo de dados já separa espelho e curadoria.
-- Datasets privados, download ou análise do conteúdo dos arquivos.
-- Multiusuário, perfis e autenticação (o MVP é monousuário, mas a API não deve impedir isso depois).
-- Conectores para portais CKAN setoriais (previsto como ponto de extensão).
-- Marketplace.
+### MVP — Deveria ter
+| Épico | Entrega |
+|---|---|
+| EP-05 **Curadoria assistida por LLM** | Humano escolhe tarefa e parâmetros; LLM propõe em lote; humano aprova. Provedor gratuito/local atrás de uma interface desacoplada, com registro de proveniência. Inclui um spike para avaliar modelos em português. |
+| EP-06 **API própria e exportação** | API REST v1 em OpenAPI, usada pela interface web, e exportação em CSV/JSON. |
+
+### Fase 2
+| Épico | Observação |
+|---|---|
+| EP-08 Verificação de links | Worker separado; requisita os servidores dos órgãos, sem baixar dados. |
+| EP-09 Exploração em linguagem natural | Busca semântica e chat sobre o catálogo curado. A API do MVP é desenhada para servir de ferramenta ao LLM. |
+| EP-11 Padrões DCAT-BR e DQV | Mapeamento e exportação, após definição do padrão com o CPQD. |
+
+### Backlog (futuro)
+EP-10 Governança de IA (Autoavaliação de Impacto Ético, relatório de transparência), EP-12 Evolução
+de taxonomias (A9), EP-13 Reusos e solicitações, EP-14 Devolução de propostas ao portal, EP-15
+Multiusuário e nuvem.
+
+### Fora do escopo
+- Escrita no portal, datasets privados, download ou análise do conteúdo dos arquivos (inclui A10).
+- Marketplace e integração com Data Space (apenas extensibilidade do modelo).
 
 ## 6. Critérios de sucesso do MVP (proposta)
 
-1. Extração completa do catálogo, com relatório de conferência (coletado × esperado por organização).
+1. Extração completa, com relatório de conferência (coletado × esperado por organização).
 2. Reextração incremental que identifica corretamente novos, alterados e removidos.
-3. Busca e filtros respondem em até 1 segundo sobre o catálogo completo (meta a validar).
-4. Pontuação de qualidade disponível para 100% dos conjuntos coletados, explicável por regra.
+3. Busca e filtros em até 1 segundo sobre o catálogo completo (meta a validar).
+4. Pontuação de qualidade para 100% dos conjuntos coletados, explicável regra a regra.
 5. Fluxo ponta a ponta demonstrável: selecionar conjuntos → LLM propõe → humano aprova → exporta.
-6. Sobe com um único comando em Docker; roda a suíte de testes automatizados sem falhas.
+6. Sobe com um único comando em Docker; suíte de testes verde no CI, com cobertura em torno de 80% na API (referência do plano, A7).
 
 ## 7. Requisitos não funcionais
 
 - **Execução:** Docker (Compose) local, portável para nuvem depois.
-- **Respeito ao portal:** concorrência baixa, retry com backoff e jitter, User-Agent identificado,
-  timeouts explícitos. A API **exige chave** e responde de forma intermitente (ver riscos).
-- **Segredos:** chave só em `.env`; nunca em logs, banco ou git.
+- **Respeito ao portal:** concorrência baixa, retry com backoff e jitter, User-Agent identificado, timeouts explícitos.
+- **Segredos:** chave só em `.env`; nunca em logs, banco ou git. Documentos institucionais restritos ficam fora do git.
 - **Qualidade:** testes unitários, de integração (com API simulada) e E2E dos fluxos principais.
 - **Observabilidade básica:** logs estruturados e histórico de execuções de extração.
-- **Idioma:** interface e documentação em português.
+- **Idioma:** interface e documentação em português; código em inglês.
+- **Licença:** definir antes de publicar (o plano pede licença compatível com uso governamental).
 
 ## 8. Riscos e achados da descoberta
 
@@ -107,29 +126,29 @@ O MVP é monousuário, mas o desenho considera os papéis abaixo.
 |---|---|---|
 | **A API responde vazio de forma intermitente.** A mesma consulta (`pagina=1`) devolveu 0 e depois 15 itens; ao somar 21 páginas de organizações, quase todas precisaram de retry. | Uma página vazia **não** indica fim do catálogo; um extrator ingênuo perderia dados em silêncio. | Retry em respostas vazias, conferência contra totais por organização, relatório de divergências. |
 | **A API exige chave** em todas as rotas, ao contrário da especificação do cliente. | Dependência de credencial; risco de bloqueio por abuso. | Chave em `.env`, taxa limitada, documentado no ADR de extração. |
-| **A listagem traz só resumo** e o detalhe exige 1 chamada por conjunto (~20,7 mil chamadas). | Primeira extração é demorada. | Extração em duas fases, retomável e paralelizada com limite; medir o tempo real. |
-| **A listagem não informa o total.** | Difícil saber quando terminou. | Usar soma por organização como total esperado. |
-| **Custo e qualidade de LLM gratuito** para português técnico. | Qualidade das propostas pode ser baixa. | Interface de provedor desacoplada; avaliar modelos no desenho; humano sempre revisa. |
-| **Enquadramento regulatório** (GuIA, AIE do MGI). | Uso de IA no governo exige documentação e supervisão. | Trilha de auditoria desde o MVP; **[?]** confirmar se o time precisa fazer a Autoavaliação de Impacto Ético. |
+| **A listagem traz só resumo** e o detalhe exige 1 chamada por conjunto (~20,7 mil chamadas). | Primeira extração é demorada. | Duas fases, retomável e paralelizada com limite; medir o tempo real. |
+| **A listagem não informa o total.** | Difícil saber quando terminou. | Usar a soma por organização como total esperado. |
+| **LLM gratuito pode ter qualidade baixa em português técnico.** | Propostas fracas. | Interface de provedor desacoplada; spike de avaliação; humano sempre revisa. |
+| **Padrões de metadados ainda não definidos** (DCAT-BR, DQV, FAIR serão definidos com o CPQD). | Retrabalho nas regras de qualidade. | Regras configuráveis; mapeamento DCAT-BR/DQV na fase 2. |
+| **Repositório pode ficar público.** | Vazamento de segredos ou documentos contratuais. | `.env` e `docs/00-descoberta/restrito/` fora do git; checagem antes de publicar (US-064). |
 
 ## 9. Perguntas abertas para o cliente
 
-1. **Frameworks de metadados:** quais o Inspire quer aplicar (ex.: o padrão de metadados do próprio
-   dados.gov.br, DCAT/DCAT-BR, FAIR, escala de 5 estrelas, outro)? Há documento ou critérios com pesos?
-   Sem isso, começo com as regras genéricas da especificação do cliente.
-2. **Relação com o Catálogo Nacional de Dados (CND):** o dossiê cita a automação do CND com dashboards
-   de qualidade. Este produto é complementar ao CND, ou concorrente/independente?
-3. **Link rot (E8):** entra no MVP ou fica para a fase 2?
-4. **Papéis institucionais:** você citou o CNPq como coordenador; o dossiê aponta MGI (coordenação),
-   CPQD (liderança técnica) e MCTI/Finep (fomento). Quem será o comprador/avaliador do protótipo?
-5. **Eixos:** entendi "eixos 3 e 4" como as Camadas 3 e 4 do dossiê (o dossiê também fala em 7 frentes,
-   que não detalha). Está correto?
-6. **LLM soberano:** o Inspire desenvolve LLMs em português. Há chance de acesso a um desses modelos
-   futuramente? Isso favorece manter a integração aberta a provedores.
+1. **Padrões de metadados:** o kickoff com o CPQD já definiu os padrões (DCAT-BR, DQV, FAIR)? Se não,
+   uso DCAT-BR e DQV como hipótese e deixo as regras de qualidade configuráveis.
+2. **Cronograma:** em que mês do plano vocês estão e quando é a demonstração para os professores? As
+   atividades A4, A6 e A7 se estendem do mês 4 ao 15, então a data muda quanto escopo cabe.
+3. **Repositório público:** o repo no seu GitHub será público? Sugiro a licença Apache-2.0, por conter
+   concessão de patentes; confirme se a UFSCar ou o CPQD impõem alguma licença.
+4. **Coleção "bases sociais":** o plano foca bases sociais (saúde, assistência, educação). Quero criar
+   uma coleção curada inicial para isso. Quem define a lista, ou deduzo por tema e organização?
+5. **Documentos restritos:** coloquei o Plano de Trabalho em `docs/00-descoberta/restrito/`, ignorado
+   pelo git, por conter dados contratuais e financeiros. O dossiê do Inspire continua versionado.
+   Faz sentido?
 
 ## 10. Próximos passos
 
-1. Cliente revisa este documento e responde às perguntas.
-2. Rodada de arquitetura: C4 (C1–C3 e fluxos), com a conversa sobre tecnologias.
+1. Cliente revisa este documento, o backlog e responde às perguntas.
+2. Rodada de arquitetura: C4 (C1–C3 e fluxos) e conversa sobre tecnologias (US-060).
 3. ADRs de stack, extração, modelo de dados e provedor de LLM.
-4. Backlog detalhado por épico e início da implementação.
+4. Início da implementação, começando por EP-07 e EP-01.

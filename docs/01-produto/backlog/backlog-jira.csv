@@ -1,0 +1,88 @@
+Issue Id,Issue Type,Summary,Description,Priority,Labels,Labels,Labels,Epic Name,Parent
+EP-01,Epic,Extração do catálogo,"Espelhar os metadados do catálogo do dados.gov.br (só públicos; recursos apenas com link), de forma manual, retomável e incremental. Plano de trabalho: A4.",Highest,mvp,extracao,,Extração do catálogo,
+US-001,Story,"Coletar dimensões (organizações, temas, tags, formatos, ODS, observância legal)","Como curador, quero ter as tabelas de domínio do portal para filtrar e normalizar.
+
+Critérios de aceite:
+- Coleta todas as organizações paginadas e registra o total esperado (qtdConjuntoDeDados).
+- Coleta temas, tags, formatos, ODS e observância legal.
+- Tolera respostas vazias intermitentes da API com retry.",Highest,mvp,extracao,,,EP-01
+US-002,Story,Cliente HTTP resiliente para a API do portal,"Retry com backoff e jitter (inclui resposta vazia), timeouts explícitos, concorrência limitada, User-Agent identificado, chave lida do ambiente e nunca registrada em log.
+
+Critérios de aceite:
+- Testes com API simulada cobrindo 401, 429, 5xx, timeout e lista vazia intermitente.",Highest,mvp,extracao,tecnico,,EP-01
+US-003,Story,Coletar listagem de conjuntos (fase 1),"Varrer todas as páginas de conjuntos-dados (pagina inicia em 1, 15 itens). Página vazia não encerra a varredura: confirmar com retries e com o total por organização.
+
+Critérios de aceite:
+- Relatório coletado x esperado por organização.
+- Divergências listadas, não escondidas.",Highest,mvp,extracao,,,EP-01
+US-004,Story,Coletar detalhe de cada conjunto e recursos (fase 2),"Uma chamada de detalhe por conjunto, com fila retomável e paralelismo limitado.
+
+Critérios de aceite:
+- Interrupção e retomada sem refazer o já coletado.
+- Tempo total da primeira carga medido e registrado.",Highest,mvp,extracao,,,EP-01
+US-005,Story,Guardar snapshot bruto e hash por conjunto,"Persistir o JSON bruto por execução e um hash determinístico dos campos relevantes.
+
+Critérios de aceite:
+- Reexecução classifica cada conjunto como novo, alterado, inalterado ou removido do catálogo (remoção lógica).",High,mvp,extracao,,,EP-01
+US-006,Story,Disparar e acompanhar extração pela interface web,"Botão para iniciar extração completa ou incremental, com progresso, cancelamento e histórico de execuções com resumo (novos, alterados, removidos, erros).",High,mvp,extracao,web,,EP-01
+US-007,Story,Disparar extração por linha de comando,"Mesmo fluxo da interface, executável em container, para uso por processo agendado no futuro.",Medium,mvp,extracao,tecnico,,EP-01
+EP-02,Epic,Discovery do catálogo,Explorar o catálogo espelhado com busca e filtros.,Highest,mvp,discovery,,Discovery do catálogo,
+US-010,Story,Busca textual nos conjuntos,"Busca por título, descrição, tags e organização, com tolerância a acentos e relevância razoável.
+
+Critérios de aceite:
+- Resposta em até 1 s sobre o catálogo completo (meta a validar).",Highest,mvp,discovery,,,EP-02
+US-011,Story,Filtros combináveis,"Filtrar por organização, esfera, UF, tema, formato, licença, periodicidade, atualidade e faixa de qualidade, com contagem por filtro.",High,mvp,discovery,,,EP-02
+US-012,Story,Página de detalhe do conjunto,"Mostrar metadados originais, versão curada, recursos com link para o portal, pontuação de qualidade e histórico de mudanças.",High,mvp,discovery,,,EP-02
+US-013,Story,Visão por organização,"Lista e painel por organização com quantidade de conjuntos, qualidade média e atualidade.",Medium,mvp,discovery,,,EP-02
+US-014,Story,Painel geral do catálogo,"Indicadores: total de conjuntos, por esfera/tema/formato, distribuição de qualidade e data da última extração.",Medium,mvp,discovery,,,EP-02
+EP-03,Epic,Qualidade dos metadados,Avaliar metadados por regras explicáveis. Pesos e critérios definidos com o time; alinhar com DCAT-BR/DQV quando o padrão for definido.,Highest,mvp,qualidade,,Qualidade dos metadados,
+US-020,Story,Motor de regras de qualidade configurável,"Regras determinísticas com pesos em configuração: completude (descrição, licença, periodicidade, tags, cobertura), formato aberto (escala de 5 estrelas), atualidade x periodicidade declarada.
+
+Critérios de aceite:
+- Cada pontuação mostra quais regras passaram e falharam.",Highest,mvp,qualidade,,,EP-03
+US-021,Story,Pontuação por conjunto e agregada por organização/tema,Recalcular após cada extração e guardar histórico para ver evolução.,High,mvp,qualidade,,,EP-03
+US-022,Story,Lista priorizada de conjuntos a curar,"Ordenar por pior qualidade, relevância (downloads, reusos) e tamanho do órgão.",High,mvp,qualidade,curadoria,,EP-03
+EP-04,Epic,Curadoria humana,"Camada curada separada do espelho do portal, com histórico. Plano de trabalho: A6.",Highest,mvp,curadoria,,Curadoria humana,
+US-030,Story,Modelo de dados com espelho e camada curada separados,"O que vem do portal nunca é sobrescrito. A curadoria guarda só diferenças, com autoria e data. Desenho preparado para futura devolução de propostas ao portal.",Highest,mvp,curadoria,tecnico,,EP-04
+US-031,Story,Editar metadados curados,"Editar título, descrição, tags e tema de um conjunto, vendo lado a lado o original e o curado.",High,mvp,curadoria,web,,EP-04
+US-032,Story,Status de curadoria,"Pendente, em revisão, aprovado, rejeitado, duplicado. Filtrável na busca.",High,mvp,curadoria,,,EP-04
+US-033,Story,Coleções de conjuntos,"Agrupar conjuntos (ex.: bases sociais de saúde, assistência e educação, foco da atividade A1 do plano).",Medium,mvp,curadoria,,,EP-04
+US-034,Story,Histórico e auditoria de alterações,"Linha do tempo por conjunto: quem ou qual modelo alterou, quando, o quê, e reversão.",Medium,mvp,curadoria,,,EP-04
+US-035,Story,Detecção de possíveis duplicados,Sugerir conjuntos muito parecidos (texto e organização) para revisão humana.,Low,fase-2,curadoria,,,EP-04
+EP-05,Epic,Curadoria assistida por LLM,"Humano parametriza, LLM executa, humano aprova. Provedor gratuito/local por trás de uma interface desacoplada. Plano de trabalho: A6.",High,mvp,llm,,Curadoria assistida por LLM,
+US-040,Story,Interface de provedor de LLM desacoplada,"Contrato único para provedores (local ou remoto), configurável por ambiente, sem acoplar o domínio a um fornecedor.",High,mvp,llm,tecnico,,EP-05
+US-041,Story,Tarefas de curadoria parametrizáveis,"Catálogo de tarefas com prompt versionado: melhorar descrição, sugerir tags, sugerir tema, avaliar qualidade textual. O humano escolhe tarefa, conjuntos e parâmetros.",High,mvp,llm,curadoria,,EP-05
+US-042,Story,Execução em lote com fila de revisão,"Gera propostas em lote; o humano aprova, edita ou rejeita cada uma. Nada é aplicado sem aprovação.",High,mvp,llm,curadoria,,EP-05
+US-043,Story,Registro de execução e proveniência,"Guardar modelo, versão, prompt, parâmetros, entrada, saída e decisão humana de cada proposta. Atende a supervisão humana e auditabilidade do GuIA.",High,mvp,llm,governanca,,EP-05
+US-044,Task,Avaliar modelos gratuitos/locais para português,"Comparar 2 a 3 modelos open source em amostra rotulada à mão, com custo, velocidade e qualidade. Resultado vira ADR.",High,mvp,llm,spike,,EP-05
+EP-06,Epic,API própria e exportação,"API REST documentada (OpenAPI), versionada, usada pela interface web e preparada para outros consumidores e para ferramentas de LLM. Plano de trabalho: A7.",High,mvp,api,,API própria e exportação,
+US-050,Story,API REST v1 documentada em OpenAPI,"Conjuntos, organizações, qualidade, curadoria e extração. Versionada (/v1). A interface web consome só esta API.",High,mvp,api,,,EP-06
+US-051,Story,Exportar base curada em CSV e JSON,"Exporta com ou sem filtros, trazendo original, curado e status.",Medium,mvp,api,,,EP-06
+EP-07,Epic,Fundação técnica e qualidade de software,"Execução em Docker, testes, CI e documentação contínua.",Highest,mvp,tecnico,,Fundação técnica e qualidade de software,
+US-060,Task,"Conversa e ADR de tecnologias (stack, banco, busca, fila, front)","Reunião de decisão com o cliente, com opções e recomendação.",Highest,mvp,tecnico,adr,,EP-07
+US-061,Task,Esqueleto do projeto com Docker Compose,Sobe tudo com um comando. Configuração por variáveis de ambiente.,Highest,mvp,tecnico,,,EP-07
+US-062,Task,"Pipeline de CI: lint, testes e build","Executa a cada push. Meta de cobertura em torno de 80% na API (referência do plano de trabalho, A7).",High,mvp,tecnico,,,EP-07
+US-063,Task,Testes E2E dos fluxos principais,"Extração, busca, curadoria e fluxo com LLM. Etapa em que o cliente volta a interagir mais.",High,mvp,tecnico,teste,,EP-07
+US-064,Task,Definir licença e preparar repositório para publicação,O plano pede repositório público com licença compatível com uso governamental. Verificar que não há segredos nem documentos restritos no histórico.,Medium,mvp,tecnico,governanca,,EP-07
+US-065,Task,"Documentação de implementação, testes e deploy","Manter docs/04, 05 e 06 e o diário atualizados, com diagramas C4.",Medium,mvp,tecnico,doc,,EP-07
+EP-08,Epic,Verificação de links dos recursos (link rot),Worker separado que verifica disponibilidade dos recursos sem baixar dados.,Medium,fase-2,links,,Verificação de links dos recursos (link rot),
+US-070,Story,Worker de verificação HEAD/GET parcial,"Registra status HTTP, tempo de resposta, content-type real versus declarado e validade do certificado TLS, com limite de taxa por domínio.",Medium,fase-2,links,,,EP-08
+US-071,Story,Integrar disponibilidade à pontuação de qualidade,Nova regra de qualidade e filtro na busca.,Medium,fase-2,links,qualidade,,EP-08
+EP-09,Epic,Exploração em linguagem natural,"Perguntas em português sobre o catálogo curado, respondidas por um LLM que usa a API própria como ferramenta.",Medium,fase-2,llm,nl,Exploração em linguagem natural,
+US-080,Story,Busca semântica com embeddings,Índice vetorial dos conjuntos; busca por significado além das palavras. Também base para duplicados e taxonomia.,Medium,fase-2,nl,,,EP-09
+US-081,Story,Chat sobre o catálogo,"O LLM chama a API de busca e responde citando os conjuntos, com links. Não inventa conjuntos fora do catálogo.",Medium,fase-2,nl,,,EP-09
+EP-10,Epic,Governança de IA e conformidade,Requisitos do GuIA/MGI que podem ser exigidos quando o produto for para órgãos públicos.,Medium,backlog,governanca,,Governança de IA e conformidade,
+US-090,Story,Autoavaliação de Impacto Ético (AIE),Preparar a AIE do uso de LLM na curadoria e classificar o risco. A exigência ainda precisa ser confirmada.,Medium,backlog,governanca,,,EP-10
+US-091,Story,Relatório de transparência do uso de IA,Exportar relatório de quais propostas vieram de LLM e quais foram aprovadas por humanos.,Low,backlog,governanca,,,EP-10
+EP-11,Epic,Padrões de metadados (DCAT-BR e DQV),Alinhar o modelo curado e a qualidade aos padrões a definir com o CPQD (A5). Hipótese de trabalho: DCAT-BR e DQV.,Medium,fase-2,padroes,,Padrões de metadados (DCAT-BR e DQV),
+US-100,Story,Mapear o modelo curado para DCAT-BR,Tabela de correspondência campo a campo e lacunas.,Medium,fase-2,padroes,,,EP-11
+US-101,Story,Exportar catálogo em DCAT (JSON-LD) e qualidade em DQV,Exportação padronizada para consumo por outros sistemas.,Medium,fase-2,padroes,,,EP-11
+EP-12,Epic,Evolução automática de taxonomias,"Descobrir temas emergentes com embeddings, clustering e LLM. Plano de trabalho: A9.",Low,futuro,taxonomia,,Evolução automática de taxonomias,
+US-110,Story,Clusterizar conjuntos e sugerir novos temas,Depende da busca semântica (US-080). Humano valida cada sugestão.,Low,futuro,taxonomia,,,EP-12
+EP-13,Epic,Reusos e solicitações de dados,Usar reusos e pedidos de abertura para priorizar a curadoria e achar lacunas.,Low,futuro,reusos,,Reusos e solicitações de dados,
+US-120,Story,Coletar reusos e solicitações,Coleta e vínculo com os conjuntos.,Low,futuro,reusos,,,EP-13
+EP-14,Epic,Devolução de propostas ao portal,Propor alterações ao dados.gov.br a partir da curadoria. Exige perfil de administrador de organização; não está no curto nem no médio prazo.,Low,futuro,portal,,Devolução de propostas ao portal,
+US-130,Story,Gerar pacote de propostas por organização,"Diferenças entre espelho e curado, prontas para os órgãos aplicarem.",Low,futuro,portal,,,EP-14
+EP-15,Epic,"Multiusuário, acesso e escala","Login, papéis (curador, coordenação, explorador), publicação em nuvem.",Low,futuro,acesso,,"Multiusuário, acesso e escala",
+US-140,Story,Autenticação e papéis,Login e permissões por papel. A API do MVP já não pressupõe usuário único.,Low,futuro,acesso,,,EP-15
+US-141,Story,Implantação em nuvem,"Parte do ambiente fornecido pelo CPQD, conforme o plano de trabalho.",Low,futuro,acesso,tecnico,,EP-15

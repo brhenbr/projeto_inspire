@@ -21,3 +21,6 @@ Thumbs.db
 .idea/
 .vscode/
 *.log
+
+# Documentos institucionais/contratuais (nao versionar)
+docs/00-descoberta/restrito/
