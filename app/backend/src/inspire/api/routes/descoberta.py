@@ -97,6 +97,12 @@ def detalhar_organizacao(slug: str, db: Db) -> dict[str, Any]:
     return found
 
 
+@router.get("/temas")
+def listar_temas(db: Db) -> list[dict[str, Any]]:
+    """Temas oficiais do catálogo, com a quantidade de conjuntos (considera a curadoria)."""
+    return catalog.list_themes(db)
+
+
 @router.get("/painel")
 def painel(db: Db) -> dict[str, Any]:
     """Indicadores gerais do catálogo e da última extração."""

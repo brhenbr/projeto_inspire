@@ -259,6 +259,18 @@ def get_organization(engine: Engine, slug: str) -> dict[str, Any] | None:
     }
 
 
+def list_themes(engine: Engine) -> list[dict[str, Any]]:
+    with engine.connect() as conn:
+        rows = conn.execute(
+            text(
+                "SELECT t.slug, t.titulo, count(b.id) AS conjuntos FROM catalogo.tema t "
+                "LEFT JOIN analitico.conjunto_busca b ON t.slug = ANY(b.temas) AND NOT b.removido "
+                "GROUP BY t.slug, t.titulo ORDER BY t.titulo"
+            )
+        ).all()
+    return [dict(r._mapping) for r in rows]
+
+
 def dashboard(engine: Engine) -> dict[str, Any]:
     with engine.connect() as conn:
         totals = conn.execute(

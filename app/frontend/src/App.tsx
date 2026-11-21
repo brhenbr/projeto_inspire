@@ -1,42 +1,74 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { Link, NavLink, Route, Routes } from "react-router-dom";
 
-import { fetchSaude, type Saude } from "./api";
+import { api, getCurator, setCurator, type LlmEstado } from "./api";
+import { useApi } from "./hooks";
+import BuscaPage from "./pages/Busca";
+import { ColecaoPage, ColecoesPage } from "./pages/Colecoes";
+import ConfiguracoesPage from "./pages/Configuracoes";
+import ConjuntoPage from "./pages/Conjunto";
+import ExtracaoPage from "./pages/Extracao";
+import FilaPage from "./pages/Fila";
+import LlmPage from "./pages/Llm";
+import { OrganizacaoPage, OrganizacoesPage } from "./pages/Organizacoes";
+import PainelPage from "./pages/Painel";
 
-type Estado =
-  | { tipo: "carregando" }
-  | { tipo: "pronto"; saude: Saude }
-  | { tipo: "erro"; mensagem: string };
+const MENU: [string, string][] = [
+  ["/", "Painel"],
+  ["/conjuntos", "Buscar"],
+  ["/curadoria", "Fila de curadoria"],
+  ["/colecoes", "Coleções"],
+  ["/organizacoes", "Organizações"],
+  ["/llm", "Sugestões de LLM"],
+  ["/extracao", "Extração"],
+  ["/configuracoes", "Configurações"],
+];
 
 export default function App() {
-  const [estado, setEstado] = useState<Estado>({ tipo: "carregando" });
-
-  useEffect(() => {
-    const controller = new AbortController();
-    fetchSaude(controller.signal)
-      .then((saude) => setEstado({ tipo: "pronto", saude }))
-      .catch((erro: unknown) => {
-        if (controller.signal.aborted) return;
-        setEstado({ tipo: "erro", mensagem: erro instanceof Error ? erro.message : "Erro desconhecido" });
-      });
-    return () => controller.abort();
-  }, []);
+  const llm = useApi(() => api.get<LlmEstado>("/llm/estado"), []);
+  const [curador, setNome] = useState(getCurator());
+  const e = llm.data;
 
   return (
-    <main className="pagina">
-      <h1>Inspire Catálogo</h1>
-      <p className="subtitulo">Extração, discovery e curadoria do catálogo do dados.gov.br</p>
-      <section aria-label="Estado do sistema" className="cartao">
-        <h2>Estado do sistema</h2>
-        {estado.tipo === "carregando" && <p>Verificando…</p>}
-        {estado.tipo === "erro" && <p role="alert">Não foi possível falar com a API. {estado.mensagem}</p>}
-        {estado.tipo === "pronto" && (
-          <ul>
-            <li>API: {estado.saude.status === "ok" ? "funcionando" : "com problemas"}</li>
-            <li>Banco de dados: {estado.saude.banco === "ok" ? "funcionando" : "indisponível"}</li>
-            <li>Versão: {estado.saude.versao}</li>
-          </ul>
-        )}
-      </section>
-    </main>
+    <>
+      <header className="topo">
+        <div className="topo-interno">
+          <Link className="marca" to="/">Inspire Catálogo</Link>
+          <nav className="menu" aria-label="Principal">
+            {MENU.map(([to, rotulo]) => (
+              <NavLink key={to} to={to} end={to === "/"} className={({ isActive }) => (isActive ? "ativo" : "")}>{rotulo}</NavLink>
+            ))}
+          </nav>
+          <label className="curador">
+            Curador(a)
+            <input type="text" value={curador} placeholder="seu nome" aria-label="Seu nome (registrado nas alterações)" onChange={(ev) => { setNome(ev.target.value); setCurator(ev.target.value); }} />
+          </label>
+        </div>
+      </header>
+      {e?.habilitado && e.externo && (
+        <div className="aviso aviso-externo" role="alert">
+          <div className="aviso-interno"><strong>Provedor de LLM externo ativo</strong> ({e.host}): campos públicos dos conjuntos são enviados a ele ao pedir sugestões.</div>
+        </div>
+      )}
+      {e?.habilitado && e.simulado && (
+        <div className="aviso aviso-simulado" role="note">
+          <div className="aviso-interno"><strong>Modo simulado:</strong> as sugestões de LLM são geradas por regras simples, sem IA e sem enviar dados a ninguém.</div>
+        </div>
+      )}
+      <Routes>
+        <Route path="/" element={<PainelPage />} />
+        <Route path="/conjuntos" element={<BuscaPage />} />
+        <Route path="/conjuntos/:id" element={<ConjuntoPage />} />
+        <Route path="/curadoria" element={<FilaPage />} />
+        <Route path="/colecoes" element={<ColecoesPage />} />
+        <Route path="/colecoes/:id" element={<ColecaoPage />} />
+        <Route path="/organizacoes" element={<OrganizacoesPage />} />
+        <Route path="/organizacoes/:slug" element={<OrganizacaoPage />} />
+        <Route path="/llm" element={<LlmPage />} />
+        <Route path="/extracao" element={<ExtracaoPage />} />
+        <Route path="/configuracoes" element={<ConfiguracoesPage />} />
+        <Route path="*" element={<main className="pagina"><h1>Página não encontrada</h1><Link to="/">Ir para o painel</Link></main>} />
+      </Routes>
+    </>
   );
 }

@@ -235,3 +235,10 @@ def test_recalculo_guarda_historico_so_quando_a_nota_muda(populated: Engine) -> 
     antes = scalar(populated, "SELECT count(*) FROM analitico.qualidade_historico")
     quality.recompute(populated)  # nada mudou
     assert scalar(populated, "SELECT count(*) FROM analitico.qualidade_historico") == antes
+
+
+def test_api_temas(api: TestClient) -> None:
+    temas = api.get("/v1/temas").json()
+
+    assert {t["slug"] for t in temas} == {"saude", "educacao", "trabalho"}
+    assert sum(t["conjuntos"] for t in temas) == 61
