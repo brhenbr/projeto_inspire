@@ -78,6 +78,12 @@ Protótipo web, monousuário porém com arquitetura desacoplada, para **extraç�
 - Tamanho medido: ~20.700 conjuntos em 311 organizações (soma de `qtdConjuntoDeDados`).
 - A chave do cliente está em `.env` e foi validada (200). Nunca imprimir seu valor.
 
+## Comandos
+- Subir: `docker compose up --build` (web em http://127.0.0.1:8080, API em `/api/docs`).
+- Portão de qualidade: `bash scripts/qualidade.sh` (ruff, mypy, pytest com PostgreSQL real e cobertura >= 80%, eslint, tsc, vitest). Rodar antes de cada commit de código.
+- Dependências: alterar `pyproject.toml`/`package.json` e regerar `uv.lock`/`package-lock.json` em contêiner; nunca instalar no host.
+- Código em inglês; schemas/tabelas do banco em português (vocabulário do portal).
+
 ## Estrutura do repositório
 - `app/` — código do produto.
 - `docs/` — documentação do projeto (00-descoberta … 06-deploy, diario).

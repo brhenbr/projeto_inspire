@@ -49,8 +49,9 @@ def main(origem: str, destino: str) -> None:
         linhas += [f"## {ep['id']} — {ep['titulo']}", "",
                    f"*{ep['prioridade']} · {', '.join(ep.get('labels', []))}*", "", ep.get("descricao", ""), ""]
         for it in (i for i in itens if i.get("pai") == ep["id"]):
+            marca = f" ✔ {it['status']}" if it.get("status") else ""
             linhas.append(f"- **{it['id']}** ({it['tipo']}, {it['prioridade']}, "
-                          f"{', '.join(it.get('labels', []))}) — {it['titulo']}")
+                          f"{', '.join(it.get('labels', []))}) — {it['titulo']}{marca}")
         linhas.append("")
     (out / "backlog.md").write_text("\n".join(linhas), encoding="utf-8")
     print(f"{len(itens)} itens ({sum(i['tipo']=='Epic' for i in itens)} épicos) -> {out}")

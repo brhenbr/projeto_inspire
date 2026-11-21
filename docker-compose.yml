@@ -1,0 +1,79 @@
+# Inspire Catálogo — execução local. Suba tudo com:  docker compose up --build
+# Só o contêiner "web" é publicado, e apenas em localhost (ADR-0002).
+
+x-hardening: &hardening
+  security_opt: ["no-new-privileges:true"]
+  cap_drop: ["ALL"]
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: inspire
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-inspire_dev}
+      POSTGRES_DB: inspire
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U inspire -d inspire"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  migrate:
+    build: ./app/backend
+    <<: *hardening
+    command: ["alembic", "upgrade", "head"]
+    environment: &db-env
+      DATABASE_URL: postgresql+psycopg://inspire:${POSTGRES_PASSWORD:-inspire_dev}@db:5432/inspire
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  api:
+    build: ./app/backend
+    <<: *hardening
+    environment: *db-env
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request as u; u.urlopen('http://localhost:8000/v1/saude', timeout=3)"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  worker:
+    build: ./app/backend
+    <<: *hardening
+    command: ["python", "-m", "inspire.worker"]
+    environment:
+      <<: *db-env
+      # A chave do portal só existe no worker (menor privilégio).
+      DADOS_GOV_API_KEY: ${DADOS_GOV_API_KEY:-}
+      DADOS_GOV_BASE_URL: ${DADOS_GOV_BASE_URL:-https://dados.gov.br}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  web:
+    build: ./app/frontend
+    <<: *hardening
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pgdata:
