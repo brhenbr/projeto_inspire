@@ -50,7 +50,7 @@ Entender o pedido, fechar as primeiras premissas com o cliente e validar a API r
 - Medido o ambiente de desenvolvimento: sem GPU útil, 16 GB de RAM, Docker Desktop fechado. Isso limita
   o LLM local e foi incorporado à proposta.
 - Criados o C1 (`docs/02-arquitetura/c1-contexto.md`) e a proposta de tecnologias com rascunho de C2.
-  Os diagramas Mermaid não foram renderizados nesta sessão; conferir a exibição no GitHub ou no VS Code.
+  (Renderização conferida mais adiante nesta sessão.)
 
 ## Continuação: padrões, armazenamento e diagramas
 - Cliente: padrões DCAT-BR, DQV e FAIR (apoio: DMBOK); sem GPU, LLM por API com extensão para GPU local; CI adiado; Docker ligado (verificado).
@@ -63,6 +63,7 @@ Entender o pedido, fechar as primeiras premissas com o cliente e validar a API r
 - Pesquisa: o DCAT-BR v1.0 é publicado pelo Catálogo Nacional de Dados (gov.br); a especificação precisa ser obtida e lida (US-023).
 
 ## Pendências / próximos passos
-- Cliente cria a chave de API e a coloca no `.env` local.
-- Redigir visão e escopo do MVP (`docs/01-produto/`) para aprovação.
-- Rodada de arquitetura com C4 e tarefa de conversa sobre tecnologias.
+- Cliente confirma o ADR-0005 (armazenamento em camadas em um único PostgreSQL).
+- C3 (componentes), fluxos (extração e curadoria com LLM) e modelo de dados.
+- Esqueleto do projeto em Docker, depois extração, discovery e qualidade.
+- Spike de provedores gratuitos de LLM (US-067) e matriz de qualidade DQV/FAIR/DMBOK (US-023).
