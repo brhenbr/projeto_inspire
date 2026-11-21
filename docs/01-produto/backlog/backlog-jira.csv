@@ -26,6 +26,12 @@ Critérios de aceite:
 - Reexecução classifica cada conjunto como novo, alterado, inalterado ou removido do catálogo (remoção lógica).",High,mvp,extracao,,,,EP-01
 US-006,Story,Disparar e acompanhar extração pela interface web,"Botão para iniciar extração completa ou incremental, com progresso, cancelamento e histórico de execuções com resumo (novos, alterados, removidos, erros).",High,mvp,extracao,web,,,EP-01
 US-007,Story,Disparar extração por linha de comando,"Mesmo fluxo da interface, executável em container, para uso por processo agendado no futuro.",Medium,mvp,extracao,tecnico,,,EP-01
+US-008,Story,"Normalizador raw para catálogo, reexecutável","Transforma os documentos JSON da camada raw em tabelas do schema catalogo, de forma idempotente (ADR-0005).
+
+Critérios de aceite:
+- Reprocessar o mesmo raw produz o mesmo catálogo.
+- Mudança na regra de normalização é aplicada sem nova extração.
+- Modelo alinhado ao DCAT-BR.",Highest,mvp,extracao,tecnico,,,EP-01
 EP-02,Epic,Discovery do catálogo,Explorar o catálogo espelhado com busca e filtros.,Highest,mvp,discovery,,,Discovery do catálogo,
 US-010,Story,Busca textual nos conjuntos,"Busca por título, descrição, tags e organização, com tolerância a acentos e relevância razoável.
 
@@ -36,10 +42,11 @@ US-012,Story,Página de detalhe do conjunto,"Mostrar metadados originais, versã
 US-013,Story,Visão por organização,"Lista e painel por organização com quantidade de conjuntos, qualidade média e atualidade.",Medium,mvp,discovery,,,,EP-02
 US-014,Story,Painel geral do catálogo,"Indicadores: total de conjuntos, por esfera/tema/formato, distribuição de qualidade e data da última extração.",Medium,mvp,discovery,,,,EP-02
 EP-03,Epic,Qualidade dos metadados,Avaliar metadados por regras explicáveis. Pesos e critérios definidos com o time; alinhar com DCAT-BR/DQV quando o padrão for definido.,Highest,mvp,qualidade,,,Qualidade dos metadados,
-US-020,Story,Motor de regras de qualidade configurável,"Regras determinísticas com pesos em configuração: completude (descrição, licença, periodicidade, tags, cobertura), formato aberto (escala de 5 estrelas), atualidade x periodicidade declarada.
+US-020,Story,Motor de regras de qualidade configurável,"Regras determinísticas com pesos em configuração, organizadas pelas dimensões de qualidade do DQV e pelos princípios FAIR (ex.: completude, atualidade, disponibilidade, conformidade, localizável, acessível, interoperável, reutilizável). Onde houver dúvida, usar as dimensões de qualidade do DMBOK. Inclui formato aberto (escala de 5 estrelas) e atualidade x periodicidade declarada.
 
 Critérios de aceite:
-- Cada pontuação mostra quais regras passaram e falharam.",Highest,mvp,qualidade,,,,EP-03
+- Cada pontuação mostra quais regras passaram e falharam e a qual dimensão pertencem.",Highest,mvp,qualidade,,,,EP-03
+US-023,Task,Matriz de qualidade: DQV x FAIR x DMBOK,"Levantar as dimensões e métricas do DQV, os princípios FAIR e as dimensões de qualidade do DMBOK, e mapear cada regra do motor a elas, com fonte. Obter a especificação do DCAT-BR v1.0 do Catálogo Nacional de Dados. Entrega: documento revisado pelo cliente antes de implementar as regras.",Highest,mvp,qualidade,padroes,,,EP-03
 US-021,Story,Pontuação por conjunto e agregada por organização/tema,Recalcular após cada extração e guardar histórico para ver evolução.,High,mvp,qualidade,,,,EP-03
 US-022,Story,Lista priorizada de conjuntos a curar,"Ordenar por pior qualidade, relevância (downloads, reusos) e tamanho do órgão.",High,mvp,qualidade,curadoria,,,EP-03
 EP-04,Epic,Curadoria humana,"Camada curada separada do espelho do portal, com histórico. Plano de trabalho: A6.",Highest,mvp,curadoria,,,Curadoria humana,
@@ -77,6 +84,7 @@ US-064,Task,Definir licença e preparar repositório para publicação,O plano p
 US-066,Task,Checklist de segurança e soberania (ADR-0002),"Aplicar e verificar os requisitos do ADR-0002: nenhum dado ou prompt sai para serviço externo sem decisão explícita, imagens e dependências de origem conhecida, varredura de dependências e de segredos no CI, container sem privilégios e sem credenciais embutidas.",High,mvp,tecnico,seguranca,,,EP-07
 US-067,Task,Selecionar provedores gratuitos de LLM e validar condições de uso,"Pesquisar provedores com API gratuita e contrato compatível com a OpenAI. Critérios do ADR-0004: cota utilizável, termos sobre retenção e uso dos dados aceitáveis para dados públicos, disponibilidade a partir do Brasil, qualidade em português. Entregar lista aprovada (2 ou 3 provedores) para o cliente validar. Em paralelo, perguntar ao CPQD/UFSCar sobre um servidor soberano.",High,mvp,llm,seguranca,spike,,EP-05
 US-068,Task,Salvaguardas do LLM externo (ADR-0004),"Desligado por padrão; lista de hosts aprovados; montador de prompt que só aceita campos públicos, com teste automatizado provando que nome e e-mail de responsáveis nunca saem; aviso visível na interface; marca ""externo"" no registro de proveniência.",High,mvp,llm,seguranca,,,EP-05
+US-069,Task,"Perfil Docker 'llm-local' para rodar LLM em GPU (preparado, desativado)","Perfil opcional do Compose com Ollama ou vLLM e a configuração de GPU documentada, para uso se o projeto obtiver uma. Sem GPU hoje, não é ativado nem testado em hardware real; validar apenas que a configuração aponta para ele sem mudar código.",Low,futuro,llm,tecnico,,,EP-05
 US-065,Task,"Documentação de implementação, testes e deploy","Manter docs/04, 05 e 06 e o diário atualizados, com diagramas C4.",Medium,mvp,tecnico,doc,,,EP-07
 EP-08,Epic,Verificação de links dos recursos (link rot),Worker separado que verifica disponibilidade dos recursos sem baixar dados.,Medium,fase-2,links,,,Verificação de links dos recursos (link rot),
 US-070,Story,Worker de verificação HEAD/GET parcial,"Registra status HTTP, tempo de resposta, content-type real versus declarado e validade do certificado TLS, com limite de taxa por domínio.",Medium,fase-2,links,,,,EP-08
@@ -87,7 +95,7 @@ US-081,Story,Chat sobre o catálogo,"O LLM chama a API de busca e responde citan
 EP-10,Epic,Governança de IA e conformidade,Requisitos do GuIA/MGI que podem ser exigidos quando o produto for para órgãos públicos.,Medium,backlog,governanca,,,Governança de IA e conformidade,
 US-090,Story,Autoavaliação de Impacto Ético (AIE),Preparar a AIE do uso de LLM na curadoria e classificar o risco. A exigência ainda precisa ser confirmada.,Medium,backlog,governanca,,,,EP-10
 US-091,Story,Relatório de transparência do uso de IA,Exportar relatório de quais propostas vieram de LLM e quais foram aprovadas por humanos.,Low,backlog,governanca,,,,EP-10
-EP-11,Epic,Padrões de metadados (DCAT-BR e DQV),Alinhar o modelo curado e a qualidade aos padrões a definir com o CPQD (A5). Hipótese de trabalho: DCAT-BR e DQV.,Medium,fase-2,padroes,,,Padrões de metadados (DCAT-BR e DQV),
+EP-11,Epic,Padrões de metadados (DCAT-BR e DQV),Exportar e mapear o catálogo conforme DCAT-BR v1.0 e a qualidade conforme DQV (padrões já definidos pelo projeto). O modelo de dados já nasce alinhado; esta fase entrega a exportação e a validação.,Medium,fase-2,padroes,,,Padrões de metadados (DCAT-BR e DQV),
 US-100,Story,Mapear o modelo curado para DCAT-BR,Tabela de correspondência campo a campo e lacunas.,Medium,fase-2,padroes,,,,EP-11
 US-101,Story,Exportar catálogo em DCAT (JSON-LD) e qualidade em DQV,Exportação padronizada para consumo por outros sistemas.,Medium,fase-2,padroes,,,,EP-11
 EP-12,Epic,Evolução automática de taxonomias,"Descobrir temas emergentes com embeddings, clustering e LLM. Plano de trabalho: A9.",Low,futuro,taxonomia,,,Evolução automática de taxonomias,

@@ -52,6 +52,16 @@ Entender o pedido, fechar as primeiras premissas com o cliente e validar a API r
 - Criados o C1 (`docs/02-arquitetura/c1-contexto.md`) e a proposta de tecnologias com rascunho de C2.
   Os diagramas Mermaid não foram renderizados nesta sessão; conferir a exibição no GitHub ou no VS Code.
 
+## Continuação: padrões, armazenamento e diagramas
+- Cliente: padrões DCAT-BR, DQV e FAIR (apoio: DMBOK); sem GPU, LLM por API com extensão para GPU local; CI adiado; Docker ligado (verificado).
+- Cliente propôs armazenamento em duas frentes (documento e tabular). Concluí que o desenho em camadas
+  faz sentido, mas em um único PostgreSQL (`jsonb` + tabelas), pelos motivos do
+  [ADR-0005](../03-decisoes/0005-armazenamento-em-camadas.md). Fica em proposta até o cliente confirmar.
+- C2 movido para arquivo próprio e atualizado. Criado o visualizador offline `docs/diagramas.html`.
+  **Os diagramas C1 e C2 foram renderizados em navegador headless e conferidos**, o que não havia sido feito antes.
+- Backlog: matriz de qualidade (US-023), normalizador raw→catálogo (US-008), perfil `llm-local` (US-069). Agora 70 itens.
+- Pesquisa: o DCAT-BR v1.0 é publicado pelo Catálogo Nacional de Dados (gov.br); a especificação precisa ser obtida e lida (US-023).
+
 ## Pendências / próximos passos
 - Cliente cria a chave de API e a coloca no `.env` local.
 - Redigir visão e escopo do MVP (`docs/01-produto/`) para aprovação.

@@ -15,6 +15,7 @@ Espelhar os metadados do catálogo do dados.gov.br (só públicos; recursos apen
 - **US-005** (Story, High, mvp, extracao) — Guardar snapshot bruto e hash por conjunto
 - **US-006** (Story, High, mvp, extracao, web) — Disparar e acompanhar extração pela interface web
 - **US-007** (Story, Medium, mvp, extracao, tecnico) — Disparar extração por linha de comando
+- **US-008** (Story, Highest, mvp, extracao, tecnico) — Normalizador raw para catálogo, reexecutável
 
 ## EP-02 — Discovery do catálogo
 
@@ -35,6 +36,7 @@ Explorar o catálogo espelhado com busca e filtros.
 Avaliar metadados por regras explicáveis. Pesos e critérios definidos com o time; alinhar com DCAT-BR/DQV quando o padrão for definido.
 
 - **US-020** (Story, Highest, mvp, qualidade) — Motor de regras de qualidade configurável
+- **US-023** (Task, Highest, mvp, qualidade, padroes) — Matriz de qualidade: DQV x FAIR x DMBOK
 - **US-021** (Story, High, mvp, qualidade) — Pontuação por conjunto e agregada por organização/tema
 - **US-022** (Story, High, mvp, qualidade, curadoria) — Lista priorizada de conjuntos a curar
 
@@ -66,6 +68,7 @@ Humano parametriza, LLM executa, humano aprova. Provedor gratuito/local por trá
 - **US-044** (Spike, High, mvp, llm, spike) — Avaliar modelos gratuitos/locais para português
 - **US-067** (Spike, High, mvp, llm, seguranca, spike) — Selecionar provedores gratuitos de LLM e validar condições de uso
 - **US-068** (Task, High, mvp, llm, seguranca) — Salvaguardas do LLM externo (ADR-0004)
+- **US-069** (Task, Low, futuro, llm, tecnico) — Perfil Docker 'llm-local' para rodar LLM em GPU (preparado, desativado)
 
 ## EP-06 — API própria e exportação
 
@@ -121,7 +124,7 @@ Requisitos do GuIA/MGI que podem ser exigidos quando o produto for para órgãos
 
 *Medium · fase-2, padroes*
 
-Alinhar o modelo curado e a qualidade aos padrões a definir com o CPQD (A5). Hipótese de trabalho: DCAT-BR e DQV.
+Exportar e mapear o catálogo conforme DCAT-BR v1.0 e a qualidade conforme DQV (padrões já definidos pelo projeto). O modelo de dados já nasce alinhado; esta fase entrega a exportação e a validação.
 
 - **US-100** (Story, Medium, fase-2, padroes) — Mapear o modelo curado para DCAT-BR
 - **US-101** (Story, Medium, fase-2, padroes) — Exportar catálogo em DCAT (JSON-LD) e qualidade em DQV

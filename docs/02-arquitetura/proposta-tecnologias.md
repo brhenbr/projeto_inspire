@@ -31,7 +31,7 @@ segurança e soberania · um time pequeno e acadêmico precisa conseguir manter 
 | Camada | Recomendação | Alternativas consideradas | Por que |
 |---|---|---|---|
 | Backend / API | **Python 3.12 + FastAPI** | TypeScript (NestJS), Java/Spring, .NET | OpenAPI nativo (exigência do plano), melhor ecossistema de IA, e é a linguagem que pesquisadores da área costumam dominar. |
-| Banco de dados | **PostgreSQL 16** | MongoDB, SQLite, DuckDB | Relacional, maduro, livre. Já cobre **busca textual em português** (full-text com `unaccent` e `pg_trgm`) e, com `pgvector`, **busca semântica** depois. Um só banco. |
+| Banco de dados | **PostgreSQL 16**, em camadas (ver [ADR-0005](../03-decisoes/0005-armazenamento-em-camadas.md)) | MongoDB, SQLite, DuckDB | Relacional, maduro, livre. Já cobre **busca textual em português** (full-text com `unaccent` e `pg_trgm`) e, com `pgvector`, **busca semântica** depois. Um só banco. |
 | Busca | **Dentro do PostgreSQL** | OpenSearch/Elasticsearch, Meilisearch | 20 mil documentos não justificam outro serviço. Reavaliamos se a busca ficar lenta. |
 | Fila/jobs | **Fila em PostgreSQL** (ex.: Procrastinate) com processo worker | Celery + Redis, RQ | Sem Redis nem broker extra. Extração e LLM rodam em worker separado da API, com retomada. |
 | Migrações/ORM | SQLAlchemy 2 + Alembic | Django ORM | Padrão do ecossistema FastAPI. |
@@ -51,36 +51,8 @@ pode migrar para GitLab ou Gitea sob controle deles.
 **Licenças:** todas as peças recomendadas são livres (PostgreSQL, FastAPI, React, Ollama, pgvector).
 Ainda vou confirmar a licença de cada modelo de LLM e de embeddings no spike antes de adotar.
 
-## 5. C2 (contêineres), conforme ADR-0003 e ADR-0004
-
-```mermaid
-flowchart TB
-    user["👤 Curador / Coordenação / Explorador"]
-
-    subgraph sistema["Inspire Catálogo"]
-        web["<b>Web</b><br/>[React + TypeScript]<br/>Interface do usuário"]
-        api["<b>API</b><br/>[Python, FastAPI]<br/>REST /v1 em OpenAPI;<br/>regras de negócio e orquestração"]
-        worker["<b>Worker</b><br/>[Python]<br/>Extração, recálculo de qualidade,<br/>execução de lotes de LLM"]
-        db[("<b>PostgreSQL</b><br/>[+ busca textual, + pgvector depois]<br/>Espelho, snapshots, curadoria,<br/>qualidade, fila de jobs")]
-    end
-
-    portal["Portal dados.gov.br"]
-    llmrt["<b>Provedor de LLM (opcional)</b><br/>[Externo gratuito, ADR-0004,<br/>ou servidor soberano no futuro]<br/>API compatível com OpenAI"]
-
-    user -->|HTTPS| web
-    web -->|"JSON/HTTPS"| api
-    api -->|SQL| db
-    api -->|"enfileira jobs"| db
-    worker -->|"consome jobs, grava resultados"| db
-    worker -->|"HTTPS + chave"| portal
-    worker -->|"só campos públicos, um conjunto por vez"| llmrt
-    api -.->|"futuro: chat NL"| llmrt
-
-    classDef nosso fill:#1168bd,stroke:#0b4884,color:#fff
-    classDef ext fill:#999,stroke:#6b6b6b,color:#fff
-    class web,api,worker,db nosso
-    class portal,llmrt ext
-```
+## 5. C2 (contêineres)
+Ver [c2-conteineres.md](c2-conteineres.md), que reflete as decisões aceitas.
 
 Pontos de desenho que valem destacar:
 - **Snapshot só quando muda:** o JSON bruto de um conjunto é guardado apenas se o hash mudou. Mantém o

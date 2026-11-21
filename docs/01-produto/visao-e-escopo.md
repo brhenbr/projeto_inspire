@@ -68,7 +68,7 @@ documentação precisa se sustentar sozinha, sem depender de explicação oral.
 
 ## 5. Escopo
 
-Detalhamento em [backlog/backlog.md](backlog/backlog.md) (66 itens, 15 épicos), com versão para importar no Jira.
+Detalhamento em [backlog/backlog.md](backlog/backlog.md) (70 itens, 15 épicos), com versão para importar no Jira.
 
 ### MVP — Deve ter
 | Épico | Entrega |
@@ -143,10 +143,12 @@ Multiusuário e nuvem.
 - Documentos restritos ficam fora do git. Segurança e soberania são requisitos de projeto
   ([ADR-0002](../03-decisoes/0002-seguranca-e-soberania.md)).
 
+**Resolvidas depois:**
+- Padrões de metadados: DCAT-BR, DQV e FAIR, com o DMBOK como apoio. A matriz que liga cada regra de qualidade a eles é a US-023.
+- Sem GPU: o produto usa API de LLM ([ADR-0004](../03-decisoes/0004-provedor-de-llm-externo-controlado.md)) e fica preparado para rodar LLM local se houver GPU (US-069).
+
 **Ainda abertas:**
-1. **Padrões de metadados:** o cliente informou que já estão definidos. Quais são? Preciso do nome dos
-   padrões e, se existir, do documento, para configurar as regras de qualidade.
-2. **Tecnologias:** ver [proposta de tecnologias](../02-arquitetura/proposta-tecnologias.md), seção 8.
+1. **Armazenamento em camadas** em um único PostgreSQL: confirmar o [ADR-0005](../03-decisoes/0005-armazenamento-em-camadas.md).
 
 ## 10. Próximos passos
 

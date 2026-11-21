@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Diagramas do projeto</title>
+<style>
+body{font-family:system-ui,Segoe UI,sans-serif;margin:0;background:#f5f6f8;color:#1c2330}
+header{background:#08427b;color:#fff;padding:16px 32px} header h1{margin:0;font-size:20px}
+main{max-width:1300px;margin:0 auto;padding:24px 32px}
+nav ul{columns:2} section{margin:32px 0} .fonte{color:#667;font-size:13px}
+.diagrama{background:#fff;border:1px solid #d9dde3;border-radius:8px;padding:16px;margin:16px 0;overflow:auto}
+</style></head><body>
+<header><h1>Diagramas do projeto (2)</h1></header>
+<main><nav><ul><li><a href="#s0">C4 — Nível 1: Contexto do sistema</a> (1)</li><li><a href="#s1">C4 — Nível 2: Contêineres</a> (1)</li></ul></nav><section id="s0"><h2>C4 — Nível 1: Contexto do sistema</h2><p class="fonte">Fonte: <a href="02-arquitetura/c1-contexto.md">02-arquitetura/c1-contexto.md</a></p><div class="diagrama"><pre class="mermaid">flowchart TB
+    curador[&quot;👤 &lt;b&gt;Curador(a)&lt;/b&gt;&lt;br/&gt;Revisa e melhora metadados&quot;]
+    coord[&quot;👤 &lt;b&gt;Coordenação do projeto&lt;/b&gt;&lt;br/&gt;Acompanha a qualidade e a evolução&quot;]
+    explorador[&quot;👤 &lt;b&gt;Explorador(a) de dados&lt;/b&gt;&lt;br/&gt;Busca dados para análise&quot;]
+
+    sistema[&quot;&lt;b&gt;Inspire Catálogo&lt;/b&gt;&lt;br/&gt;[Sistema de software]&lt;br/&gt;Espelha o catálogo do dados.gov.br, permite explorá-lo,&lt;br/&gt;mede a qualidade dos metadados e organiza a curadoria&lt;br/&gt;com apoio de LLM&quot;]
+
+    portal[&quot;&lt;b&gt;Portal dados.gov.br&lt;/b&gt;&lt;br/&gt;[Sistema externo]&lt;br/&gt;API REST com chave; fonte dos metadados&lt;br/&gt;(~20,7 mil conjuntos)&quot;]
+    llm[&quot;&lt;b&gt;Provedor de LLM&lt;/b&gt;&lt;br/&gt;[Sistema externo opcional]&lt;br/&gt;API gratuita (ADR-0004) ou servidor soberano;&lt;br/&gt;troca por configuração&quot;]
+    orgaos[&quot;&lt;b&gt;Servidores dos órgãos&lt;/b&gt;&lt;br/&gt;[Sistema externo]&lt;br/&gt;Hospedam os recursos (arquivos e APIs)&quot;]
+    jira[&quot;&lt;b&gt;Jira&lt;/b&gt;&lt;br/&gt;[Ferramenta de gestão]&lt;br/&gt;Backlog do projeto&quot;]
+
+    curador --&gt;|&quot;Cura metadados e aprova&lt;br/&gt;propostas do LLM [web]&quot;| sistema
+    coord --&gt;|&quot;Consulta indicadores [web]&quot;| sistema
+    explorador --&gt;|&quot;Busca e explora [web]&quot;| sistema
+    sistema --&gt;|&quot;Extrai metadados&lt;br/&gt;[HTTPS, chave de API]&quot;| portal
+    sistema --&gt;|&quot;Pede propostas de curadoria&lt;br/&gt;[API compatível com OpenAI]&quot;| llm
+    sistema -.-&gt;|&quot;Fase 2: verifica links&lt;br/&gt;(sem baixar dados)&quot;| orgaos
+    sistema -.-&gt;|&quot;Futuro: propõe alterações&quot;| portal
+    jira -.-&gt;|&quot;Backlog importado por CSV&lt;br/&gt;(manual, fora do sistema)&quot;| sistema
+
+    classDef pessoa fill:#08427b,stroke:#052e56,color:#fff
+    classDef nosso fill:#1168bd,stroke:#0b4884,color:#fff
+    classDef externo fill:#999,stroke:#6b6b6b,color:#fff
+    class curador,coord,explorador pessoa
+    class sistema nosso
+    class portal,llm,orgaos,jira externo</pre></div></section><section id="s1"><h2>C4 — Nível 2: Contêineres</h2><p class="fonte">Fonte: <a href="02-arquitetura/c2-conteineres.md">02-arquitetura/c2-conteineres.md</a></p><div class="diagrama"><pre class="mermaid">flowchart TB
+    user[&quot;👤 Curador / Coordenação / Explorador&quot;]
+
+    subgraph sistema[&quot;Inspire Catálogo (Docker Compose)&quot;]
+        web[&quot;&lt;b&gt;Web&lt;/b&gt;&lt;br/&gt;[React + TypeScript]&lt;br/&gt;Interface do usuário&quot;]
+        api[&quot;&lt;b&gt;API&lt;/b&gt;&lt;br/&gt;[Python, FastAPI]&lt;br/&gt;REST /v1 em OpenAPI;&lt;br/&gt;regras de negócio e orquestração&quot;]
+        worker[&quot;&lt;b&gt;Worker&lt;/b&gt;&lt;br/&gt;[Python]&lt;br/&gt;Extração, normalização,&lt;br/&gt;qualidade e lotes de LLM&quot;]
+        db[(&quot;&lt;b&gt;PostgreSQL&lt;/b&gt;&lt;br/&gt;schemas: raw · catalogo ·&lt;br/&gt;curadoria · analitico&lt;br/&gt;+ busca textual + fila de jobs&quot;)]
+        llmlocal[&quot;&lt;b&gt;LLM local&lt;/b&gt;&lt;br/&gt;[Ollama ou vLLM]&lt;br/&gt;Perfil opcional &#x27;llm-local&#x27;,&lt;br/&gt;só com GPU&quot;]
+    end
+
+    portal[&quot;&lt;b&gt;Portal dados.gov.br&lt;/b&gt;&lt;br/&gt;[externo]&quot;]
+    llmext[&quot;&lt;b&gt;API de LLM&lt;/b&gt;&lt;br/&gt;[externo opcional, gratuito]&lt;br/&gt;campos públicos apenas&quot;]
+
+    user --&gt;|HTTPS| web
+    web --&gt;|&quot;JSON/HTTPS&quot;| api
+    api --&gt;|&quot;consulta e grava;&lt;br/&gt;enfileira jobs&quot;| db
+    worker --&gt;|&quot;consome jobs;&lt;br/&gt;grava as camadas&quot;| db
+    worker --&gt;|&quot;HTTPS + chave de API&quot;| portal
+    worker --&gt;|&quot;prompts e propostas&lt;br/&gt;(API compatível com OpenAI)&quot;| llmext
+    worker -.-&gt;|&quot;mesma interface,&lt;br/&gt;rede interna&quot;| llmlocal
+
+    classDef nosso fill:#1168bd,stroke:#0b4884,color:#fff
+    classDef opc fill:#5b9bd5,stroke:#3a6fa0,color:#fff,stroke-dasharray: 5 3
+    classDef ext fill:#999,stroke:#6b6b6b,color:#fff
+    class web,api,worker,db nosso
+    class llmlocal opc
+    class portal,llmext ext</pre></div></section></main>
+<script src="assets/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true,securityLevel:"strict",theme:"default",flowchart:{useMaxWidth:false}});</script>
+</body></html>

@@ -26,6 +26,15 @@ Protótipo web, monousuário porém com arquitetura desacoplada, para **extraç�
 - `docs/00-descoberta/restrito/` guarda documentos contratuais e é ignorado pelo git. Não resumir
   valores, bolsas ou desembolsos em arquivos versionados. O repositório pode se tornar público.
 - Backlog: `docs/01-produto/backlog/backlog.json` é a fonte; `.md` e `.csv` são gerados.
+- Diagramas: Mermaid nos `.md`; `docs/diagramas.html` é gerado por `kit/scripts/gerar_visualizador.py`. Renderizar e olhar antes de entregar.
+
+## Padrões de metadados (definidos pelo projeto)
+- **DCAT-BR** (perfil brasileiro do DCAT, usado no Catálogo Nacional de Dados), **DQV** e princípios **FAIR**.
+  Em caso de dúvida, usar os princípios do **DMBOK**. O modelo `catalogo` nasce alinhado ao DCAT-BR.
+- Regras de qualidade são organizadas por dimensões DQV/FAIR/DMBOK e citam a fonte (US-023).
+
+## Armazenamento (ADR-0005, em proposta)
+- Um PostgreSQL com camadas: `raw` (JSON bruto) → `catalogo` (tabular, reconstruível) → `analitico`; `curadoria` separada.
 
 ## Segurança e soberania (ADR-0002) — vale para toda decisão
 - Nada sai da infraestrutura do projeto sem ADR. Nuvem de LLM no exterior é proibida por padrão.
@@ -39,7 +48,7 @@ Protótipo web, monousuário porém com arquitetura desacoplada, para **extraç�
   e cronograma ajustados em conjunto ao longo do caminho. Demonstração a professores da UFSCar em breve.
 
 ## Ambiente de desenvolvimento (medido em 2026-11-21)
-- Windows, i7-4500U, 16 GB, sem GPU útil: LLM local só pequeno e em CPU. Docker Desktop precisa estar aberto.
+- Windows, i7-4500U, 16 GB, sem GPU útil: LLM local só pequeno e em CPU. Docker Desktop precisa estar aberto (verificado funcionando, 8 GB para o Docker). Sem GPU: LLM via API (ADR-0004), com perfil `llm-local` preparado para GPU futura.
 
 ## Regras de trabalho
 - Documentação em **português**; código e identificadores em inglês.
