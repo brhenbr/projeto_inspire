@@ -102,3 +102,22 @@ erDiagram
 - **Conflito:** se o portal mudar um campo que a curadoria também alterou, a alteração curada permanece,
   a proposta ligada a ele fica desatualizada e o conjunto volta a "pendente" para revisão humana.
 - **Datas:** convertidas de `dd/mm/aaaa` para data; valores inválidos são registrados, não descartados.
+
+## 6. Como ficou implementado (diferenças em relação ao desenho acima)
+O desenho acima é o ponto de partida; estas são as diferenças reais, para a documentação não mentir.
+
+- **Migrações:** `0001` schemas e extensões; `0002` camada `raw`; `0003` camada `catalogo` e fila de detalhe; `0004` curadoria,
+  qualidade e modelo de leitura; `0005` cancelamento de execuções de LLM.
+- **`raw.fila_detalhe`** (nova): uma linha por conjunto listado na execução, com o resumo da listagem e o estado (`pendente`,
+  `concluido`, `sem_detalhe`, `erro`). É o que torna a extração retomável e permite o relatório de conferência.
+- **`analitico.conjunto_efetivo` (visão) virou a tabela `analitico.conjunto_busca`:** uma linha por conjunto com valores efetivos
+  (original + curadoria), arrays de temas, tags e formatos, nota, prioridade e `tsvector`. Motivo e alternativas:
+  [ADR-0008](../03-decisoes/0008-busca-e-modelo-de-leitura.md). Ela é um derivado e pode ser reconstruída.
+- **`analitico.qualidade_conjunto`** guarda a nota, as notas por dimensão e o detalhe de cada regra (para explicar a nota);
+  `qualidade_historico` só registra mudança de nota; `regra_qualidade` guarda pesos e ativação.
+- **`curadoria.alteracao`** é só inserção (valor `NULL` = reversão ao valor do portal). `colecao` ganhou `ultimos_membros` e
+  `ultimo_diff` para mostrar o que entrou e saiu a cada extração.
+- **Campos editáveis:** título, descrição, tags, temas, periodicidade e licença.
+- **Tags** não têm coleta própria (o portal só as lista por busca de nome); vêm dos conjuntos.
+- **Dados pessoais:** removidos na ingestão, conforme a seção 2; o banco recusa gravá-los (barreira testada).
+- **Tabelas de ligação com ODS e reusos** (`conjunto_ods`, reusos): não implementadas; o detalhe real do portal não traz ODS e reusos são fase futura.

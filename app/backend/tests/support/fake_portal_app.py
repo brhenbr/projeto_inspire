@@ -16,6 +16,11 @@ portal = FakePortal(
     flaky_every=int(os.environ.get("FAKE_PORTAL_FLAKY_EVERY", "7")),
     bad_ids={"ds-0003"},
 )
+portal.add("ds-saude", "orgao-1", 1)
+portal.update_title("ds-saude", "Saúde da População Brasileira")
+portal.datasets["ds-saude"]["descricao"] = (
+    "Indicadores de mortalidade e internações hospitalares por município. " * 3
+)
 app = FastAPI(title="Portal falso")
 
 

@@ -1,0 +1,73 @@
+# Pilha completa e DESCARTÁVEL para os testes E2E (ADR-0013): banco novo, portal falso, API, worker e web reais.
+# Rodar (na raiz):  bash scripts/e2e.sh        ou        docker compose -f docker-compose.e2e.yml up --build --abort-on-container-exit --exit-code-from playwright
+name: inspire-e2e
+
+x-backend: &backend
+  image: inspire-backend:dev
+  build: ./app/backend
+
+x-db-env: &db-env
+  DATABASE_URL: postgresql+psycopg://inspire:inspire_e2e@db:5432/inspire
+  LOG_LEVEL: WARNING
+  LLM_ENABLED: "true"
+  LLM_PROVIDER: simulado
+  LLM_REQUEST_INTERVAL_S: "0"
+
+services:
+  db:
+    image: postgres:16
+    environment: { POSTGRES_USER: inspire, POSTGRES_PASSWORD: inspire_e2e, POSTGRES_DB: inspire }
+    tmpfs: [/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U inspire -d inspire"], interval: 3s, timeout: 3s, retries: 20 }
+
+  migrate:
+    <<: *backend
+    command: ["alembic", "upgrade", "head"]
+    environment: *db-env
+    depends_on: { db: { condition: service_healthy } }
+    restart: "no"
+
+  fake-portal:
+    <<: *backend
+    command: ["uvicorn", "--app-dir", "tests", "support.fake_portal_app:app", "--host", "0.0.0.0", "--port", "9000"]
+    environment: { FAKE_PORTAL_DATASETS: "45", FAKE_PORTAL_ORGS: "3", FAKE_PORTAL_FLAKY_EVERY: "7" }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://localhost:9000/_teste/chamadas', timeout=3)"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  api:
+    <<: *backend
+    environment: *db-env
+    depends_on: { migrate: { condition: service_completed_successfully } }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://localhost:8000/v1/saude', timeout=3)"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  worker:
+    <<: *backend
+    command: ["python", "-m", "inspire.worker"]
+    environment:
+      <<: *db-env
+      DADOS_GOV_BASE_URL: http://fake-portal:9000
+      DADOS_GOV_API_KEY: chave-de-teste
+      PORTAL_MAX_RPS: "0"
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      fake-portal: { condition: service_healthy }
+
+  web:
+    build: ./app/frontend
+    depends_on: { api: { condition: service_healthy } }
+    healthcheck: { test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:8080/"], interval: 3s, timeout: 3s, retries: 20 }
+
+  playwright:
+    build: ./app/e2e
+    environment: { BASE_URL: "http://web:8080", FAKE_PORTAL: "http://fake-portal:9000", CI: "true" }
+    volumes: ["./app/e2e/reports:/e2e/reports"]
+    depends_on:
+      web: { condition: service_healthy }
+      worker: { condition: service_started }

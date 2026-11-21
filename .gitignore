@@ -24,3 +24,7 @@ Thumbs.db
 
 # Documentos institucionais/contratuais (nao versionar)
 docs/00-descoberta/restrito/
+
+# E2E
+app/e2e/node_modules/
+app/e2e/reports/
