@@ -32,6 +32,12 @@ services:
     environment: &db-env
       DATABASE_URL: postgresql+psycopg://inspire:${POSTGRES_PASSWORD:-inspire_dev}@db:5432/inspire
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      # LLM (ADR-0004/0011): o modo 'simulado' não usa IA nem rede. Provedor externo exige LLM_ALLOWED_HOSTS.
+      LLM_ENABLED: ${LLM_ENABLED:-true}
+      LLM_PROVIDER: ${LLM_PROVIDER:-simulado}
+      LLM_BASE_URL: ${LLM_BASE_URL:-}
+      LLM_MODEL: ${LLM_MODEL:-}
+      LLM_ALLOWED_HOSTS: ${LLM_ALLOWED_HOSTS:-localhost,127.0.0.1,llm-local}
     depends_on:
       db:
         condition: service_healthy
@@ -62,6 +68,8 @@ services:
       # A chave do portal só existe no worker (menor privilégio).
       DADOS_GOV_API_KEY: ${DADOS_GOV_API_KEY:-}
       DADOS_GOV_BASE_URL: ${DADOS_GOV_BASE_URL:-https://dados.gov.br}
+      PORTAL_MAX_RPS: ${PORTAL_MAX_RPS:-4}
+      LLM_API_KEY: ${LLM_API_KEY:-}
     depends_on:
       migrate:
         condition: service_completed_successfully

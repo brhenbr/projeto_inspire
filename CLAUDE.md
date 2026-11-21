@@ -61,6 +61,13 @@ Protótipo web, monousuário porém com arquitetura desacoplada, para **extraç�
   fora do Swagger; o portal já traz `selo` e `atualizado`. Nome e/ou e-mail do responsável vêm em boa parte dos detalhes
   (amostra de 59: nome em 30, nome+e-mail em 16): remover na ingestão (modelo-de-dados.md, seção 2).
 
+## Testes e ferramentas
+- Testes de integração rodam no banco `inspire_test` (criado pelo conftest) e RECUSAM rodar em outro banco. Nunca no
+  banco da aplicação: um teste já deixou um job na fila e o worker o executou de verdade.
+- `bash scripts/formatar.sh` formata/corrige o backend; `bash scripts/qualidade.sh` é o portão completo.
+- Parâmetro de saída da exportação é `saida` (não `formato`, que é filtro de recurso).
+- LLM: modo `simulado` (sem IA, sem rede) por padrão no compose; provedor real só por configuração (ADR-0011).
+
 ## Regras de trabalho
 - Documentação em **português**; código e identificadores em inglês. O cliente achou os C4 técnicos demais:
   colocar um parágrafo "em palavras simples" no topo de cada doc de arquitetura e rever o C4 com ele no final.
@@ -83,6 +90,10 @@ Protótipo web, monousuário porém com arquitetura desacoplada, para **extraç�
   vazia NÃO significa fim; sempre tentar de novo e conferir contra o total por organização.
 - **Alguns conjuntos aparecem na listagem mas o detalhe devolve sempre HTTP 400** ("Erro ao executar a consulta"):
   1 em 60 na amostra (um do IPEA). Não aborta a extração: registrar o item como indisponível e listar no relatório.
+- **O portal bloqueia chamadas rápidas demais respondendo HTTP 405** (visto: ~3.500 chamadas seguidas a 4 em
+  paralelo sem limite de taxa; 16.601 respostas 405; minutos depois os mesmos itens davam 200). Por isso o cliente
+  limita a taxa (`PORTAL_MAX_RPS`, padrão 4/s) e pausa todas as threads ao ver 405/429/503. 400 ocasional é defeito
+  de item específico; 405 NUNCA é erro definitivo do item.
 - Tamanho medido: ~20.700 conjuntos em 311 organizações (soma de `qtdConjuntoDeDados`).
 - A chave do cliente está em `.env` e foi validada (200). Nunca imprimir seu valor.
 

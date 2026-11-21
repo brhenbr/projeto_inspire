@@ -21,8 +21,15 @@ def main(argv: list[str] | None = None) -> int:
     ex.add_argument("--tipo", choices=["incremental", "completa"], default="incremental")
     ex.add_argument("--forcar", action="store_true", help="ignora o intervalo mínimo")
     sub.add_parser("estado", help="mostra o que pode ser pedido agora")
+    sub.add_parser("matriz-qualidade", help="imprime a matriz de qualidade em Markdown")
     args = parser.parse_args(argv)
 
+    if args.cmd == "matriz-qualidade":
+        from inspire.quality.matrix import render_markdown
+
+        sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[union-attr]
+        print(render_markdown())
+        return 0
     engine, policy = get_engine(), get_policy()
     if args.cmd == "estado":
         out = {
