@@ -46,5 +46,9 @@ evolutiva, devolução ao portal, multiusuário, agendamento automático, detec�
    consulta ("-ões" vira "-ão").
 5. **Imagem do serviço de migração desatualizada** (já tratado na implementação 02): os três serviços do backend usam uma só imagem.
 
-## Números
-Backend: ver [estratégia de testes](../05-testes/estrategia.md) e o diário da sessão 03.
+## Números (2026-11-21)
+- Testes: backend 247 (cobertura 92,6%), frontend 32, E2E 52.
+- Extração real: 20.218 conjuntos, 256 organizações, 126.741 recursos, nota média 72,9; 560 conjuntos sem detalhe no portal.
+- Desempenho: consultas entre 0,07 e 0,66 s sobre o catálogo real.
+- Observação: o painel mostra "alterados" alto na última extração real porque ela completou os detalhes de conjuntos que a
+  primeira tentativa (bloqueada pelo portal) deixara sem detalhe; não são mudanças do portal.

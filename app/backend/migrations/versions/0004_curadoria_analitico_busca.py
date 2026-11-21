@@ -30,7 +30,7 @@ def upgrade() -> None:
         """
         CREATE OR REPLACE FUNCTION public.f_busca(text) RETURNS text
         LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT
-        AS $$ SELECT regexp_replace(public.f_unaccent(lower($1)), 'oes\y', 'ao', 'g') $$
+        AS $$ SELECT regexp_replace(public.f_unaccent(lower($1)), 'oes\\y', 'ao', 'g') $$
         """
     )
 

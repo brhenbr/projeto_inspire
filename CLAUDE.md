@@ -69,6 +69,11 @@ Protótipo web, monousuário porém com arquitetura desacoplada, para **extraç�
 - Parâmetro de saída da exportação é `saida` (não `formato`, que é filtro de recurso).
 - LLM: modo `simulado` (sem IA, sem rede) por padrão no compose; provedor real só por configuração (ADR-0011).
 
+## Armadilhas já vividas
+- Nunca editar migração já aplicada: criar uma nova (a 0006 reconcilia bancos migrados com a 0004 intermediária).
+- nginx precisa resolver o nome da API dinamicamente (resolver do Docker), senão devolve 502 quando a API é recriada.
+- `docker compose run` não reconstrói imagem: o `scripts/e2e.sh` faz `build` antes.
+
 ## Regras de trabalho
 - Documentação em **português**; código e identificadores em inglês. O cliente achou os C4 técnicos demais:
   colocar um parágrafo "em palavras simples" no topo de cada doc de arquitetura e rever o C4 com ele no final.
@@ -95,7 +100,10 @@ Protótipo web, monousuário porém com arquitetura desacoplada, para **extraç�
   paralelo sem limite de taxa; 16.601 respostas 405; minutos depois os mesmos itens davam 200). Por isso o cliente
   limita a taxa (`PORTAL_MAX_RPS`, padrão 4/s) e pausa todas as threads ao ver 405/429/503. 400 ocasional é defeito
   de item específico; 405 NUNCA é erro definitivo do item.
-- Tamanho medido: ~20.700 conjuntos em 311 organizações (soma de `qtdConjuntoDeDados`).
+- **Extração real completa feita em 2026-11-21** (89 min a 4 req/s): 20.218 conjuntos coletados de 20.682 declarados (cobertura 97,8%:
+  por isso as remoções NÃO foram aplicadas, regra de segurança abaixo de 99%), 560 sem detalhe (2,8%, HTTP 400 do portal), 0 erros,
+  256 organizações com conjuntos, 126.741 recursos, nota média 72,9. Em 19.658 detalhes, 13.363 tinham responsável: 0 foram gravados.
+- Tamanho medido antes: ~20.700 conjuntos em 311 organizações (soma de `qtdConjuntoDeDados`).
 - A chave do cliente está em `.env` e foi validada (200). Nunca imprimir seu valor.
 
 ## Comandos

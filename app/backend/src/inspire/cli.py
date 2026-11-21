@@ -21,6 +21,7 @@ def main(argv: list[str] | None = None) -> int:
     ex.add_argument("--tipo", choices=["incremental", "completa"], default="incremental")
     ex.add_argument("--forcar", action="store_true", help="ignora o intervalo mínimo")
     sub.add_parser("estado", help="mostra o que pode ser pedido agora")
+    sub.add_parser("reconstruir", help="reconstrói o modelo de leitura e recalcula a qualidade")
     sub.add_parser("matriz-qualidade", help="imprime a matriz de qualidade em Markdown")
     args = parser.parse_args(argv)
 
@@ -29,6 +30,12 @@ def main(argv: list[str] | None = None) -> int:
 
         sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[union-attr]
         print(render_markdown())
+        return 0
+    if args.cmd == "reconstruir":
+        from inspire.analytics.pipeline import rebuild_after_extraction
+
+        rebuild_after_extraction(get_engine())
+        print("modelo de leitura e qualidade reconstruídos")
         return 0
     engine, policy = get_engine(), get_policy()
     if args.cmd == "estado":
