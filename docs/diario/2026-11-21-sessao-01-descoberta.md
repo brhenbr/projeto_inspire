@@ -41,6 +41,17 @@ Entender o pedido, fechar as primeiras premissas com o cliente e validar a API r
   `kit/scripts/backlog_to_jira.py` e CSV para Jira (importação não testada em Jira real).
 - Visão e escopo atualizados para a versão 0.2.
 
+## Continuação: segurança, soberania e início da arquitetura
+- Cliente: padrões de metadados já definidos (nomes ainda não informados); cronograma "o mais rápido
+  possível" com o cliente como gestor; repo será público; coleções viram feature do app; segurança e
+  soberania são prioridade. Registrado em [ADR-0002](../03-decisoes/0002-seguranca-e-soberania.md).
+- Backlog ajustado: coleções como feature (US-033, US-036, US-037), checklist de segurança (US-066) e
+  spike de onde rodar o LLM (US-067). Agora 66 itens.
+- Medido o ambiente de desenvolvimento: sem GPU útil, 16 GB de RAM, Docker Desktop fechado. Isso limita
+  o LLM local e foi incorporado à proposta.
+- Criados o C1 (`docs/02-arquitetura/c1-contexto.md`) e a proposta de tecnologias com rascunho de C2.
+  Os diagramas Mermaid não foram renderizados nesta sessão; conferir a exibição no GitHub ou no VS Code.
+
 ## Pendências / próximos passos
 - Cliente cria a chave de API e a coloca no `.env` local.
 - Redigir visão e escopo do MVP (`docs/01-produto/`) para aprovação.

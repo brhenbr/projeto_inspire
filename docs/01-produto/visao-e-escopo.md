@@ -68,7 +68,7 @@ documentação precisa se sustentar sozinha, sem depender de explicação oral.
 
 ## 5. Escopo
 
-Detalhamento em [backlog/backlog.md](backlog/backlog.md) (62 itens, 15 épicos), com versão para importar no Jira.
+Detalhamento em [backlog/backlog.md](backlog/backlog.md) (66 itens, 15 épicos), com versão para importar no Jira.
 
 ### MVP — Deve ter
 | Épico | Entrega |
@@ -134,17 +134,19 @@ Multiusuário e nuvem.
 
 ## 9. Perguntas abertas para o cliente
 
-1. **Padrões de metadados:** o kickoff com o CPQD já definiu os padrões (DCAT-BR, DQV, FAIR)? Se não,
-   uso DCAT-BR e DQV como hipótese e deixo as regras de qualidade configuráveis.
-2. **Cronograma:** em que mês do plano vocês estão e quando é a demonstração para os professores? As
-   atividades A4, A6 e A7 se estendem do mês 4 ao 15, então a data muda quanto escopo cabe.
-3. **Repositório público:** o repo no seu GitHub será público? Sugiro a licença Apache-2.0, por conter
-   concessão de patentes; confirme se a UFSCar ou o CPQD impõem alguma licença.
-4. **Coleção "bases sociais":** o plano foca bases sociais (saúde, assistência, educação). Quero criar
-   uma coleção curada inicial para isso. Quem define a lista, ou deduzo por tema e organização?
-5. **Documentos restritos:** coloquei o Plano de Trabalho em `docs/00-descoberta/restrito/`, ignorado
-   pelo git, por conter dados contratuais e financeiros. O dossiê do Inspire continua versionado.
-   Faz sentido?
+**Resolvidas em 2026-11-21:**
+- Cronograma: o mais rápido possível, com o máximo de features; o cliente é o gestor e ajusta o plano
+  ao longo do caminho. Estamos em dezembro; o protótipo continuará evoluindo além disso.
+- Repositório será público; licença a decidir depois (sugestão Apache-2.0, US-064).
+- Coleções: viram **feature do app** (US-033, US-036); a coleção inicial de bases sociais é montada
+  por tema e organização e submetida à validação do cliente (US-037).
+- Documentos restritos ficam fora do git. Segurança e soberania são requisitos de projeto
+  ([ADR-0002](../03-decisoes/0002-seguranca-e-soberania.md)).
+
+**Ainda abertas:**
+1. **Padrões de metadados:** o cliente informou que já estão definidos. Quais são? Preciso do nome dos
+   padrões e, se existir, do documento, para configurar as regras de qualidade.
+2. **Tecnologias:** ver [proposta de tecnologias](../02-arquitetura/proposta-tecnologias.md), seção 8.
 
 ## 10. Próximos passos
 

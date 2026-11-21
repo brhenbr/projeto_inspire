@@ -47,7 +47,9 @@ Camada curada separada do espelho do portal, com histórico. Plano de trabalho: 
 - **US-030** (Story, Highest, mvp, curadoria, tecnico) — Modelo de dados com espelho e camada curada separados
 - **US-031** (Story, High, mvp, curadoria, web) — Editar metadados curados
 - **US-032** (Story, High, mvp, curadoria) — Status de curadoria
-- **US-033** (Story, Medium, mvp, curadoria) — Coleções de conjuntos
+- **US-033** (Story, High, mvp, curadoria, web) — Criar e gerenciar coleções pela interface
+- **US-036** (Story, High, mvp, curadoria, web) — Coleções dinâmicas a partir de filtros salvos
+- **US-037** (Task, Medium, mvp, curadoria) — Criar a coleção inicial de bases sociais
 - **US-034** (Story, Medium, mvp, curadoria) — Histórico e auditoria de alterações
 - **US-035** (Story, Low, fase-2, curadoria) — Detecção de possíveis duplicados
 
@@ -62,6 +64,7 @@ Humano parametriza, LLM executa, humano aprova. Provedor gratuito/local por trá
 - **US-042** (Story, High, mvp, llm, curadoria) — Execução em lote com fila de revisão
 - **US-043** (Story, High, mvp, llm, governanca) — Registro de execução e proveniência
 - **US-044** (Spike, High, mvp, llm, spike) — Avaliar modelos gratuitos/locais para português
+- **US-067** (Spike, High, mvp, llm, seguranca, spike) — Definir onde o LLM roda com qualidade aceitável
 
 ## EP-06 — API própria e exportação
 
@@ -83,6 +86,7 @@ Execução em Docker, testes, CI e documentação contínua.
 - **US-062** (Task, High, mvp, tecnico) — Pipeline de CI: lint, testes e build
 - **US-063** (Task, High, mvp, tecnico, teste) — Testes E2E dos fluxos principais
 - **US-064** (Task, Medium, mvp, tecnico, governanca) — Definir licença e preparar repositório para publicação
+- **US-066** (Task, High, mvp, tecnico, seguranca) — Checklist de segurança e soberania (ADR-0002)
 - **US-065** (Task, Medium, mvp, tecnico, doc) — Documentação de implementação, testes e deploy
 
 ## EP-08 — Verificação de links dos recursos (link rot)

@@ -27,6 +27,18 @@ Protótipo web, monousuário porém com arquitetura desacoplada, para **extraç�
   valores, bolsas ou desembolsos em arquivos versionados. O repositório pode se tornar público.
 - Backlog: `docs/01-produto/backlog/backlog.json` é a fonte; `.md` e `.csv` são gerados.
 
+## Segurança e soberania (ADR-0002) — vale para toda decisão
+- Nada sai da infraestrutura do projeto sem ADR. Nuvem de LLM no exterior é proibida por padrão.
+- Só software livre e auditável, sem telemetria externa; dependências fixadas e varridas no CI.
+- Contatos de responsáveis dos conjuntos (nome/e-mail) são dados pessoais: minimizar e nunca enviar a LLM.
+
+## Cronograma e gestão
+- Cliente é o gestor: dá as direções. Meta: o mais rápido possível e o máximo de features, com plano
+  e cronograma ajustados em conjunto ao longo do caminho. Demonstração a professores da UFSCar em breve.
+
+## Ambiente de desenvolvimento (medido em 2026-11-21)
+- Windows, i7-4500U, 16 GB, sem GPU útil: LLM local só pequeno e em CPU. Docker Desktop precisa estar aberto.
+
 ## Regras de trabalho
 - Documentação em **português**; código e identificadores em inglês.
 - Todo o ciclo (concepção, desenho, implementação, testes, deploy) é registrado em `docs/`.
