@@ -12,7 +12,7 @@ flowchart TB
     sistema["<b>Inspire Catálogo</b><br/>[Sistema de software]<br/>Espelha o catálogo do dados.gov.br, permite explorá-lo,<br/>mede a qualidade dos metadados e organiza a curadoria<br/>com apoio de LLM"]
 
     portal["<b>Portal dados.gov.br</b><br/>[Sistema externo]<br/>API REST com chave; fonte dos metadados<br/>(~20,7 mil conjuntos)"]
-    llm["<b>Provedor de LLM</b><br/>[Sistema externo controlado]<br/>Local ou sob controle do projeto;<br/>troca por configuração"]
+    llm["<b>Provedor de LLM</b><br/>[Sistema externo opcional]<br/>API gratuita (ADR-0004) ou servidor soberano;<br/>troca por configuração"]
     orgaos["<b>Servidores dos órgãos</b><br/>[Sistema externo]<br/>Hospedam os recursos (arquivos e APIs)"]
     jira["<b>Jira</b><br/>[Ferramenta de gestão]<br/>Backlog do projeto"]
 
@@ -38,4 +38,5 @@ flowchart TB
 - A seta tracejada de volta ao portal exige perfil de administrador de organização e não está no
   curto nem no médio prazo; o modelo de dados já separa espelho e curadoria para viabilizá-la.
 - Segurança e soberania ([ADR-0002](../03-decisoes/0002-seguranca-e-soberania.md)): o único sistema
-  externo que recebe dados do projeto seria o provedor de LLM, e ele deve ser local ou controlado.
+  externo que recebe dados do projeto é o provedor de LLM, e só recebe campos públicos do catálogo
+  ([ADR-0004](../03-decisoes/0004-provedor-de-llm-externo-controlado.md)).

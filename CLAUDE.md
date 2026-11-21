@@ -29,6 +29,8 @@ Protótipo web, monousuário porém com arquitetura desacoplada, para **extraç�
 
 ## Segurança e soberania (ADR-0002) — vale para toda decisão
 - Nada sai da infraestrutura do projeto sem ADR. Nuvem de LLM no exterior é proibida por padrão.
+  **Exceção aprovada (ADR-0004):** API gratuita de LLM, só com campos públicos do catálogo, desligada por
+  padrão, com lista de provedores aprovados e aviso na tela. Nunca enviar contatos pessoais nem a base curada.
 - Só software livre e auditável, sem telemetria externa; dependências fixadas e varridas no CI.
 - Contatos de responsáveis dos conjuntos (nome/e-mail) são dados pessoais: minimizar e nunca enviar a LLM.
 

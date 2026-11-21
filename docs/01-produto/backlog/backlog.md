@@ -64,7 +64,8 @@ Humano parametriza, LLM executa, humano aprova. Provedor gratuito/local por trá
 - **US-042** (Story, High, mvp, llm, curadoria) — Execução em lote com fila de revisão
 - **US-043** (Story, High, mvp, llm, governanca) — Registro de execução e proveniência
 - **US-044** (Spike, High, mvp, llm, spike) — Avaliar modelos gratuitos/locais para português
-- **US-067** (Spike, High, mvp, llm, seguranca, spike) — Definir onde o LLM roda com qualidade aceitável
+- **US-067** (Spike, High, mvp, llm, seguranca, spike) — Selecionar provedores gratuitos de LLM e validar condições de uso
+- **US-068** (Task, High, mvp, llm, seguranca) — Salvaguardas do LLM externo (ADR-0004)
 
 ## EP-06 — API própria e exportação
 

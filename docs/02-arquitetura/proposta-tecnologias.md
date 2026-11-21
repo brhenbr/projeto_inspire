@@ -51,7 +51,7 @@ pode migrar para GitLab ou Gitea sob controle deles.
 **Licenças:** todas as peças recomendadas são livres (PostgreSQL, FastAPI, React, Ollama, pgvector).
 Ainda vou confirmar a licença de cada modelo de LLM e de embeddings no spike antes de adotar.
 
-## 5. Rascunho de C2 (contêineres), válido se a stack for aprovada
+## 5. C2 (contêineres), conforme ADR-0003 e ADR-0004
 
 ```mermaid
 flowchart TB
@@ -62,10 +62,10 @@ flowchart TB
         api["<b>API</b><br/>[Python, FastAPI]<br/>REST /v1 em OpenAPI;<br/>regras de negócio e orquestração"]
         worker["<b>Worker</b><br/>[Python]<br/>Extração, recálculo de qualidade,<br/>execução de lotes de LLM"]
         db[("<b>PostgreSQL</b><br/>[+ busca textual, + pgvector depois]<br/>Espelho, snapshots, curadoria,<br/>qualidade, fila de jobs")]
-        llmrt["<b>Runtime de LLM</b><br/>[Ollama / vLLM]<br/>API compatível com OpenAI"]
     end
 
     portal["Portal dados.gov.br"]
+    llmrt["<b>Provedor de LLM (opcional)</b><br/>[Externo gratuito, ADR-0004,<br/>ou servidor soberano no futuro]<br/>API compatível com OpenAI"]
 
     user -->|HTTPS| web
     web -->|"JSON/HTTPS"| api
@@ -73,13 +73,13 @@ flowchart TB
     api -->|"enfileira jobs"| db
     worker -->|"consome jobs, grava resultados"| db
     worker -->|"HTTPS + chave"| portal
-    worker -->|"prompts e propostas"| llmrt
+    worker -->|"só campos públicos, um conjunto por vez"| llmrt
     api -.->|"futuro: chat NL"| llmrt
 
     classDef nosso fill:#1168bd,stroke:#0b4884,color:#fff
     classDef ext fill:#999,stroke:#6b6b6b,color:#fff
-    class web,api,worker,db,llmrt nosso
-    class portal ext
+    class web,api,worker,db nosso
+    class portal,llmrt ext
 ```
 
 Pontos de desenho que valem destacar:
