@@ -83,7 +83,7 @@ Execução em Docker, testes, CI e documentação contínua.
 
 - **US-060** (Task, Highest, mvp, tecnico, adr) — Conversa e ADR de tecnologias (stack, banco, busca, fila, front)
 - **US-061** (Task, Highest, mvp, tecnico) — Esqueleto do projeto com Docker Compose
-- **US-062** (Task, High, mvp, tecnico) — Pipeline de CI: lint, testes e build
+- **US-062** (Task, High, mvp, tecnico) — Portão local de qualidade e, depois do primeiro push, CI
 - **US-063** (Task, High, mvp, tecnico, teste) — Testes E2E dos fluxos principais
 - **US-064** (Task, Medium, mvp, tecnico, governanca) — Definir licença e preparar repositório para publicação
 - **US-066** (Task, High, mvp, tecnico, seguranca) — Checklist de segurança e soberania (ADR-0002)

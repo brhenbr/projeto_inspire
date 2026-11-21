@@ -1,6 +1,6 @@
 # Proposta de tecnologias (para decisão do cliente)
 
-- **Status:** proposta. Nada aqui está fixado até o cliente aprovar; as decisões viram ADRs.
+- **Status:** parcialmente aceita em [ADR-0003](../03-decisoes/0003-stack-tecnologica.md). Pendente: provedor de LLM (ADR-0004).
 - **Tarefa de backlog:** US-060.
 
 ## 1. Critérios (vindos do cliente e do ADR-0002)
