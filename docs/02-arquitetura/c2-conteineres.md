@@ -8,7 +8,7 @@ opcionalmente, uma API de LLM.
 Mostra as partes executáveis do Inspire Catálogo e como se comunicam. Reflete
 [ADR-0003](../03-decisoes/0003-stack-tecnologica.md) (stack),
 [ADR-0004](../03-decisoes/0004-provedor-de-llm-externo-controlado.md) (LLM) e
-[ADR-0005](../03-decisoes/0005-armazenamento-em-camadas.md) (armazenamento, em proposta).
+[ADR-0005](../03-decisoes/0005-armazenamento-em-camadas.md) (armazenamento).
 Linhas tracejadas são opcionais ou futuras.
 
 ```mermaid
