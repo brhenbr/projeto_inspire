@@ -3,7 +3,7 @@
 from fastapi import FastAPI
 
 from inspire import __version__
-from inspire.api.routes import extracoes, saude
+from inspire.api.routes import descoberta, extracoes, qualidade, saude
 from inspire.config import get_settings
 from inspire.logging import configure_logging
 
@@ -17,6 +17,8 @@ def create_app() -> FastAPI:
     )
     app.include_router(saude.router, prefix="/v1")
     app.include_router(extracoes.router, prefix="/v1")
+    app.include_router(descoberta.router, prefix="/v1")
+    app.include_router(qualidade.router, prefix="/v1")
     return app
 
 
