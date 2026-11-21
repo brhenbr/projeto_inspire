@@ -27,7 +27,13 @@ from inspire.extraction.errors import (
 
 API_KEY_HEADER = "chave-api-dados-abertos"
 USER_AGENT = f"inspire-catalogo/{__version__} (projeto Inspire; coleta de metadados)"
-RETRYABLE_STATUS = frozenset({429, 500, 502, 503, 504})
+# O portal recusa chamadas em excesso com 405 (observado em 2026-11-21: 16.601 respostas 405 depois de ~3.500
+# chamadas rápidas; os mesmos itens respondiam 200 minutos depois). Tratamos como bloqueio temporário.
+THROTTLE_STATUS = frozenset({405, 408, 425, 429, 503})
+RETRYABLE_STATUS = THROTTLE_STATUS | {500, 502, 504}
+BAD_REQUEST_RETRIES = (
+    2  # 400 às vezes é definitivo (item com defeito no portal), mas vale confirmar
+)
 
 
 @dataclass(frozen=True)
@@ -55,6 +61,10 @@ class PortalClient:
         max_concurrency: int = 4,
         connect_timeout_s: float = 10.0,
         read_timeout_s: float = 30.0,
+        max_rps: float = 0.0,
+        throttle_cooldown_s: float = 5.0,
+        throttle_cap_s: float = 120.0,
+        clock: Callable[[], float] = time.monotonic,
         transport: httpx.BaseTransport | None = None,
         sleep: Callable[[float], None] = time.sleep,
         rng: Callable[[], float] = random.random,
@@ -67,6 +77,14 @@ class PortalClient:
         self._backoff_cap_s = backoff_cap_s
         self._sleep = sleep
         self._rng = rng
+        self._clock = clock
+        self._min_interval = 1.0 / max_rps if max_rps > 0 else 0.0
+        self._cooldown_s = throttle_cooldown_s
+        self._cooldown_cap_s = throttle_cap_s
+        self._gate = threading.Lock()
+        self._next_slot = 0.0
+        self._blocked_until = 0.0
+        self._throttle_streak = 0
         self._slots = threading.BoundedSemaphore(max_concurrency)
         self._http = httpx.Client(
             base_url=base_url.rstrip("/"),
@@ -121,10 +139,12 @@ class PortalClient:
     ) -> tuple[Any, bool]:
         log = structlog.get_logger("portal")
         empties = 0
+        bad_requests = 0
         last_reason = "sem tentativas"
         for attempt in range(retries + 1):
             retry_after: float | None = None
             try:
+                self._pace()
                 with self._slots:
                     response = self._http.get(path, params=params)
             except httpx.TransportError as exc:  # timeout, conexão recusada, DNS…
@@ -136,6 +156,11 @@ class PortalClient:
                 if status in RETRYABLE_STATUS:
                     last_reason = f"HTTP {status}"
                     retry_after = _parse_retry_after(response.headers.get("Retry-After"))
+                    if status in THROTTLE_STATUS:
+                        self._penalize(retry_after)
+                elif status == 400 and bad_requests < BAD_REQUEST_RETRIES:
+                    bad_requests += 1
+                    last_reason = "HTTP 400"
                 elif status >= 400:
                     raise PortalRequestError(
                         f"Pedido recusado pelo portal (HTTP {status}) em {path}",
@@ -147,6 +172,7 @@ class PortalClient:
                     except ValueError:  # corpo cortado ou não-JSON: trata como falha transitória
                         last_reason = "JSON inválido"
                     else:
+                        self._relax()
                         if body:  # lista ou objeto com conteúdo
                             return body, False
                         empties += 1
@@ -167,6 +193,30 @@ class PortalClient:
         raise PortalUnavailableError(
             f"Portal sem resposta utilizável em {path} ({last_reason})", attempts=retries + 1
         )
+
+    def _pace(self) -> None:
+        """Respeita o limite de requisições por segundo e a pausa coletiva depois de um bloqueio."""
+        with self._gate:
+            now = self._clock()
+            start = max(now, self._next_slot, self._blocked_until)
+            self._next_slot = start + self._min_interval
+        if start > now:
+            self._sleep(start - now)
+
+    def _penalize(self, retry_after: float | None) -> None:
+        """O portal pediu calma: todas as threads esperam, e a pausa cresce se o bloqueio insistir."""
+        with self._gate:
+            self._throttle_streak += 1
+            cooldown = min(
+                self._cooldown_cap_s, self._cooldown_s * 2.0 ** (self._throttle_streak - 1)
+            )
+            if retry_after is not None:
+                cooldown = max(cooldown, min(retry_after, self._cooldown_cap_s))
+            self._blocked_until = max(self._blocked_until, self._clock() + cooldown)
+
+    def _relax(self) -> None:
+        with self._gate:
+            self._throttle_streak = 0
 
     def _delay(self, attempt: int, retry_after: float | None) -> float:
         ceiling = min(self._backoff_cap_s, self._backoff_base_s * (2.0**attempt))

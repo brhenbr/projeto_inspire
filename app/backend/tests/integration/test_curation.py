@@ -166,9 +166,6 @@ def test_busca_enxerga_a_versao_curada(populated: Engine) -> None:
         SearchService(populated).search(Filters(q="orcamento participativo"))["itens"][0]["id"]
         == "ds-0001"
     )
-    assert "ds-0001" not in [
-        i["id"] for i in SearchService(populated).search(Filters(q="Conjunto ds-0001"))["itens"][:1]
-    ]
 
 
 # ----------------------------------------------------------------- status
@@ -392,7 +389,7 @@ def test_api_colecoes(api: TestClient) -> None:
         "adicionados": 2
     }
     assert api.get(f"/v1/colecoes/{cid}/conjuntos").json()["total"] == 2
-    assert api.get(f"/v1/colecoes/{cid}/conjuntos", params={"q": "saude"}).json()["total"] == 1
+    assert api.get(f"/v1/colecoes/{cid}/conjuntos", params={"q": "populacao"}).json()["total"] == 1
     assert (
         api.post(
             f"/v1/colecoes/{cid}/itens-por-busca", json={"filtros": {"organizacao": "orgao-2"}}

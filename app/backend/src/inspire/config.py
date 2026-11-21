@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     portal_empty_retries: int = 4
     portal_backoff_base_s: float = 0.5
     portal_backoff_cap_s: float = 30.0
+    portal_max_rps: float = 4.0  # o portal bloqueia (HTTP 405) quando chamado rápido demais
+    portal_throttle_cooldown_s: float = 5.0
+    portal_throttle_cap_s: float = 120.0
 
     # Controle de pedidos de extração (ADR-0006)
     extraction_min_interval_incremental_min: int = 60

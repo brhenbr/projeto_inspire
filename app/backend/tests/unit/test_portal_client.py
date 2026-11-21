@@ -26,6 +26,7 @@ def make_client(handler: Handler, **kwargs: object) -> tuple[PortalClient, list[
         transport=httpx.MockTransport(handler),
         sleep=sleeps.append,
         rng=lambda: 1.0,  # sem aleatoriedade: espera = teto do backoff
+        clock=lambda: 0.0,  # tempo parado: pausas e ritmo ficam verificáveis
         **kwargs,  # type: ignore[arg-type]
     )
     return client, sleeps
@@ -100,21 +101,20 @@ def test_chave_recusada_nao_tenta_de_novo(status: int) -> None:
     assert sleeps == []
 
 
-def test_outro_4xx_nao_tenta_de_novo() -> None:
-    handler, calls = sequence(httpx.Response(400, json={"erro": "pagina invalida"}))
+def test_outro_4xx_definitivo_nao_tenta_de_novo() -> None:
+    handler, calls = sequence(httpx.Response(404))
     client, _ = make_client(handler)
 
     with pytest.raises(PortalRequestError) as info:
         client.get_json("/x")
 
-    assert len(calls) == 1
-    assert info.value.status_code == 400  # quem coleta decide: item indisponível, segue em frente
+    assert len(calls) == 1 and info.value.status_code == 404
 
 
 # ----------------------------------------------------------------- retry
 
 
-@pytest.mark.parametrize("status", [429, 500, 502, 503, 504])
+@pytest.mark.parametrize("status", [500, 502, 504])
 def test_tenta_de_novo_em_erros_transitorios(status: int) -> None:
     handler, calls = sequence(httpx.Response(status), httpx.Response(status), ok({"id": "1"}))
     client, sleeps = make_client(handler, backoff_base_s=1.0)
@@ -149,11 +149,11 @@ def test_respeita_retry_after_do_portal() -> None:
 
     client.get_json("/x")
 
-    assert sleeps == [7.0]
+    assert sleeps[0] == 7.0
 
 
 def test_espera_nunca_passa_do_teto() -> None:
-    handler, _ = sequence(httpx.Response(503))
+    handler, _ = sequence(httpx.Response(500))
     client, sleeps = make_client(handler, max_retries=8, backoff_base_s=1.0, backoff_cap_s=5.0)
 
     with pytest.raises(PortalUnavailableError):
@@ -164,7 +164,7 @@ def test_espera_nunca_passa_do_teto() -> None:
 
 
 def test_jitter_fica_entre_metade_e_o_teto() -> None:
-    handler, _ = sequence(httpx.Response(503), ok({"a": 1}))
+    handler, _ = sequence(httpx.Response(500), ok({"a": 1}))
     sleeps: list[float] = []
     client = PortalClient(
         "https://portal.test",
@@ -277,3 +277,102 @@ def test_nunca_passa_do_limite_de_chamadas_simultaneas() -> None:
         t.join()
 
     assert 1 <= pico <= limite
+
+
+# ----------------------------------------------------------------- bloqueio do portal (HTTP 405) e ritmo
+
+
+@pytest.mark.parametrize("status", [405, 408, 425, 429, 503])
+def test_bloqueio_temporario_do_portal_e_tentado_de_novo(status: int) -> None:
+    handler, calls = sequence(httpx.Response(status), ok({"id": "1"}))
+    client, _ = make_client(handler)
+
+    assert client.get_json("/x") == {"id": "1"}
+    assert len(calls) == 2
+
+
+def test_405_em_massa_nao_vira_erro_definitivo_do_item() -> None:
+    """Regressão: 16.601 itens foram marcados 'sem detalhe' porque o portal respondeu 405 sob carga."""
+    handler, _ = sequence(httpx.Response(405))
+    client, _ = make_client(handler, max_retries=3)
+
+    with pytest.raises(
+        PortalUnavailableError
+    ):  # indisponível agora, e não 'recusado de forma definitiva'
+        client.get_json("/x")
+
+
+def test_depois_de_um_bloqueio_todas_as_chamadas_esperam_a_pausa() -> None:
+    handler, _ = sequence(httpx.Response(405), ok({"a": 1}), ok({"b": 2}))
+    client, sleeps = make_client(handler, throttle_cooldown_s=5.0)
+
+    client.get_json("/x")  # leva o 405 e espera a pausa de 5 s antes de tentar de novo
+    sleeps.clear()
+    client.get_json("/y")  # a pausa continua valendo para a chamada seguinte (tempo parado)
+
+    assert sleeps == [5.0]
+
+
+def test_pausa_cresce_quando_o_bloqueio_insiste_e_zera_apos_sucesso() -> None:
+    handler, _ = sequence(
+        httpx.Response(405), httpx.Response(405), httpx.Response(405), ok({"a": 1})
+    )
+    client, sleeps = make_client(handler, throttle_cooldown_s=5.0, throttle_cap_s=100.0)
+
+    client.get_json("/x")
+
+    waits = [w for w in sleeps if w >= 5.0]
+    assert 5.0 in waits and 10.0 in waits and 20.0 in waits  # 5, 10, 20: dobra a cada insistência
+    assert client._throttle_streak == 0  # sucesso zera
+
+
+def test_pausa_respeita_o_teto() -> None:
+    handler, _ = sequence(httpx.Response(405))
+    client, sleeps = make_client(
+        handler, max_retries=6, throttle_cooldown_s=5.0, throttle_cap_s=12.0, backoff_cap_s=1.0
+    )
+
+    with pytest.raises(PortalUnavailableError):
+        client.get_json("/x")
+
+    assert max(sleeps) == 12.0
+
+
+def test_limite_de_requisicoes_por_segundo_espaca_as_chamadas() -> None:
+    handler, _ = sequence(ok({"a": 1}))
+    client, sleeps = make_client(handler, max_rps=4.0)  # uma a cada 0,25 s
+
+    for _ in range(4):
+        client.get_json("/x")
+
+    assert sleeps == [0.25, 0.5, 0.75]  # tempo parado: cada chamada espera sua vez na fila
+
+
+def test_sem_limite_configurado_nao_espera_nada() -> None:
+    handler, _ = sequence(ok({"a": 1}))
+    client, sleeps = make_client(handler)
+
+    for _ in range(5):
+        client.get_json("/x")
+
+    assert sleeps == []
+
+
+def test_400_e_confirmado_antes_de_ser_considerado_definitivo() -> None:
+    handler, calls = sequence(
+        httpx.Response(400, json={"Erro na API": "Erro ao executar a consulta"})
+    )
+    client, _ = make_client(handler)
+
+    with pytest.raises(PortalRequestError) as info:
+        client.get_json("/x")
+
+    assert len(calls) == 3 and info.value.status_code == 400  # 1 tentativa + 2 confirmações
+
+
+def test_400_passageiro_se_recupera() -> None:
+    handler, calls = sequence(httpx.Response(400), ok({"id": "1"}))
+    client, _ = make_client(handler)
+
+    assert client.get_json("/x") == {"id": "1"}
+    assert len(calls) == 2

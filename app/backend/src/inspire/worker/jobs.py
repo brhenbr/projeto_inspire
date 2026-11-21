@@ -57,6 +57,9 @@ def process_next(engine: Engine, settings: Settings, *, after_extraction=None) -
             max_concurrency=settings.portal_max_concurrency,
             connect_timeout_s=settings.portal_connect_timeout_s,
             read_timeout_s=settings.portal_read_timeout_s,
+            max_rps=settings.portal_max_rps,
+            throttle_cooldown_s=settings.portal_throttle_cooldown_s,
+            throttle_cap_s=settings.portal_throttle_cap_s,
         )
     except PortalAuthError as exc:
         with engine.begin() as conn:
