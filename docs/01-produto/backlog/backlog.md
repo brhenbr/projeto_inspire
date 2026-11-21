@@ -16,6 +16,7 @@ Espelhar os metadados do catálogo do dados.gov.br (só públicos; recursos apen
 - **US-006** (Story, High, mvp, extracao, web) — Disparar e acompanhar extração pela interface web
 - **US-007** (Story, Medium, mvp, extracao, tecnico) — Disparar extração por linha de comando
 - **US-008** (Story, Highest, mvp, extracao, tecnico) — Normalizador raw para catálogo, reexecutável
+- **US-009** (Story, Highest, mvp, extracao, seguranca) — Remover dados pessoais na ingestão
 
 ## EP-02 — Discovery do catálogo
 
@@ -66,6 +67,7 @@ Humano parametriza, LLM executa, humano aprova. Provedor gratuito/local por trá
 - **US-042** (Story, High, mvp, llm, curadoria) — Execução em lote com fila de revisão
 - **US-043** (Story, High, mvp, llm, governanca) — Registro de execução e proveniência
 - **US-044** (Spike, High, mvp, llm, spike) — Avaliar modelos gratuitos/locais para português
+- **US-045** (Story, Medium, mvp, llm, curadoria) — Marcar propostas desatualizadas quando o conjunto mudar no portal
 - **US-067** (Spike, High, mvp, llm, seguranca, spike) — Selecionar provedores gratuitos de LLM e validar condições de uso
 - **US-068** (Task, High, mvp, llm, seguranca) — Salvaguardas do LLM externo (ADR-0004)
 - **US-069** (Task, Low, futuro, llm, tecnico) — Perfil Docker 'llm-local' para rodar LLM em GPU (preparado, desativado)
@@ -92,6 +94,7 @@ Execução em Docker, testes, CI e documentação contínua.
 - **US-064** (Task, Medium, mvp, tecnico, governanca) — Definir licença e preparar repositório para publicação
 - **US-066** (Task, High, mvp, tecnico, seguranca) — Checklist de segurança e soberania (ADR-0002)
 - **US-065** (Task, Medium, mvp, tecnico, doc) — Documentação de implementação, testes e deploy
+- **US-072** (Task, Low, mvp, doc) — Versão da arquitetura em linguagem acessível e revisão do C4 com o cliente
 
 ## EP-08 — Verificação de links dos recursos (link rot)
 

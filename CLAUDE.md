@@ -33,7 +33,7 @@ Protótipo web, monousuário porém com arquitetura desacoplada, para **extraç�
   Em caso de dúvida, usar os princípios do **DMBOK**. O modelo `catalogo` nasce alinhado ao DCAT-BR.
 - Regras de qualidade são organizadas por dimensões DQV/FAIR/DMBOK e citam a fonte (US-023).
 
-## Armazenamento (ADR-0005, em proposta)
+## Armazenamento (ADR-0005, aceita)
 - Um PostgreSQL com camadas: `raw` (JSON bruto) → `catalogo` (tabular, reconstruível) → `analitico`; `curadoria` separada.
 
 ## Segurança e soberania (ADR-0002) — vale para toda decisão
@@ -50,8 +50,14 @@ Protótipo web, monousuário porém com arquitetura desacoplada, para **extraç�
 ## Ambiente de desenvolvimento (medido em 2026-11-21)
 - Windows, i7-4500U, 16 GB, sem GPU útil: LLM local só pequeno e em CPU. Docker Desktop precisa estar aberto (verificado funcionando, 8 GB para o Docker). Sem GPU: LLM via API (ADR-0004), com perfil `llm-local` preparado para GPU futura.
 
+## Fatos do payload real (conferidos em 2026-11-21)
+- Datas em texto `dd/mm/aaaa`; muitos campos nulos; no detalhe a organização vem como slug; há `conjuntoDadosAssociados`
+  fora do Swagger; o portal já traz `selo` e `atualizado`. Nome e e-mail do responsável vêm em todo detalhe:
+  remover na ingestão (modelo-de-dados.md, seção 2).
+
 ## Regras de trabalho
-- Documentação em **português**; código e identificadores em inglês.
+- Documentação em **português**; código e identificadores em inglês. O cliente achou os C4 técnicos demais:
+  colocar um parágrafo "em palavras simples" no topo de cada doc de arquitetura e rever o C4 com ele no final.
 - Todo o ciclo (concepção, desenho, implementação, testes, deploy) é registrado em `docs/`.
 - Decisões relevantes viram ADR em `docs/03-decisoes/` (template em `kit/templates/`).
 - Cada sessão de trabalho gera uma entrada em `docs/diario/`.

@@ -62,8 +62,17 @@ Entender o pedido, fechar as primeiras premissas com o cliente e validar a API r
 - Backlog: matriz de qualidade (US-023), normalizador raw→catálogo (US-008), perfil `llm-local` (US-069). Agora 70 itens.
 - Pesquisa: o DCAT-BR v1.0 é publicado pelo Catálogo Nacional de Dados (gov.br); a especificação precisa ser obtida e lida (US-023).
 
+## Continuação: C3, fluxos e modelo de dados
+- Cliente confirmou o ADR-0005 (PostgreSQL em camadas) e achou os C4 técnicos; mantidos, a rever no final.
+  Adicionado um parágrafo "em palavras simples" em cada doc de arquitetura e a tarefa US-072.
+- Criados `c3-componentes.md`, `fluxos.md` (2 sequências e 3 diagramas de estado) e `modelo-de-dados.md`.
+- Conferido um detalhe real do portal: datas `dd/mm/aaaa`, organização como slug, `conjuntoDadosAssociados`
+  fora do Swagger, `selo` e `atualizado` já calculados pelo portal, e **nome e e-mail do responsável em todo
+  conjunto**. Decisão de desenho: remover contatos na ingestão (US-009).
+- Os 9 diagramas foram renderizados em navegador sem erros de sintaxe. O C3 inicial ficou confuso e foi simplificado.
+- Backlog em 73 itens.
+
 ## Pendências / próximos passos
-- Cliente confirma o ADR-0005 (armazenamento em camadas em um único PostgreSQL).
-- C3 (componentes), fluxos (extração e curadoria com LLM) e modelo de dados.
-- Esqueleto do projeto em Docker, depois extração, discovery e qualidade.
+- Cliente valida o desenho (C3, fluxos, modelo de dados) e a decisão de não guardar contatos pessoais.
+- Esqueleto do projeto em Docker, depois extração (EP-01), discovery e qualidade.
 - Spike de provedores gratuitos de LLM (US-067) e matriz de qualidade DQV/FAIR/DMBOK (US-023).

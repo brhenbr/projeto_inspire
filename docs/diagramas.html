@@ -7,8 +7,8 @@ main{max-width:1300px;margin:0 auto;padding:24px 32px}
 nav ul{columns:2} section{margin:32px 0} .fonte{color:#667;font-size:13px}
 .diagrama{background:#fff;border:1px solid #d9dde3;border-radius:8px;padding:16px;margin:16px 0;overflow:auto}
 </style></head><body>
-<header><h1>Diagramas do projeto (2)</h1></header>
-<main><nav><ul><li><a href="#s0">C4 — Nível 1: Contexto do sistema</a> (1)</li><li><a href="#s1">C4 — Nível 2: Contêineres</a> (1)</li></ul></nav><section id="s0"><h2>C4 — Nível 1: Contexto do sistema</h2><p class="fonte">Fonte: <a href="02-arquitetura/c1-contexto.md">02-arquitetura/c1-contexto.md</a></p><div class="diagrama"><pre class="mermaid">flowchart TB
+<header><h1>Diagramas do projeto (9)</h1></header>
+<main><nav><ul><li><a href="#s0">C4 — Nível 1: Contexto do sistema</a> (1)</li><li><a href="#s1">C4 — Nível 2: Contêineres</a> (1)</li><li><a href="#s2">C4 — Nível 3: Componentes do backend</a> (1)</li><li><a href="#s3">C4 — Nível 4: Fluxos e estados</a> (5)</li><li><a href="#s4">Modelo de dados</a> (1)</li></ul></nav><section id="s0"><h2>C4 — Nível 1: Contexto do sistema</h2><p class="fonte">Fonte: <a href="02-arquitetura/c1-contexto.md">02-arquitetura/c1-contexto.md</a></p><div class="diagrama"><pre class="mermaid">flowchart TB
     curador[&quot;👤 &lt;b&gt;Curador(a)&lt;/b&gt;&lt;br/&gt;Revisa e melhora metadados&quot;]
     coord[&quot;👤 &lt;b&gt;Coordenação do projeto&lt;/b&gt;&lt;br/&gt;Acompanha a qualidade e a evolução&quot;]
     explorador[&quot;👤 &lt;b&gt;Explorador(a) de dados&lt;/b&gt;&lt;br/&gt;Busca dados para análise&quot;]
@@ -61,7 +61,160 @@ nav ul{columns:2} section{margin:32px 0} .fonte{color:#667;font-size:13px}
     classDef ext fill:#999,stroke:#6b6b6b,color:#fff
     class web,api,worker,db nosso
     class llmlocal opc
-    class portal,llmext ext</pre></div></section></main>
+    class portal,llmext ext</pre></div></section><section id="s2"><h2>C4 — Nível 3: Componentes do backend</h2><p class="fonte">Fonte: <a href="02-arquitetura/c3-componentes.md">02-arquitetura/c3-componentes.md</a></p><div class="diagrama"><pre class="mermaid">flowchart TB
+    rest[&quot;&lt;b&gt;API REST /v1&lt;/b&gt;&lt;br/&gt;Recebe pedidos da interface web&quot;]
+    jobs[&quot;&lt;b&gt;Tratadores de jobs&lt;/b&gt;&lt;br/&gt;Executam tarefas longas da fila&quot;]
+    fila[&quot;&lt;b&gt;Fila de jobs&lt;/b&gt;&lt;br/&gt;No PostgreSQL&quot;]
+
+    subgraph modulos[&quot;Módulos de negócio&quot;]
+        direction LR
+        extracao[&quot;&lt;b&gt;Extração&lt;/b&gt;&lt;br/&gt;Coleta em duas fases,&lt;br/&gt;retomada e conferência&quot;]
+        normal[&quot;&lt;b&gt;Normalização&lt;/b&gt;&lt;br/&gt;JSON bruto em tabelas,&lt;br/&gt;sem dados pessoais&quot;]
+        catalogo[&quot;&lt;b&gt;Catálogo&lt;/b&gt;&lt;br/&gt;Busca, filtros e detalhe&quot;]
+        qualidade[&quot;&lt;b&gt;Qualidade&lt;/b&gt;&lt;br/&gt;Regras DQV/FAIR/DMBOK,&lt;br/&gt;pontuação explicável&quot;]
+        curadoria[&quot;&lt;b&gt;Curadoria&lt;/b&gt;&lt;br/&gt;Edições, status, coleções&lt;br/&gt;e histórico&quot;]
+        assistente[&quot;&lt;b&gt;Assistente LLM&lt;/b&gt;&lt;br/&gt;Tarefas, lotes e propostas&quot;]
+        exporta[&quot;&lt;b&gt;Exportação&lt;/b&gt;&lt;br/&gt;CSV e JSON&quot;]
+    end
+
+    subgraph adaptadores[&quot;Adaptadores: peças trocáveis que falam com o mundo de fora&quot;]
+        direction LR
+        cliente[&quot;&lt;b&gt;Cliente do portal&lt;/b&gt;&lt;br/&gt;Retry e limite de taxa&quot;]
+        repos[&quot;&lt;b&gt;Armazenamento&lt;/b&gt;&lt;br/&gt;PostgreSQL em camadas&quot;]
+        filtro[&quot;&lt;b&gt;Filtro de campos públicos&lt;/b&gt;&lt;br/&gt;Barreira antes do LLM&quot;]
+        llm[&quot;&lt;b&gt;Provedor de LLM&lt;/b&gt;&lt;br/&gt;Externo ou local&quot;]
+    end
+
+    rest --&gt;|&quot;enfileira&quot;| fila
+    fila --&gt;|&quot;entrega&quot;| jobs
+    rest --&gt;|&quot;consulta e comanda&quot;| modulos
+    jobs --&gt;|&quot;executa&quot;| modulos
+    extracao --&gt;|&quot;pede dados&quot;| cliente
+    assistente --&gt;|&quot;só passa por&quot;| filtro
+    filtro --&gt; llm
+    modulos --&gt;|&quot;lê e grava&quot;| repos
+
+    classDef mod fill:#1168bd,stroke:#0b4884,color:#fff
+    classDef ada fill:#5b9bd5,stroke:#3a6fa0,color:#fff
+    classDef ent fill:#08427b,stroke:#052e56,color:#fff
+    class extracao,normal,catalogo,qualidade,curadoria,assistente,exporta mod
+    class cliente,repos,filtro,llm ada
+    class rest,jobs,fila ent</pre></div></section><section id="s3"><h2>C4 — Nível 4: Fluxos e estados</h2><p class="fonte">Fonte: <a href="02-arquitetura/fluxos.md">02-arquitetura/fluxos.md</a></p><div class="diagrama"><pre class="mermaid">sequenceDiagram
+    autonumber
+    actor U as Curador
+    participant W as Web
+    participant A as API
+    participant F as Fila (PostgreSQL)
+    participant K as Worker
+    participant P as Portal dados.gov.br
+    participant D as Banco (raw, catalogo)
+
+    U-&gt;&gt;W: Clica em Extrair catálogo
+    W-&gt;&gt;A: POST /v1/extracoes
+    A-&gt;&gt;F: Cria execução e enfileira o job
+    A--&gt;&gt;W: 202 com o id da execução
+    F-&gt;&gt;K: Entrega o job
+    K-&gt;&gt;P: Dimensões (temas, tags, formatos, ODS, observância)
+    K-&gt;&gt;P: Organizações, todas as páginas
+    Note over K,P: Cada organização informa quantos conjuntos tem, o total esperado
+    loop Fase 1: listagem, página a página
+        K-&gt;&gt;P: GET conjuntos-dados?pagina=N
+        alt Página vazia
+            K-&gt;&gt;P: Tenta de novo com espera crescente
+            Note over K: Só considera o fim após confirmar com o total esperado
+        end
+        K-&gt;&gt;D: Registra ids e resumos na fila de detalhe
+    end
+    loop Fase 2: detalhe de cada conjunto, com concorrência limitada
+        K-&gt;&gt;P: GET conjuntos-dados/id
+        Note over K: Remove dados pessoais e calcula o hash
+        alt Hash novo ou mudou
+            K-&gt;&gt;D: Grava o JSON em raw
+            K-&gt;&gt;D: Normaliza para catalogo
+        else Hash igual
+            K-&gt;&gt;D: Só marca como visto nesta execução
+        end
+    end
+    K-&gt;&gt;D: Marca como removidos os conjuntos que não apareceram
+    K-&gt;&gt;D: Recalcula a qualidade dos conjuntos alterados
+    K-&gt;&gt;D: Grava o relatório (coletado x esperado, divergências, erros)
+    W-&gt;&gt;A: Consulta o progresso periodicamente
+    A--&gt;&gt;W: Estado e contadores da execução
+    U-&gt;&gt;W: Abre o relatório da extração</pre></div><div class="diagrama"><pre class="mermaid">sequenceDiagram
+    autonumber
+    actor U as Curador
+    participant W as Web
+    participant A as API
+    participant F as Fila
+    participant K as Worker
+    participant X as Filtro de campos públicos
+    participant L as Provedor de LLM
+    participant D as Banco (curadoria)
+
+    U-&gt;&gt;W: Seleciona conjuntos, tarefa e parâmetros
+    W-&gt;&gt;A: POST /v1/execucoes-llm
+    A-&gt;&gt;F: Cria a execução e enfileira
+    A--&gt;&gt;W: 202 com o id da execução
+    F-&gt;&gt;K: Entrega o job
+    loop Para cada conjunto, um de cada vez
+        K-&gt;&gt;X: Monta o prompt com o texto do conjunto
+        X--&gt;&gt;K: Prompt só com campos públicos
+        K-&gt;&gt;L: Pede a proposta
+        alt Limite de uso ou falha temporária
+            K-&gt;&gt;L: Tenta de novo com espera e retoma depois
+        end
+        L--&gt;&gt;K: Texto proposto
+        K-&gt;&gt;D: Salva proposta pendente com modelo, versão, prompt e provedor
+    end
+    U-&gt;&gt;W: Abre a fila de revisão
+    W-&gt;&gt;A: GET /v1/propostas
+    A--&gt;&gt;W: Propostas com o original ao lado
+    U-&gt;&gt;W: Aprova, edita ou rejeita
+    W-&gt;&gt;A: PATCH /v1/propostas/id
+    A-&gt;&gt;D: Aplica na camada curada e registra autoria e histórico</pre></div><div class="diagrama"><pre class="mermaid">stateDiagram-v2
+    [*] --&gt; Enfileirada
+    Enfileirada --&gt; EmAndamento: worker pega o job
+    EmAndamento --&gt; Pausada: usuário pausa ou falha recuperável
+    Pausada --&gt; EmAndamento: retomada
+    EmAndamento --&gt; Concluida: tudo conferido
+    EmAndamento --&gt; ConcluidaComDivergencias: faltaram itens após as tentativas
+    EmAndamento --&gt; Falhou: erro não recuperável
+    EmAndamento --&gt; Cancelada: usuário cancela
+    Pausada --&gt; Cancelada: usuário cancela
+    Concluida --&gt; [*]
+    ConcluidaComDivergencias --&gt; [*]
+    Falhou --&gt; [*]
+    Cancelada --&gt; [*]</pre></div><div class="diagrama"><pre class="mermaid">stateDiagram-v2
+    [*] --&gt; Pendente
+    Pendente --&gt; EmRevisao: curador assume
+    EmRevisao --&gt; Aprovado: revisão concluída
+    EmRevisao --&gt; Rejeitado: não aproveitar a curadoria
+    EmRevisao --&gt; Duplicado: marca duplicidade
+    Aprovado --&gt; EmRevisao: reabrir
+    Rejeitado --&gt; EmRevisao: reabrir
+    Duplicado --&gt; EmRevisao: reabrir
+    Aprovado --&gt; Pendente: conjunto mudou no portal</pre></div><div class="diagrama"><pre class="mermaid">stateDiagram-v2
+    [*] --&gt; Pendente: gerada pelo LLM
+    Pendente --&gt; Aprovada: humano aprova
+    Pendente --&gt; Editada: humano edita e aprova
+    Pendente --&gt; Rejeitada: humano rejeita
+    Pendente --&gt; Desatualizada: conjunto mudou no portal
+    Desatualizada --&gt; Pendente: reavaliada
+    Aprovada --&gt; [*]
+    Editada --&gt; [*]
+    Rejeitada --&gt; [*]</pre></div></section><section id="s4"><h2>Modelo de dados</h2><p class="fonte">Fonte: <a href="02-arquitetura/modelo-de-dados.md">02-arquitetura/modelo-de-dados.md</a></p><div class="diagrama"><pre class="mermaid">erDiagram
+    ORGANIZACAO ||--o{ CONJUNTO : publica
+    CONJUNTO ||--o{ RECURSO : tem
+    CONJUNTO }o--o{ TEMA : classificado_em
+    CONJUNTO }o--o{ TAG : marcado_com
+    CONJUNTO ||--o{ ALTERACAO : recebe
+    CONJUNTO ||--o| STATUS_CONJUNTO : tem
+    CONJUNTO }o--o{ COLECAO : agrupado_em
+    CONJUNTO ||--o{ QUALIDADE_CONJUNTO : pontuado
+    LLM_EXECUCAO ||--o{ LLM_PROPOSTA : gera
+    CONJUNTO ||--o{ LLM_PROPOSTA : alvo
+    LLM_PROPOSTA ||--o| ALTERACAO : origina
+    REGRA_QUALIDADE ||--o{ QUALIDADE_CONJUNTO : avalia</pre></div></section></main>
 <script src="assets/mermaid.min.js"></script>
 <script>mermaid.initialize({startOnLoad:true,securityLevel:"strict",theme:"default",flowchart:{useMaxWidth:false}});</script>
 </body></html>

@@ -1,5 +1,10 @@
 # C4 — Nível 2: Contêineres
 
+**Em palavras simples:** o sistema é feito de cinco peças que rodam juntas: a tela que o usuário vê (Web), o
+"cérebro" que atende pedidos (API), um trabalhador que faz as tarefas demoradas em segundo plano (Worker), o
+banco de dados e, de forma opcional, um LLM rodando localmente. Fora dele ficam o portal de dados e,
+opcionalmente, uma API de LLM.
+
 Mostra as partes executáveis do Inspire Catálogo e como se comunicam. Reflete
 [ADR-0003](../03-decisoes/0003-stack-tecnologica.md) (stack),
 [ADR-0004](../03-decisoes/0004-provedor-de-llm-externo-controlado.md) (LLM) e

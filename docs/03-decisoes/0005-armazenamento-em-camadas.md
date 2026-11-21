@@ -1,6 +1,6 @@
 # ADR-0005: Armazenamento em camadas (documento → tabular → analítico) em um único PostgreSQL
 
-- **Status:** proposta (aguarda confirmação do cliente)
+- **Status:** aceita (confirmada pelo cliente em 2026-11-21)
 - **Data:** 2026-11-21
 - **Decisores:** cliente (dono do produto) e Claude
 
@@ -48,4 +48,4 @@ por MongoDB/FerretDB ou armazenamento de objetos (ex.: MinIO) é trocar um adapt
 ## Consequências
 - O normalizador (raw → catálogo) é um componente central, testado e reexecutável.
 - O modelo `catalogo` será desenhado já alinhado ao DCAT-BR, para facilitar a exportação futura (EP-11).
-- Se o cliente preferir mesmo dois motores, este ADR muda para a opção 1 e o custo operacional sobe.
+- Se no futuro o volume exigir outro motor para o bruto, troca-se o adaptador `RawStore`.

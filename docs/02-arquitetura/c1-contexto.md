@@ -1,5 +1,8 @@
 # C4 — Nível 1: Contexto do sistema
 
+**Em palavras simples:** quem usa o sistema, e com quais serviços de fora ele conversa. O sistema busca
+dados no portal dados.gov.br e, se ligado, pede ajuda a um LLM.
+
 Mostra o Inspire Catálogo, quem o usa e com quais sistemas externos ele conversa. Não depende de
 tecnologia. Linhas tracejadas são integrações previstas para depois do MVP.
 

@@ -32,6 +32,10 @@ Critérios de aceite:
 - Reprocessar o mesmo raw produz o mesmo catálogo.
 - Mudança na regra de normalização é aplicada sem nova extração.
 - Modelo alinhado ao DCAT-BR.",Highest,mvp,extracao,tecnico,,,EP-01
+US-009,Story,Remover dados pessoais na ingestão,"Nome e e-mail do responsável pelo conjunto são removidos antes de gravar o bruto e antes do hash; guarda-se só se existiam.
+
+Critérios de aceite:
+- Teste automatizado com payload real simulado prova que nenhum contato chega ao banco, à API ou ao LLM.",Highest,mvp,extracao,seguranca,,,EP-01
 EP-02,Epic,Discovery do catálogo,Explorar o catálogo espelhado com busca e filtros.,Highest,mvp,discovery,,,Discovery do catálogo,
 US-010,Story,Busca textual nos conjuntos,"Busca por título, descrição, tags e organização, com tolerância a acentos e relevância razoável.
 
@@ -72,6 +76,7 @@ US-041,Story,Tarefas de curadoria parametrizáveis,"Catálogo de tarefas com pro
 US-042,Story,Execução em lote com fila de revisão,"Gera propostas em lote; o humano aprova, edita ou rejeita cada uma. Nada é aplicado sem aprovação.",High,mvp,llm,curadoria,,,EP-05
 US-043,Story,Registro de execução e proveniência,"Guardar modelo, versão, prompt, parâmetros, entrada, saída e decisão humana de cada proposta. Atende a supervisão humana e auditabilidade do GuIA.",High,mvp,llm,governanca,,,EP-05
 US-044,Task,Avaliar modelos gratuitos/locais para português,"Comparar 2 a 3 modelos open source em amostra rotulada à mão, com custo, velocidade e qualidade. Resultado vira ADR.",High,mvp,llm,spike,spike,,EP-05
+US-045,Story,Marcar propostas desatualizadas quando o conjunto mudar no portal,"Se o conjunto mudar depois da proposta, ela fica desatualizada e só pode ser aprovada após nova revisão.",Medium,mvp,llm,curadoria,,,EP-05
 EP-06,Epic,API própria e exportação,"API REST documentada (OpenAPI), versionada, usada pela interface web e preparada para outros consumidores e para ferramentas de LLM. Plano de trabalho: A7.",High,mvp,api,,,API própria e exportação,
 US-050,Story,API REST v1 documentada em OpenAPI,"Conjuntos, organizações, qualidade, curadoria e extração. Versionada (/v1). A interface web consome só esta API.",High,mvp,api,,,,EP-06
 US-051,Story,Exportar base curada em CSV e JSON,"Exporta com ou sem filtros, trazendo original, curado e status.",Medium,mvp,api,,,,EP-06
@@ -86,6 +91,7 @@ US-067,Task,Selecionar provedores gratuitos de LLM e validar condições de uso,
 US-068,Task,Salvaguardas do LLM externo (ADR-0004),"Desligado por padrão; lista de hosts aprovados; montador de prompt que só aceita campos públicos, com teste automatizado provando que nome e e-mail de responsáveis nunca saem; aviso visível na interface; marca ""externo"" no registro de proveniência.",High,mvp,llm,seguranca,,,EP-05
 US-069,Task,"Perfil Docker 'llm-local' para rodar LLM em GPU (preparado, desativado)","Perfil opcional do Compose com Ollama ou vLLM e a configuração de GPU documentada, para uso se o projeto obtiver uma. Sem GPU hoje, não é ativado nem testado em hardware real; validar apenas que a configuração aponta para ele sem mudar código.",Low,futuro,llm,tecnico,,,EP-05
 US-065,Task,"Documentação de implementação, testes e deploy","Manter docs/04, 05 e 06 e o diário atualizados, com diagramas C4.",Medium,mvp,tecnico,doc,,,EP-07
+US-072,Task,Versão da arquitetura em linguagem acessível e revisão do C4 com o cliente,O cliente achou os diagramas C4 técnicos. Criar uma visão simplificada para público não técnico e revisar o C4 no fim do MVP.,Low,mvp,doc,,,,EP-07
 EP-08,Epic,Verificação de links dos recursos (link rot),Worker separado que verifica disponibilidade dos recursos sem baixar dados.,Medium,fase-2,links,,,Verificação de links dos recursos (link rot),
 US-070,Story,Worker de verificação HEAD/GET parcial,"Registra status HTTP, tempo de resposta, content-type real versus declarado e validade do certificado TLS, com limite de taxa por domínio.",Medium,fase-2,links,,,,EP-08
 US-071,Story,Integrar disponibilidade à pontuação de qualidade,Nova regra de qualidade e filtro na busca.,Medium,fase-2,links,qualidade,,,EP-08
