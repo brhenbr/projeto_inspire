@@ -34,7 +34,7 @@ Nome e e-mail do responsável pelo conjunto vêm em **todos** os detalhes públi
 ### `raw` — documento bruto (só inserção)
 | Tabela | Conteúdo |
 |---|---|
-| `execucao` | Cada extração: início, fim, estado, parâmetros, totais |
+| `execucao` | Cada extração: tipo (incremental ou completa), se foi forçada e quem pediu, início, fim, estado, parâmetros, totais. Um índice único parcial garante **uma execução ativa por vez** ([ADR-0006](../03-decisoes/0006-controle-de-extracoes.md)) |
 | `documento` | `tipo` (conjunto, organização, tema, tag…), `chave_externa`, `hash`, `payload` (JSON), `execucao_id`, `coletado_em` |
 | `visto` | Em quais execuções cada documento foi visto (permite detectar remoções) |
 

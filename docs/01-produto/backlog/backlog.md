@@ -12,9 +12,12 @@ Espelhar os metadados do catálogo do dados.gov.br (só públicos; recursos apen
 - **US-002** (Story, Highest, mvp, extracao, tecnico) — Cliente HTTP resiliente para a API do portal
 - **US-003** (Story, Highest, mvp, extracao) — Coletar listagem de conjuntos (fase 1)
 - **US-004** (Story, Highest, mvp, extracao) — Coletar detalhe de cada conjunto e recursos (fase 2)
+- **US-016** (Story, High, mvp, extracao) — Extração incremental pela data de alteração
 - **US-005** (Story, High, mvp, extracao) — Guardar snapshot bruto e hash por conjunto
-- **US-006** (Story, High, mvp, extracao, web) — Disparar e acompanhar extração pela interface web
+- **US-006** (Story, High, mvp, extracao, web) — Botão de extração na interface, com estado e controle
 - **US-007** (Story, Medium, mvp, extracao, tecnico) — Disparar extração por linha de comando
+- **US-017** (Story, Medium, fase-2, extracao) — Agendamento automático de extrações
+- **US-015** (Story, Highest, mvp, extracao, tecnico) — Controle de pedidos de extração no backend (ADR-0006)
 - **US-008** (Story, Highest, mvp, extracao, tecnico) — Normalizador raw para catálogo, reexecutável
 - **US-009** (Story, Highest, mvp, extracao, seguranca) — Remover dados pessoais na ingestão
 

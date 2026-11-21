@@ -27,6 +27,16 @@ Sair do desenho e ter o sistema inteiro subindo em Docker, com testes e portão 
 - Um comando meu com heredocs aninhados falhou por erro de aspas, sem efeito colateral; passei a escrever
   arquivos com a ferramenta própria.
 
+## Continuação: controle do botão de extração
+- Cliente levantou o risco de cliques repetidos gastarem processamento e sobrecarregarem o portal.
+- Medi o portal: ~0,17 s por detalhe e ~0,24 s por página; carga completa ~1 h em série. A data de alteração
+  da listagem coincidiu com a do detalhe em 24 de 24 conjuntos (amostra pequena), o que viabiliza extração
+  incremental.
+- Decisão em [ADR-0006](../03-decisoes/0006-controle-de-extracoes.md): controle no backend, uma execução
+  ativa por vez, incremental por padrão, intervalo mínimo configurável, forçar registrado.
+- Backlog: US-015 (controle), US-016 (incremental), US-017 (agendamento, fase 2); US-006 refeita. 76 itens.
+- Fluxo 1.1 adicionado em `fluxos.md`; 10 diagramas renderizados sem erro.
+
 ## Verificação
 Backend: ruff, mypy, 9 testes, cobertura 84%. Frontend: eslint, tsc, 3 testes. Sistema completo no Docker
 conferido de fora (página, API pelo nginx, OpenAPI, portas, logs sem a chave) e a página foi vista renderizada.

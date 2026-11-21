@@ -7,8 +7,8 @@ main{max-width:1300px;margin:0 auto;padding:24px 32px}
 nav ul{columns:2} section{margin:32px 0} .fonte{color:#667;font-size:13px}
 .diagrama{background:#fff;border:1px solid #d9dde3;border-radius:8px;padding:16px;margin:16px 0;overflow:auto}
 </style></head><body>
-<header><h1>Diagramas do projeto (9)</h1></header>
-<main><nav><ul><li><a href="#s0">C4 — Nível 1: Contexto do sistema</a> (1)</li><li><a href="#s1">C4 — Nível 2: Contêineres</a> (1)</li><li><a href="#s2">C4 — Nível 3: Componentes do backend</a> (1)</li><li><a href="#s3">C4 — Nível 4: Fluxos e estados</a> (5)</li><li><a href="#s4">Modelo de dados</a> (1)</li></ul></nav><section id="s0"><h2>C4 — Nível 1: Contexto do sistema</h2><p class="fonte">Fonte: <a href="02-arquitetura/c1-contexto.md">02-arquitetura/c1-contexto.md</a></p><div class="diagrama"><pre class="mermaid">flowchart TB
+<header><h1>Diagramas do projeto (10)</h1></header>
+<main><nav><ul><li><a href="#s0">C4 — Nível 1: Contexto do sistema</a> (1)</li><li><a href="#s1">C4 — Nível 2: Contêineres</a> (1)</li><li><a href="#s2">C4 — Nível 3: Componentes do backend</a> (1)</li><li><a href="#s3">C4 — Nível 4: Fluxos e estados</a> (6)</li><li><a href="#s4">Modelo de dados</a> (1)</li></ul></nav><section id="s0"><h2>C4 — Nível 1: Contexto do sistema</h2><p class="fonte">Fonte: <a href="02-arquitetura/c1-contexto.md">02-arquitetura/c1-contexto.md</a></p><div class="diagrama"><pre class="mermaid">flowchart TB
     curador[&quot;👤 &lt;b&gt;Curador(a)&lt;/b&gt;&lt;br/&gt;Revisa e melhora metadados&quot;]
     coord[&quot;👤 &lt;b&gt;Coordenação do projeto&lt;/b&gt;&lt;br/&gt;Acompanha a qualidade e a evolução&quot;]
     explorador[&quot;👤 &lt;b&gt;Explorador(a) de dados&lt;/b&gt;&lt;br/&gt;Busca dados para análise&quot;]
@@ -140,7 +140,23 @@ nav ul{columns:2} section{margin:32px 0} .fonte{color:#667;font-size:13px}
     K-&gt;&gt;D: Grava o relatório (coletado x esperado, divergências, erros)
     W-&gt;&gt;A: Consulta o progresso periodicamente
     A--&gt;&gt;W: Estado e contadores da execução
-    U-&gt;&gt;W: Abre o relatório da extração</pre></div><div class="diagrama"><pre class="mermaid">sequenceDiagram
+    U-&gt;&gt;W: Abre o relatório da extração</pre></div><div class="diagrama"><pre class="mermaid">flowchart TB
+    inicio([&quot;Pedido de extração&lt;br/&gt;(botão, API ou comando)&quot;]) --&gt; ativa{&quot;Já existe uma&lt;br/&gt;extração ativa?&quot;}
+    ativa --&gt;|&quot;Sim&quot;| devolve[&quot;Devolve a extração em curso&lt;br/&gt;e não cria outra&quot;]
+    ativa --&gt;|&quot;Não&quot;| forcada{&quot;Pedido forçado&lt;br/&gt;e confirmado?&quot;}
+    forcada --&gt;|&quot;Sim&quot;| registra[&quot;Registra quem forçou&quot;]
+    forcada --&gt;|&quot;Não&quot;| intervalo{&quot;Passou o intervalo mínimo&lt;br/&gt;desde a última bem-sucedida?&quot;}
+    intervalo --&gt;|&quot;Não&quot;| bloqueia[&quot;Recusa com o motivo&lt;br/&gt;e o horário em que libera&quot;]
+    intervalo --&gt;|&quot;Sim&quot;| cria[&quot;Cria a execução&lt;br/&gt;e enfileira&quot;]
+    registra --&gt; cria
+    cria --&gt; tipo{&quot;Tipo&quot;}
+    tipo --&gt;|&quot;Incremental (padrão)&quot;| inc[&quot;Lista tudo e busca o detalhe&lt;br/&gt;só do que mudou&quot;]
+    tipo --&gt;|&quot;Completa&quot;| comp[&quot;Lista tudo e busca o detalhe&lt;br/&gt;de todos os conjuntos&quot;]
+
+    classDef ok fill:#1168bd,stroke:#0b4884,color:#fff
+    classDef nao fill:#999,stroke:#6b6b6b,color:#fff
+    class cria,inc,comp,registra ok
+    class devolve,bloqueia nao</pre></div><div class="diagrama"><pre class="mermaid">sequenceDiagram
     autonumber
     actor U as Curador
     participant W as Web

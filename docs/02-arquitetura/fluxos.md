@@ -61,6 +61,32 @@ sequenceDiagram
 - O hash é calculado **depois** de remover contatos pessoais (ver [modelo de dados](modelo-de-dados.md)).
 - A chave da API só existe no ambiente do worker e nunca é registrada em log.
 
+### 1.1 O que acontece quando alguém pede uma extração
+
+**Em palavras simples:** antes de gastar qualquer processamento, o sistema confere se já há uma extração
+em andamento e se passou tempo suficiente desde a última. Clicar várias vezes não custa quase nada:
+quem decide é o backend, e a tela só mostra o resultado ([ADR-0006](../03-decisoes/0006-controle-de-extracoes.md)).
+
+```mermaid
+flowchart TB
+    inicio(["Pedido de extração<br/>(botão, API ou comando)"]) --> ativa{"Já existe uma<br/>extração ativa?"}
+    ativa -->|"Sim"| devolve["Devolve a extração em curso<br/>e não cria outra"]
+    ativa -->|"Não"| forcada{"Pedido forçado<br/>e confirmado?"}
+    forcada -->|"Sim"| registra["Registra quem forçou"]
+    forcada -->|"Não"| intervalo{"Passou o intervalo mínimo<br/>desde a última bem-sucedida?"}
+    intervalo -->|"Não"| bloqueia["Recusa com o motivo<br/>e o horário em que libera"]
+    intervalo -->|"Sim"| cria["Cria a execução<br/>e enfileira"]
+    registra --> cria
+    cria --> tipo{"Tipo"}
+    tipo -->|"Incremental (padrão)"| inc["Lista tudo e busca o detalhe<br/>só do que mudou"]
+    tipo -->|"Completa"| comp["Lista tudo e busca o detalhe<br/>de todos os conjuntos"]
+
+    classDef ok fill:#1168bd,stroke:#0b4884,color:#fff
+    classDef nao fill:#999,stroke:#6b6b6b,color:#fff
+    class cria,inc,comp,registra ok
+    class devolve,bloqueia nao
+```
+
 ## 2. Curadoria assistida por LLM
 
 Quem manda é o humano: escolhe os conjuntos, a tarefa e os parâmetros. O LLM só gera **propostas**.

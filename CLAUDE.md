@@ -43,6 +43,12 @@ Protótipo web, monousuário porém com arquitetura desacoplada, para **extraç�
 - Só software livre e auditável, sem telemetria externa; dependências fixadas e varridas no CI.
 - Contatos de responsáveis dos conjuntos (nome/e-mail) são dados pessoais: minimizar e nunca enviar a LLM.
 
+## Extração: controle de custo (ADR-0006)
+- Controle no backend, não só na tela: uma execução ativa por vez (índice único parcial), intervalo mínimo
+  (incremental 60 min, completa 24 h, configuráveis), incremental por padrão, "forçar" só ignora o intervalo.
+- Medido: detalhe ~0,17 s, listagem ~0,24 s por chamada; carga completa ~1 h em série (~15-20 min com 4 em
+  paralelo); a data da listagem coincidiu com a do detalhe em 24/24 amostras (validar em escala).
+
 ## Cronograma e gestão
 - Cliente é o gestor: dá as direções. Meta: o mais rápido possível e o máximo de features, com plano
   e cronograma ajustados em conjunto ao longo do caminho. Demonstração a professores da UFSCar em breve.

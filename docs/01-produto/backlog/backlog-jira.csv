@@ -20,12 +20,31 @@ US-004,Story,Coletar detalhe de cada conjunto e recursos (fase 2),"Uma chamada d
 Critérios de aceite:
 - Interrupção e retomada sem refazer o já coletado.
 - Tempo total da primeira carga medido e registrado.",Highest,mvp,extracao,,,,EP-01
+US-016,Story,Extração incremental pela data de alteração,"Percorre a listagem completa e busca o detalhe só dos conjuntos novos ou com data de alteração diferente da guardada.
+
+Critérios de aceite:
+- Segunda execução sem mudanças no portal faz zero chamadas de detalhe.
+- Relatório informa quantos detalhes foram evitados.
+- Validar em escala, na primeira carga completa, a hipótese de que a data da listagem reflete mudanças (24 de 24 amostras coincidiram).",High,mvp,extracao,,,,EP-01
 US-005,Story,Guardar snapshot bruto e hash por conjunto,"Persistir o JSON bruto por execução e um hash determinístico dos campos relevantes.
 
 Critérios de aceite:
 - Reexecução classifica cada conjunto como novo, alterado, inalterado ou removido do catálogo (remoção lógica).",High,mvp,extracao,,,,EP-01
-US-006,Story,Disparar e acompanhar extração pela interface web,"Botão para iniciar extração completa ou incremental, com progresso, cancelamento e histórico de execuções com resumo (novos, alterados, removidos, erros).",High,mvp,extracao,web,,,EP-01
+US-006,Story,"Botão de extração na interface, com estado e controle","Botão para iniciar extração incremental (padrão) ou completa, com progresso, cancelamento e histórico de execuções com resumo (novos, alterados, removidos, erros).
+
+Critérios de aceite:
+- A tela só reflete o estado informado pela API: botão desabilitado com o motivo e o horário de liberação.
+- Clicar várias vezes não cria execuções (ADR-0006).
+- Opção ""forçar"" com confirmação.
+- Mostra há quantos dias foi a última extração completa.",High,mvp,extracao,web,,,EP-01
 US-007,Story,Disparar extração por linha de comando,"Mesmo fluxo da interface, executável em container, para uso por processo agendado no futuro.",Medium,mvp,extracao,tecnico,,,EP-01
+US-017,Story,Agendamento automático de extrações,"Rotina agendada no worker (ex.: incremental diária e completa semanal), respeitando as mesmas regras do ADR-0006, com configuração pela tela.",Medium,fase-2,extracao,,,,EP-01
+US-015,Story,Controle de pedidos de extração no backend (ADR-0006),"Uma execução ativa por vez, garantida por índice único parcial no banco; intervalo mínimo desde a última execução bem-sucedida (incremental 60 min, completa 24 h, configuráveis); espera mínima de 5 min após falha; forçar só ignora o intervalo e é registrado.
+
+Critérios de aceite:
+- POST /v1/extracoes responde 202 (nova), 200 (devolve a execução em curso) ou 429 com o motivo e disponivel_em.
+- Teste de concorrência: dois pedidos simultâneos criam uma única execução.
+- Teste de intervalo com relógio simulado.",Highest,mvp,extracao,tecnico,,,EP-01
 US-008,Story,"Normalizador raw para catálogo, reexecutável","Transforma os documentos JSON da camada raw em tabelas do schema catalogo, de forma idempotente (ADR-0005).
 
 Critérios de aceite:
