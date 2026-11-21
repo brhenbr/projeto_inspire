@@ -1,0 +1,23 @@
+# Segredos
+.env
+.env.*
+!.env.example
+
+# Dados locais
+data/
+*.sqlite
+*.db
+*.duckdb
+
+# Python / Node / SO / IDE
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+dist/
+build/
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
