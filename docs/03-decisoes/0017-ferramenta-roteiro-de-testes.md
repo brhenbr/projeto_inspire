@@ -29,6 +29,10 @@ os casos vêm de arquivos JSON, então serve a qualquer sistema. Custo: manter o
 - Sem PIN nem login (decisão do cliente em 2026-11-22: não é necessário por ora); a área de resultados abre direto e a porta só é publicada em `127.0.0.1`. CSV protegido contra fórmulas; texto sempre como texto.
 - Sem login por usuário e sem anexos, de propósito. Não deve ser exposta à internet sem uma camada de acesso por cima.
 
+- **Reunir resultados:** cada testador tem o seu banco (roda a ferramenta localmente) e envia o CSV de "Baixar meus
+  resultados" ao responsável; `consolidar.py` junta tudo em um SQLite. Alternativa descartada por ora: uma instância
+  compartilhada (exigiria hospedagem e proteção de acesso).
+
 ## Consequências
 - Cada produto mantém os seus casos fora do kit (no caso deste, em `docs/`), e a ferramenta se reaproveita sem mudanças.
 - Testada com 15 testes automatizados da API e um teste de fumaça da interface em navegador real.

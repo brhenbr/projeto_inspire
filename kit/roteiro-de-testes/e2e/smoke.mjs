@@ -48,6 +48,7 @@ await page.getByRole("button", { name: "Não consegui executar" }).click();
 await page.getByRole("button", { name: "Salvar e ver o resumo" }).click();
 await page.getByRole("heading", { name: "Resumo" }).waitFor();
 confere(await page.getByText("Para olhar com atenção").isVisible(), "resumo lista o que falhou ou não foi executado");
+confere(await page.getByRole("button", { name: "Baixar meus resultados" }).isVisible(), "oferece baixar meus resultados");
 await page.getByRole("button", { name: "Finalizar teste" }).click();
 await page.getByText("Teste finalizado").waitFor();
 confere(true, "finaliza o teste");

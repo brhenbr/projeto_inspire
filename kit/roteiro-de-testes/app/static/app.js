@@ -30,6 +30,15 @@ async function api(metodo, caminho, corpo, cabecalhos) {
   return dados;
 }
 
+async function baixarArquivo(caminho, nome) {
+  const r = await fetch(caminho);
+  if (!r.ok) return;
+  const a = h("a", { href: URL.createObjectURL(await r.blob()), download: nome });
+  document.body.append(a);
+  a.click();
+  a.remove();
+}
+
 function montar(...nos) {
   app.replaceChildren(...nos.flat().filter(Boolean));
   window.scrollTo(0, 0);
@@ -167,6 +176,7 @@ function resumo(d) {
       ...Object.entries(RESULTADOS).map(([k, r]) => h("div", { class: "numero" }, h("b", { class: "r-" + k }, cont[k]), r)),
       h("div", { class: "numero" }, h("b", {}, faltam.length), "Sem resposta")),
     fim ? h("div", { class: "ok" }, "Teste finalizado. Obrigado!") : null,
+    h("p", { class: "sub" }, "Quando terminar, clique em \"Baixar meus resultados\" e envie o arquivo para quem conduz o teste (e-mail ou pasta combinada)."),
     problemas.length ? [h("h2", {}, "Para olhar com atenção"), h("table", {}, h("tbody", {}, problemas.map((c) => {
       const r = d.respostas[c.id];
       return h("tr", {}, h("td", {}, link(c)), h("td", {}, h("span", { class: "pill " + r.resultado }, RESULTADOS[r.resultado])), h("td", {}, r.mensagem_erro || r.comentario || ""));
@@ -174,6 +184,7 @@ function resumo(d) {
     faltam.length ? [h("h2", {}, "Ainda sem resposta"), h("ul", {}, faltam.map((c) => h("li", {}, link(c))))] : null,
     h("div", { class: "linha" },
       fim ? null : h("button", { type: "button", onclick: async () => { await api("POST", `/sessoes/${d.sessao.id}/finalizar`); telaRota(); } }, "Finalizar teste"),
+      h("button", { class: "sec", type: "button", onclick: () => baixarArquivo(`/api/sessoes/${d.sessao.id}/resultados.csv`, "meus-resultados.csv") }, "Baixar meus resultados"),
       h("a", { class: "botao sec", href: "#/" }, "Início")));
 }
 

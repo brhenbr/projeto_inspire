@@ -70,6 +70,12 @@ informado; a ferramenta não pede e-mail.
 1. Abre a página, escolhe o roteiro, escreve o nome. 2. Executa o caso 1 no sistema testado e volta. 3. Marca o
 resultado (e o erro, se falhou). 4. Segue até o último. 5. Vê o resumo. Pode fechar e voltar depois com o mesmo nome.
 
+## Reunir resultados de vários testadores
+Decisão do cliente: cada testador usa a ferramenta na **própria máquina**, com o **seu** SQLite. No Resumo há o botão
+**Baixar meus resultados** (CSV só da sua sessão), que a pessoa envia ao responsável (nunca ao repositório). O script
+`consolidar.py` lê vários CSV e grava um único SQLite com o resumo por caso. Evita hospedar a ferramenta e ter de
+proteger um endereço compartilhado.
+
 ## Fora do escopo (de propósito)
 Login por usuário, anexos e imagens, notificações, integração com ferramentas de chamados. Quem precisar disso depois
 pode ler o CSV ou a API.

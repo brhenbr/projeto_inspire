@@ -31,6 +31,17 @@ motivo aparece no log do contêiner.
 Menu **Resultados** (abre direto): tabela com testador, caso, resultado, erro e comentário. **Baixar CSV** exporta tudo
 (células que começam com `=`, `+`, `-` ou `@` ganham um apóstrofo, para não virarem fórmula na planilha).
 
+## Juntar os resultados de vários testadores
+Cada testador roda a ferramenta na própria máquina, então cada um tem o seu banco. Ao terminar, ele clica em
+**Baixar meus resultados** (no Resumo) e envia o arquivo `.csv` ao responsável por e-mail ou pasta combinada
+(**nunca para o repositório**). Quem conduz o teste junta tudo em um SQLite só:
+
+```
+python consolidar.py consolidado.db maria.csv joao.csv ana.csv
+```
+Mostra, por caso, quantos passaram, falharam ou não executaram (e marca os que têm falha). Rodar de novo com o mesmo
+`consolidado.db` acrescenta; o mesmo testador no mesmo caso fica com a resposta mais recente.
+
 ## Testes da ferramenta
 ```
 bash testar.sh

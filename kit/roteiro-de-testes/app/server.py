@@ -222,16 +222,22 @@ class App:
         return self.session(session_id)
 
     # ---------------------------------------------------------------- resultados
-    def results(self) -> dict[str, Any]:
-        sessions = [dict(r) for r in self.store.run("SELECT * FROM sessao ORDER BY id")]
-        answers = [dict(r) for r in self.store.run("SELECT * FROM resposta ORDER BY sessao_id, id")]
+    def results(self, session_id: int | None = None) -> dict[str, Any]:
+        where, params = (" WHERE id = ?", (session_id,)) if session_id else ("", ())
+        sessions = [dict(r) for r in self.store.run("SELECT * FROM sessao" + where + " ORDER BY id", params)]
+        answers = [
+            dict(r)
+            for r in self.store.run(
+                "SELECT * FROM resposta" + (" WHERE sessao_id = ?" if session_id else "") + " ORDER BY sessao_id, id", params
+            )
+        ]
         titles = {c["id"]: c["titulo"] for r in self.roteiros.all().values() for c in r["casos"]}
         for a in answers:
             a["caso_titulo"] = titles.get(a["caso_id"], "")
         return {"sessoes": sessions, "respostas": answers}
 
-    def results_csv(self) -> bytes:
-        data = self.results()
+    def results_csv(self, session_id: int | None = None) -> bytes:
+        data = self.results(session_id)
         by_id = {s["id"]: s for s in data["sessoes"]}
         buf = io.StringIO()
         writer = csv.writer(buf, lineterminator="\r\n")
@@ -299,6 +305,9 @@ def make_handler(app: App) -> type[BaseHTTPRequestHandler]:
                 self._json(200, app.answer(int(parts[1]), parts[3], self._body()))
             elif method == "POST" and len(parts) == 3 and parts[0] == "sessoes" and parts[1].isdigit() and parts[2] == "finalizar":
                 self._json(200, app.finish(int(parts[1])))
+            elif method == "GET" and len(parts) == 3 and parts[0] == "sessoes" and parts[1].isdigit() and parts[2] == "resultados.csv":
+                app.session(int(parts[1]))  # 404 se não existir
+                self._send(200, app.results_csv(int(parts[1])), "text/csv; charset=utf-8", {"Content-Disposition": 'attachment; filename="meus-resultados.csv"'})
             elif method == "GET" and parts in (["resultados"], ["resultados.csv"]):
                 if parts == ["resultados"]:
                     self._json(200, app.results())
