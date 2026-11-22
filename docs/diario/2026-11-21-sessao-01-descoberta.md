@@ -22,7 +22,7 @@ Entender o pedido, fechar as primeiras premissas com o cliente e validar a API r
   verificação de links em worker separado. Ficam como proposta até o desenho de arquitetura.
 
 ## Continuação: dossiê, chave e visão
-- Lido o dossiê do Inspire (`docs/00-descoberta/Projeto_INSPIRE_Dossie_Detalhado.pdf`). Pontos que
+- Lido o dossiê do Inspire (guardado em `docs/00-descoberta/restrito/`, fora do repositório). Pontos que
   afetam o produto: GuIA e supervisão humana (human-in-the-loop), Autoavaliação de Impacto Ético,
   Camadas 3 e 4 (LLMs soberanos em português, aplicações inteligentes) e a automação do CND.
 - Chave de API colocada pelo cliente em `.env` e validada (HTTP 200, valor não exibido).

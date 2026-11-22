@@ -8,7 +8,7 @@
 
 ## 1. Contexto
 
-O Projeto INSPIRE (ver [dossiê](../00-descoberta/Projeto_INSPIRE_Dossie_Detalhado.pdf)) usa IA para
+O Projeto INSPIRE (ver o dossiê do projeto, documento de terceiros guardado fora do repositório, em `docs/00-descoberta/restrito/`) usa IA para
 melhorar serviços e dados do governo federal. Este trabalho se encaixa principalmente na **Camada 3
 (plataformas e modelos de IA, incluindo LLMs em português)** e na **Camada 4 (aplicações inteligentes)**.
 

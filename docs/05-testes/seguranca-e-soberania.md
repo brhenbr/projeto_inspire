@@ -27,8 +27,8 @@ conferido. Verificado em 2026-11-22.
 - **Termos de uso dos provedores de LLM:** decisão do cliente: avaliar na fase 2; por ora usamos como estão. Lembrete:
   planos gratuitos costumam permitir que o provedor retenha os textos enviados; por isso só vão textos públicos.
 - **Licença do repositório:** decisão do cliente: fase 2.
-- **PDF de terceiros no repositório:** `docs/00-descoberta/Projeto_INSPIRE_Dossie_Detalhado.pdf` está versionado. Se o
-  repositório ficar público, confirmar se pode ser redistribuído; senão, mover para `docs/00-descoberta/restrito/`.
+- **PDF de terceiros (dossiê do projeto):** decisão do cliente em 2026-11-22: não pode ir a repositório público. Foi movido para
+  `docs/00-descoberta/restrito/` (ignorado pelo git) e **removido de todo o histórico** antes da criação do repositório remoto.
 - **Descrições do portal** podem conter e-mails institucionais (ouvidoria, diretoria); são texto público do portal e
   não o campo de contato do responsável. Constam do pacote de teste.
 - **A pausa por cota do roteador** vive na memória de cada processo (não é compartilhada); aceitável no MVP.
