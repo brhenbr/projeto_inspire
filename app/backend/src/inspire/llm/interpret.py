@@ -42,6 +42,9 @@ UFS = {
     "RN": "rio grande do norte", "RS": "rio grande do sul", "RO": "rondonia", "RR": "roraima",
     "SC": "santa catarina", "SP": "sao paulo", "SE": "sergipe", "TO": "tocantins",
 }  # fmt: skip
+GENERIC = frozenset(
+    ["dados", "dado", "conjunto", "conjuntos", "base", "bases", "banco", "informacao", "informacoes", "politica", "politicas", "estudo", "estudos", "sociais", "social", "governo", "federal", "publico", "publica", "brasil", "brasileiro", "registro", "registros"]
+)  # fmt: skip
 SYSTEM = (
     "Você traduz pedidos em português sobre dados abertos do governo brasileiro em filtros de busca. "
     "Responda SOMENTE com um objeto JSON, sem texto fora dele. Use apenas os valores permitidos informados; "
@@ -50,7 +53,7 @@ SYSTEM = (
 USER = """Pedido do usuário: {pergunta}
 
 Campos possíveis do JSON:
-- "q": só termos específicos do assunto que NÃO estejam cobertos pelos outros campos (não repita o tema, o órgão nem o estado; não use "dados" nem "conjunto"); omita se não houver
+- "q": só termos específicos do assunto que NÃO estejam cobertos pelos outros campos (não repita o tema, o órgão nem o estado; não use palavras genéricas como "dados", "conjunto", "base", "política", "estudo", "informação"; só um termo concreto); omita se não houver
 - "tema": um ou mais slugs de tema separados por vírgula (basta casar um deles), entre: {temas}. Use só se o pedido citar o assunto; não deduza tema a partir do nome do órgão
 - "formato": um formato de arquivo, entre: {formatos}
 - "esfera": {esferas} (só se o pedido disser explicitamente)
@@ -58,6 +61,7 @@ Campos possíveis do JSON:
 - "organizacao": nome ou sigla do órgão publicador, se citado
 - "periodicidade": entre: {periodicidades}
 - "nota_min": número de 0 a 100, só se pedirem qualidade mínima
+- "nome": título curto (até 6 palavras) que resuma o pedido, para nomear uma coleção
 - "explicacao": uma frase curta em português dizendo como entendeu o pedido
 """
 
@@ -69,6 +73,7 @@ class Interpretation:
     ignorados: list[str] = field(default_factory=list)
     organizacao: dict[str, str] | None = None
     resposta_bruta: str = ""
+    nome: str = ""
 
 
 def normalize(value: str) -> str:
@@ -139,6 +144,7 @@ def simulate(context: dict[str, Any]) -> dict[str, Any]:
     keywords = [w for w in words if len(w) >= 5 and w not in used and w not in STOPWORDS]
     if keywords:
         out["q"] = " ".join(keywords[:3])
+    out["nome"] = " ".join(words[:6]).capitalize()
     out["explicacao"] = "Interpretação simulada por regras simples (sem IA)."
     return out
 
@@ -196,9 +202,10 @@ def validate(engine: Engine, raw: dict[str, Any], vocab: dict[str, Any]) -> Inte
     pick("esfera", set(ESFERAS), lambda v: str(v).strip().lower())
     pick("uf", set(UFS), lambda v: str(v).strip().upper())
     pick("periodicidade", set(PERIODICIDADES), lambda v: str(v).strip().upper())
-    q = " ".join(re.sub(r"[,;]", " ", str(raw.get("q") or "")).split())[
+    terms = re.sub(r"[,;]", " ", str(raw.get("q") or "")).split()  # vírgula não é parte do termo
+    q = " ".join(t for t in terms if normalize(t) not in GENERIC)[
         :200
-    ]  # vírgula não é parte do termo
+    ]  # genérica só restringe à toa
     if q and not re.fullmatch(r"\W*", q):
         filters["q"] = q
     organization = None
@@ -213,7 +220,9 @@ def validate(engine: Engine, raw: dict[str, Any], vocab: dict[str, Any]) -> Inte
             filters["nota_min"] = max(0.0, min(100.0, float(raw["nota_min"])))
     except (TypeError, ValueError):
         ignored.append("nota_min: valor inválido")
+    name = " ".join(str(raw.get("nome") or "").split())[:80].strip(" .:;,-")
     return Interpretation(
+        nome=name,
         filtros=filters,
         explicacao=str(raw.get("explicacao") or "").strip()[:300],
         ignorados=ignored,

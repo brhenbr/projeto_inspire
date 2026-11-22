@@ -83,7 +83,7 @@ test.describe("4. Coleções e exportação", () => {
     await expect(page.getByRole("row", { name: /Tema saúde/ })).toContainText("Dinâmica");
     await page.getByRole("link", { name: "Tema saúde" }).click();
     await expect(page.getByRole("heading", { name: "Regra (filtros salvos)" })).toBeVisible();
-    await expect(page.getByText("tema: saude")).toBeVisible();
+    await expect(page.getByLabel("Regra da coleção").getByText(/Tema:/)).toBeVisible();
   });
 
   test("coleção dinâmica aceita exceções: excluir um conjunto da regra", async ({ page }) => {
@@ -103,7 +103,7 @@ test.describe("4. Coleções e exportação", () => {
     await page.getByRole("link", { name: "Temporária" }).click();
 
     await page.getByLabel("Novo nome").fill("Temporária renomeada");
-    await page.getByRole("button", { name: "Salvar nome" }).click();
+    await page.getByRole("button", { name: "Salvar alterações" }).click();
     await expect(page.getByRole("heading", { level: 1, name: "Temporária renomeada" })).toBeVisible();
 
     page.once("dialog", (d) => d.accept());

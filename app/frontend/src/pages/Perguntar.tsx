@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { api, type Interpretacao, type RespostaChat } from "../api";
 import { fmtNum } from "../format";
 import { useAction, useApi } from "../hooks";
+import { FiltroChips, ROTULOS, type Filtros } from "../FiltroChips";
 import { Badge, Card, Empty, ErrorBox, Nota } from "../ui";
 import type { LlmEstado } from "../api";
 
@@ -13,25 +14,11 @@ const EXEMPLOS = [
   "conjuntos federais sobre meio ambiente atualizados mensalmente",
   "dados do IBGE com boa qualidade",
 ];
-const ROTULOS: Record<string, string> = {
-  q: "Palavras", tema: "Tema", formato: "Formato", esfera: "Esfera", uf: "UF", organizacao: "Órgão",
-  periodicidade: "Periodicidade", nota_min: "Nota mínima", licenca: "Licença",
-};
-
 /** Mostra os filtros entendidos como etiquetas; o usuário sempre vê o que foi usado. */
-export function FiltrosEntendidos({ i, onRemove }: { i: Pick<Interpretacao, "filtros" | "explicacao" | "ignorados" | "organizacao">; onRemove?: (chave: string) => void }) {
-  const itens = Object.entries(i.filtros);
+export function FiltrosEntendidos({ i, onChange }: { i: Pick<Interpretacao, "filtros" | "explicacao" | "ignorados" | "organizacao">; onChange?: (novos: Filtros) => void }) {
   return (
     <div>
-      <div className="chips" aria-label="Filtros entendidos">
-        {itens.length === 0 && <Badge>nenhum filtro</Badge>}
-        {itens.map(([k, v]) => (
-          <Badge key={k} tone="azul">
-            {ROTULOS[k] ?? k}: {k === "organizacao" && i.organizacao ? i.organizacao.titulo : String(v)}
-            {onRemove && <button type="button" className="chip-x" aria-label={`Remover filtro ${ROTULOS[k] ?? k}`} onClick={() => onRemove(k)}>×</button>}
-          </Badge>
-        ))}
-      </div>
+      <FiltroChips filtros={i.filtros} organizacao={i.organizacao} onChange={onChange} rotulo="Filtros entendidos" />
       {i.explicacao && <p className="subtitulo">{i.explicacao}</p>}
       {i.ignorados.length > 0 && (
         <div className="info" role="note">

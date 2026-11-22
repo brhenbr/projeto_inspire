@@ -63,8 +63,7 @@ def test_valida_a_saida_do_modelo_e_informa_o_que_descartou(populated: Engine) -
 
     assert result.filtros["esfera"] == "federal" and result.filtros["nota_min"] == 100.0
     assert (
-        result.filtros["organizacao"] == "orgao-2"
-        and result.filtros["q"] == "vacinas benefícios sociais"
+        result.filtros["organizacao"] == "orgao-2" and result.filtros["q"] == "vacinas benefícios"
     )
     assert result.filtros["tema"] == "saude,educacao" and "uf" not in result.filtros
     assert any("tema-inventado" in i for i in result.ignorados) and any(
@@ -169,3 +168,30 @@ def test_propor_colecao_nao_cria_nada_e_nao_afrouxa(
     assert body["nome_sugerido"].startswith("Bases do órgão 1")
     assert len(client.get("/v1/colecoes").json()) == before  # nada foi criado
     assert client.post("/v1/chat/colecao", json={"descricao": "x"}).status_code == 422
+
+
+def test_nome_vem_do_modelo_e_palavras_genericas_nao_restringem(
+    populated: Engine, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    app = create_app()
+    app.dependency_overrides[get_db] = lambda: populated
+    app.dependency_overrides[get_settings] = lambda: SIM
+    answer = {
+        "q": "políticas, estudo; pobreza",
+        "nome": "  Proteção social federal.  ",
+        "tema": "saude",
+    }
+    monkeypatch.setattr(providers, "build_provider", lambda _s: Canned(json.dumps(answer)))
+
+    body = TestClient(app).post("/v1/chat/colecao", json={"descricao": "xxx"}).json()
+
+    assert body["nome_sugerido"] == "Proteção social federal"
+    assert body["filtros"]["q"] == "pobreza"  # "políticas" e "estudo" são genéricas demais
+
+
+def test_nome_sem_modelo_corta_na_primeira_pontuacao() -> None:
+    from inspire.api.routes.chat import _suggest_name
+
+    texto = "Bases de dados sociais do governo federal: saúde, assistência e educação"
+    assert _suggest_name(texto, "") == "Bases de dados sociais do governo federal"
+    assert _suggest_name(texto, "bases sociais") == "Bases sociais"

@@ -1,5 +1,6 @@
 """Chat em linguagem natural: o LLM traduz o pedido em filtros; a busca existente executa (ADR-0016)."""
 
+import re
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -25,10 +26,13 @@ class PedidoColecao(BaseModel):
     descricao: str = Field(min_length=2, max_length=interpret.MAX_TEXT)
 
 
-def _suggest_name(description: str) -> str:
-    words = description.split()
-    name = " ".join(words[:8])
-    return (name[:1].upper() + name[1:])[:80].rstrip(" ,;:.")
+def _suggest_name(description: str, from_model: str) -> str:
+    """Nome curto da coleção: o do modelo; senão, o começo da descrição até a primeira pontuação."""
+    if from_model:
+        return from_model[:1].upper() + from_model[1:]
+    head = re.split(r"[:;,.]", description.strip(), maxsplit=1)[0]
+    name = " ".join(head.split()[:8])
+    return (name[:1].upper() + name[1:])[:80]
 
 
 @router.post("/colecao")
@@ -47,7 +51,7 @@ def propor_colecao(body: PedidoColecao, db: Db, cfg: Cfg) -> dict[str, Any]:
     found = SearchService(db).search(interpret.to_filters(result), size=5)
     found.pop("facetas", None)
     return {
-        "nome_sugerido": _suggest_name(body.descricao),
+        "nome_sugerido": _suggest_name(body.descricao, result.nome),
         "filtros": result.filtros,
         "explicacao": result.explicacao,
         "ignorados": result.ignorados,

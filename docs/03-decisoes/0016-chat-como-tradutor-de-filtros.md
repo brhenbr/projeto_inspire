@@ -46,3 +46,12 @@ semântica, avaliada à parte com o catálogo real.
 - O filtro `tema` passou a aceitar vários slugs separados por vírgula (casa qualquer um), pois "saúde, assistência e
   educação" é o caso típico de coleção. Antes, o pedido virava uma busca de palavras que dava poucos resultados.
 - O prompt manda não deduzir tema a partir do nome do órgão (o que gerava "Ministério da Saúde + tema saúde + CSV" = 0).
+
+## Ajustes após o primeiro teste manual do cliente (2026-11-22)
+- Palavras genéricas ("política", "estudo", "base", "sociais"...) são descartadas de `q`: faziam o total variar de 127 a 2.246
+  entre chamadas do mesmo pedido.
+- O modelo também propõe um **nome curto** para a coleção (antes o nome era o começo do texto, cortado no meio).
+- Um chip por tema (com o nome do tema), "Restaurar filtros propostos" sem nova chamada ao LLM, e criação bloqueada
+  quando a coleção daria zero conjuntos.
+- Coleções dinâmicas passaram a ser **editáveis** (nome, descrição, filtros por × ou nova descrição em texto), com
+  "Salvar alterações" único. Nada vale até salvar.

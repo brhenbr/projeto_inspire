@@ -28,3 +28,8 @@ O texto digitado em "Curador(a)" ficava invisível (letra branca em campo branco
 2. Decidir se quer a busca semântica por embeddings (US-080) ou se o chat basta.
 3. Lista das "bases sociais" (US-037) e definição de licença e publicação (US-064).
 4. Rever os diagramas C4 em linguagem mais simples (US-072).
+
+## Teste manual do cliente (2026-11-22) e ajustes
+O cliente executou o caso "bases sociais" e apontou: total instável entre chamadas, tema em uma etiqueta só, necessidade
+de restaurar filtros sem chamar o LLM, nome da coleção cortado, falta de edição e descrição truncada na tela. Tudo tratado
+(ver ADR-0016, seção de ajustes). Verificação: backend 274, frontend 41, E2E 55 de 55.

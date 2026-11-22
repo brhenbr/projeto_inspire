@@ -47,11 +47,12 @@ test.describe("9. DCAT-BR, chat e coleção por texto", () => {
     const antes = ((await (await request.get("/api/v1/colecoes")).json()) as unknown[]).length;
     await page.goto("/colecoes");
 
-    await page.getByLabel("Descrição da coleção").fill("dados de saúde da população");
+    await page.getByLabel("Descrição da coleção").fill("dados de saúde");
     await page.getByRole("button", { name: "Propor filtros" }).click();
     await expect(page.getByTestId("total-proposta")).toBeVisible();
     expect(((await (await request.get("/api/v1/colecoes")).json()) as unknown[]).length).toBe(antes);
 
+    await expect(page.getByTestId("total-proposta")).not.toContainText(/^0 /); // sem resultado a tela não deixa criar
     await page.getByLabel("Nome da nova coleção").fill("Coleção por texto E2E");
     await page.getByRole("button", { name: "Criar coleção dinâmica" }).click();
 
