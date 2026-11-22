@@ -155,6 +155,7 @@ export default function BuscaPage() {
                   </label>
                   <a className="botao botao-sec botao-peq" href={api.url("/exportacao/conjuntos", { ...Object.fromEntries(sp.entries()), saida: "csv" })} download>Exportar CSV</a>
                   <a className="botao botao-sec botao-peq" href={api.url("/exportacao/conjuntos", { ...Object.fromEntries(sp.entries()), saida: "json" })} download>Exportar JSON</a>
+                  <a className="botao botao-sec botao-peq" href={api.url("/exportacao/conjuntos", { ...Object.fromEntries(sp.entries()), saida: "jsonld" })} download>Exportar DCAT-BR</a>
                 </div>
               </div>
               {d.aproximada && <div className="info">Nenhum resultado exato. Mostrando títulos parecidos com “{sp.get("q")}”.</div>}

@@ -6,6 +6,7 @@ decisão e as consequências. Modelo em [`kit/templates/adr.md`](../../kit/templ
 | # | Decisão | Quem decidiu |
 |---|---|---|
 | [0001](0001-premissas-de-processo-e-escopo-inicial.md) | Premissas de processo e escopo inicial | Cliente e Claude |
+| [0015](0015-formato-de-exportacao-dcat-br-dqv.md) | Exportação DCAT-BR/DQV em JSON-LD gerado em fluxo | Claude, em autonomia |
 | [0002](0002-seguranca-e-soberania.md) | Segurança e soberania como requisitos de projeto | Cliente e Claude |
 | [0003](0003-stack-tecnologica.md) | Stack: Python/FastAPI, React/TypeScript, PostgreSQL, Docker | Cliente e Claude |
 | [0004](0004-provedor-de-llm-externo-controlado.md) | API gratuita de LLM só com metadados públicos | Cliente e Claude |

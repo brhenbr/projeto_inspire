@@ -11,17 +11,23 @@ from inspire.api.deps import get_db
 from inspire.api.routes.descoberta import get_filters
 from inspire.curation import collections
 from inspire.discovery.search import Filters
-from inspire.export import service
+from inspire.export import dcat, service
 
 router = APIRouter(prefix="/exportacao", tags=["exportacao"])
 Db = Annotated[Engine, Depends(get_db)]
-Saida = Literal["csv", "json"]  # não chamar de "formato": colide com o filtro de formato do recurso
+Saida = Literal[
+    "csv", "json", "jsonld"
+]  # não chamar de "formato": colide com o filtro de formato do recurso
 
 
 def _stream(db: Engine, filters: Filters, fmt: Saida, name: str) -> StreamingResponse:
-    items = service.rows(db, filters)
-    body = service.to_csv(items) if fmt == "csv" else service.to_json(items)
-    media = "text/csv; charset=utf-8" if fmt == "csv" else "application/json"
+    if fmt == "jsonld":  # DCAT-BR com qualidade em DQV (ADR-0015)
+        body = dcat.build_catalog(db, filters, title=f"Inspire Catálogo: {name}")
+        media = "application/ld+json"
+    elif fmt == "csv":
+        body, media = service.to_csv(service.rows(db, filters)), "text/csv; charset=utf-8"
+    else:
+        body, media = service.to_json(service.rows(db, filters)), "application/json"
     stamp = datetime.now(UTC).strftime("%Y%m%d")
     return StreamingResponse(
         body,

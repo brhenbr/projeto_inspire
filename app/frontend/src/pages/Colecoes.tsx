@@ -98,6 +98,7 @@ export function ColecaoPage() {
         <span>{fmtNum(c.conjuntos)} conjunto(s)</span>
         <a className="botao botao-sec botao-peq" href={api.url(`/exportacao/colecoes/${id}`, { saida: "csv" })} download>Exportar CSV</a>
         <a className="botao botao-sec botao-peq" href={api.url(`/exportacao/colecoes/${id}`, { saida: "json" })} download>Exportar JSON</a>
+        <a className="botao botao-sec botao-peq" href={api.url(`/exportacao/colecoes/${id}`, { saida: "jsonld" })} download>Exportar DCAT-BR</a>
         <button type="button" className="botao botao-perigo botao-peq" onClick={apagar}>Apagar coleção</button>
       </div>
       <ErrorBox error={acao.error} />

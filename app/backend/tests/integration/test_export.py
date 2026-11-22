@@ -144,3 +144,44 @@ def test_matriz_de_qualidade_lista_todas_as_regras_e_dimensoes() -> None:
         r.dimension for r in RULES
     }
     assert "Gerado por" in md and "ADR-0009" in md and json.dumps("DCAT-BR")
+
+
+def test_dcat_br_jsonld_com_qualidade_dqv_e_sem_contato(api: TestClient, populated: Engine) -> None:
+    service.apply_changes(populated, "ds-0001", {"titulo": "Título DCAT curado"}, author="ana")
+
+    r = api.get("/v1/exportacao/conjuntos", params={"saida": "jsonld"})
+
+    assert r.status_code == 200 and r.headers["content-type"].startswith("application/ld+json")
+    doc = json.loads(r.content)
+    assert "dcat" in doc["@context"] and doc["@graph"][0]["@type"] == "dcat:Catalog"
+    datasets = [n for n in doc["@graph"] if n.get("@type") == "dcat:Dataset"]
+    assert len(datasets) == 61 == doc["@graph"][0]["inspire:totalConjuntos"]
+    by_id = {d["dct:identifier"]: d for d in datasets}
+    first = by_id["ds-0001"]
+    assert first["dct:title"] == "Título DCAT curado"  # valor curado, não o original
+    assert first["inspire:curado"] is True and first["dct:language"] == "pt-BR"
+    assert first["dcat:distribution"], "recursos viram distribuições"
+    assert all(x["@type"] == "dcat:Distribution" for x in first["dcat:distribution"])
+    metrics = {n["@id"] for n in doc["@graph"] if n.get("@type") == "dqv:Metric"}
+    measured = [m for d in datasets for m in d.get("dqv:hasQualityMeasurement", [])]
+    assert measured and all(m["dqv:isMeasurementOf"]["@id"] in metrics for m in measured)
+    assert "dcat:contactPoint" not in r.text and "vcard" not in r.text  # dados pessoais (ADR-0002)
+
+
+def test_dcat_br_respeita_filtros_e_colecao(api: TestClient, populated: Engine) -> None:
+    some = api.get("/v1/exportacao/conjuntos", params={"saida": "jsonld", "q": "saude populacao"})
+    n = json.loads(some.content)["@graph"][0]["inspire:totalConjuntos"]
+    assert 0 < n < 61
+    cid = collections.create(populated, "Para DCAT", kind="manual")
+    collections.add_items(populated, cid, ["ds-0001"])
+    r = api.get(f"/v1/exportacao/colecoes/{cid}", params={"saida": "jsonld"})
+    assert json.loads(r.content)["@graph"][0]["inspire:totalConjuntos"] == 1
+
+
+def test_dcat_mapeia_licenca_periodicidade_e_datas() -> None:
+    from inspire.export import dcat
+
+    assert dcat._license("cc-by") == {"@id": "https://creativecommons.org/licenses/by/4.0/"}
+    assert dcat._license("notspecified") is None and dcat._license("outra") == "outra"
+    assert dcat._br_date("01/02/2017 10:00:00") == "2017-02-01" and dcat._br_date("ontem") is None
+    assert dcat.FREQUENCIES["MENSAL"] == "monthly" and "QUADRIMESTRAL" not in dcat.FREQUENCIES
