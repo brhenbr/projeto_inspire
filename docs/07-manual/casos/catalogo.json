@@ -338,7 +338,7 @@
         "Confira o nome sugerido e clique em “Criar coleção dinâmica”."
       ],
       "esperado": [
-        "Aparecem etiquetas de filtros (um tema por etiqueta, com o nome do tema) e uma contagem de conjuntos (centenas ou milhares).",
+        "Aparecem etiquetas de filtros (um tema por etiqueta, com o nome do tema) e uma contagem de conjuntos (de cerca de cem a vários milhares, conforme o modo e a tentativa).",
         "Nada é criado até você confirmar.",
         "Remover e restaurar filtros atualiza a contagem sem nova espera.",
         "A coleção criada abre com o nome escolhido."

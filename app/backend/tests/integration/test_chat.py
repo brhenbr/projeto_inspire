@@ -195,3 +195,27 @@ def test_nome_sem_modelo_corta_na_primeira_pontuacao() -> None:
     texto = "Bases de dados sociais do governo federal: saúde, assistência e educação"
     assert _suggest_name(texto, "") == "Bases de dados sociais do governo federal"
     assert _suggest_name(texto, "bases sociais") == "Bases sociais"
+
+
+def test_simulado_ignora_palavras_de_pedido_e_formato(populated: Engine) -> None:
+    from inspire.llm.interpret import simulate
+
+    out = simulate(
+        {
+            "pergunta": "Quero dados de saúde em formato CSV",
+            "temas": [{"slug": "saude", "titulo": "Saúde"}],
+            "formatos": ["CSV"],
+        }
+    )
+
+    assert out["tema"] == "saude" and out["formato"] == "CSV"
+    assert "q" not in out  # "quero", "dados" e "formato" não são assunto
+
+
+def test_afrouxar_nunca_solta_o_ultimo_filtro(populated: Engine) -> None:
+    found, used, removed = interpret.search_relaxed(
+        populated, {"q": "xyzqwvk", "esfera": "municipal"}, size=5
+    )
+
+    assert found["total"] == 0  # nada bate: diz que não achou, em vez de mostrar tudo
+    assert len(used) == 1 and removed == ["esfera"]

@@ -43,7 +43,7 @@ UFS = {
     "SC": "santa catarina", "SP": "sao paulo", "SE": "sergipe", "TO": "tocantins",
 }  # fmt: skip
 GENERIC = frozenset(
-    ["dados", "dado", "conjunto", "conjuntos", "base", "bases", "banco", "informacao", "informacoes", "politica", "politicas", "estudo", "estudos", "sociais", "social", "governo", "federal", "publico", "publica", "brasil", "brasileiro", "registro", "registros"]
+    ["dados", "dado", "conjunto", "conjuntos", "base", "bases", "banco", "informacao", "informacoes", "politica", "politicas", "estudo", "estudos", "sociais", "social", "governo", "federal", "publico", "publica", "brasil", "brasileiro", "registro", "registros", "formato", "formatos", "arquivo", "arquivos", "planilha", "planilhas", "tabela", "tabelas", "quero", "preciso", "gostaria", "procuro", "busco", "mostre", "mostrar", "sobre", "relacionados", "referentes", "estado", "estados"]
 )  # fmt: skip
 SYSTEM = (
     "Você traduz pedidos em português sobre dados abertos do governo brasileiro em filtros de busca. "
@@ -141,7 +141,11 @@ def simulate(context: dict[str, Any]) -> dict[str, Any]:
             out["uf"] = uf
             used.update(name.split())
             break
-    keywords = [w for w in words if len(w) >= 5 and w not in used and w not in STOPWORDS]
+    keywords = [
+        w
+        for w in words
+        if len(w) >= 5 and w not in used and w not in STOPWORDS and w not in GENERIC
+    ]
     if keywords:
         out["q"] = " ".join(keywords[:3])
     out["nome"] = " ".join(words[:6]).capitalize()
@@ -263,7 +267,9 @@ def search_relaxed(
     service = SearchService(engine)
     while True:
         found = service.search(Filters.from_dict(current), size=size)
-        if found["total"] > 0 or not current:
+        if (
+            found["total"] > 0 or len(current) <= 1
+        ):  # nunca solta o último filtro: seria mostrar o catálogo todo
             return found, current, removed
         key = next((k for k in RELAX_ORDER if k in current), None)
         if key is None:

@@ -30,7 +30,7 @@ carregar() {
   else
     echo "Aviso: sem arquivo .sha256; a integridade do pacote não foi conferida."
   fi
-  $C up -d db >/dev/null
+  $C up -d --wait db >/dev/null  # espera o PostgreSQL ficar saudável antes de mexer na base
   [ "${NO_RESTART:-0}" = "1" ] || $C stop api worker >/dev/null 2>&1 || true
   $C exec -T db psql -U inspire -d postgres -v ON_ERROR_STOP=1 \
     -c "DROP DATABASE IF EXISTS \"$DB\" WITH (FORCE)" -c "CREATE DATABASE \"$DB\" OWNER inspire" >/dev/null
