@@ -1,6 +1,6 @@
 # ADR-0009: Modelo de pontuação da qualidade dos metadados
 
-- **Status:** aceita (decidida de forma autônoma, durante a ausência do cliente)
+- **Status:** aceita (decidida de forma autônoma; revisada e confirmada pelo cliente em 2026-11-21)
 - **Data:** 2026-11-21
 - **Decisores:** Claude, por delegação do cliente
 

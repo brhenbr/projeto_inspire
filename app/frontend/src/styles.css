@@ -35,7 +35,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .menu a:hover { background: rgba(255,255,255,.12); }
 .menu a.ativo { background: #fff; color: var(--azul); font-weight: 600; }
 .curador { display: flex; align-items: center; gap: 6px; font-size: .85rem; }
-.curador input { width: 130px; padding: 4px 8px; border-radius: 6px; border: 0; }
+.curador input { width: 130px; padding: 4px 8px; border-radius: 6px; border: 0; background: #fff; color: #1a1a1a; }
+.curador input::placeholder { color: #6b7280; }
 .pagina { max-width: 1280px; margin: 0 auto; padding: 24px; }
 .subtitulo { color: var(--suave); margin: 0 0 18px; }
 .aviso { padding: 10px 24px; font-size: .92rem; }
