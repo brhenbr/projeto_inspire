@@ -55,7 +55,7 @@ Camada curada separada do espelho do portal, com histórico. Plano de trabalho: 
 - **US-032** (Story, High, mvp, curadoria) — Status de curadoria ✔ Concluído
 - **US-033** (Story, High, mvp, curadoria, web) — Criar e gerenciar coleções pela interface ✔ Concluído
 - **US-036** (Story, High, mvp, curadoria, web) — Coleções dinâmicas a partir de filtros salvos ✔ Concluído
-- **US-037** (Task, Medium, mvp, curadoria) — Criar a coleção inicial de bases sociais ✔ Em andamento (o sistema propõe a lista; também será caso de teste para os testadores)
+- **US-037** (Task, Medium, mvp, curadoria) — Criar a coleção inicial de bases sociais ✔ Proposta pronta (docs/01-produto/bases-sociais-proposta.md); aguarda aprovação do cliente
 - **US-034** (Story, Medium, mvp, curadoria) — Histórico e auditoria de alterações ✔ Concluído
 - **US-035** (Story, Low, fase-2, curadoria) — Detecção de possíveis duplicados
 
@@ -69,9 +69,9 @@ Humano parametriza, LLM executa, humano aprova. Provedor gratuito/local por trá
 - **US-041** (Story, High, mvp, llm, curadoria) — Tarefas de curadoria parametrizáveis ✔ Concluído
 - **US-042** (Story, High, mvp, llm, curadoria) — Execução em lote com fila de revisão ✔ Concluído
 - **US-043** (Story, High, mvp, llm, governanca) — Registro de execução e proveniência ✔ Concluído
-- **US-044** (Spike, High, mvp, llm, spike) — Avaliar modelos gratuitos/locais para português
+- **US-044** (Spike, High, mvp, llm, spike) — Avaliar modelos gratuitos/locais para português ✔ Concluído (amostra pequena; docs/04-implementacao/05-avaliacao-de-llm-gratuitos.md)
 - **US-045** (Story, Medium, mvp, llm, curadoria) — Marcar propostas desatualizadas quando o conjunto mudar no portal ✔ Concluído
-- **US-067** (Spike, High, mvp, llm, seguranca, spike) — Selecionar provedores gratuitos de LLM e validar condições de uso ✔ Parcial (4 provedores gratuitos validados com chaves reais em 2026-11-21; termos de uso a conferir)
+- **US-067** (Spike, High, mvp, llm, seguranca, spike) — Selecionar provedores gratuitos de LLM e validar condições de uso ✔ Fase 2 (decisão do cliente em 2026-11-22: usar como está; 4 provedores validados com chaves reais)
 - **US-068** (Task, High, mvp, llm, seguranca) — Salvaguardas do LLM externo (ADR-0004) ✔ Concluído
 - **US-069** (Task, Low, futuro, llm, tecnico) — Perfil Docker 'llm-local' para rodar LLM em GPU (preparado, desativado)
 - **US-150** (Story, High, mvp, llm, seguranca) — Roteador de provedores gratuitos de LLM com troca automática por cota ✔ Concluído
@@ -93,16 +93,16 @@ Execução em Docker, testes, CI e documentação contínua.
 
 - **US-060** (Task, Highest, mvp, tecnico, adr) — Conversa e ADR de tecnologias (stack, banco, busca, fila, front) ✔ Concluído (ADR-0003)
 - **US-061** (Task, Highest, mvp, tecnico) — Esqueleto do projeto com Docker Compose ✔ Concluído
-- **US-062** (Task, High, mvp, tecnico) — Portão local de qualidade e, depois do primeiro push, CI ✔ Parcial (portão local pronto; CI depois do primeiro push)
+- **US-062** (Task, High, mvp, tecnico) — Portão local de qualidade e, depois do primeiro push, CI ✔ Parcial (portão local pronto; CI proposto em docs/06-deploy/ci-proposta.md, ativar após o push)
 - **US-063** (Task, High, mvp, tecnico, teste) — Testes E2E dos fluxos principais ✔ Concluído
-- **US-064** (Task, Medium, mvp, tecnico, governanca) — Definir licença e preparar repositório para publicação
-- **US-066** (Task, High, mvp, tecnico, seguranca) — Checklist de segurança e soberania (ADR-0002) ✔ Parcial (barreiras implementadas e testadas; falta varredura de dependências no CI)
+- **US-064** (Task, Medium, mvp, tecnico, governanca) — Definir licença e preparar repositório para publicação ✔ Fase 2 (decisão do cliente em 2026-11-22)
+- **US-066** (Task, High, mvp, tecnico, seguranca) — Checklist de segurança e soberania (ADR-0002) ✔ Concluído (docs/05-testes/seguranca-e-soberania.md; varreduras manuais até haver CI)
 - **US-065** (Task, Medium, mvp, tecnico, doc) — Documentação de implementação, testes e deploy ✔ Concluído
-- **US-072** (Task, Low, mvp, doc) — Versão da arquitetura em linguagem acessível e revisão do C4 com o cliente
+- **US-072** (Task, Low, mvp, doc) — Versão da arquitetura em linguagem acessível e revisão do C4 com o cliente ✔ Concluído (C4 reescritos em 2026-11-22; visão simples em docs/02-arquitetura/00-como-o-sistema-funciona.md)
 - **US-160** (Story, High, mvp, teste, kit) — Ferramenta independente de roteiro de testes (SQLite, sem dependências) ✔ Concluído
-- **US-161** (Story, High, mvp, teste, doc) — Manual do usuário como roteiro de testes com dados reais
+- **US-161** (Story, High, mvp, teste, doc) — Manual do usuário como roteiro de testes com dados reais ✔ Concluído (43 casos em docs/07-manual/casos/catalogo.json)
 - **US-162** (Task, High, mvp, teste, deploy) — Pacote de teste com a base já carregada (Docker)
-- **US-163** (Task, Medium, teste, doc, arquitetura) — Página 'como o sistema funciona' para os testadores
+- **US-163** (Task, Medium, teste, doc, arquitetura) — Página 'como o sistema funciona' para os testadores ✔ Concluído (docs/02-arquitetura/00-como-o-sistema-funciona.md)
 
 ## EP-08 — Verificação de links dos recursos (link rot)
 
