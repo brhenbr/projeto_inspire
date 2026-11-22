@@ -302,10 +302,10 @@ class SimulatedProvider:
 # É a aprovação do provedor (ADR-0004): o host vem fixo daqui, não do ambiente. Modelos podem ser trocados por
 # LLM_ROUTER_MODELS, pois as camadas gratuitas mudam com frequência.
 ROUTER_PRESETS: dict[str, tuple[str, str]] = {
-    "groq": ("https://api.groq.com/openai/v1", "llama-3.3-70b-versatile"),
-    "gemini": ("https://generativelanguage.googleapis.com/v1beta/openai", "gemini-2.5-flash"),
-    "openrouter": ("https://openrouter.ai/api/v1", "meta-llama/llama-3.3-70b-instruct:free"),
-    "cerebras": ("https://api.cerebras.ai/v1", "llama-3.3-70b"),
+    "groq": ("https://api.groq.com/openai/v1", "openai/gpt-oss-120b"),
+    "gemini": ("https://generativelanguage.googleapis.com/v1beta/openai", "gemini-3.5-flash"),
+    "openrouter": ("https://openrouter.ai/api/v1", "nvidia/nemotron-3-ultra-550b-a55b:free"),
+    "cerebras": ("https://api.cerebras.ai/v1", "gpt-oss-120b"),
     "mistral": ("https://api.mistral.ai/v1", "mistral-small-latest"),
     "deepseek": ("https://api.deepseek.com", "deepseek-chat"),
 }

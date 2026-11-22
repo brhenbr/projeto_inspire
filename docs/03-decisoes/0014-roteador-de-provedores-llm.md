@@ -41,5 +41,5 @@ com testes) e atualizar modelos padrão quando as camadas gratuitas mudarem.
 - Execuções em lote deixam de parar por cota de um único provedor.
 - O estado de pausa vive na memória do processo (por execução); não é compartilhado entre execuções. Aceitável no MVP.
 - DeepSeek não tem camada gratuita permanente (cobra por uso); fica na lista, mas só é usado se o cliente criar chave.
-- Modelos padrão são palpites razoáveis em 2026-11-21 e devem ser conferidos ao criar as chaves.
+- Modelos padrão foram conferidos com chamadas reais em 2026-11-21 (groq gpt-oss-120b, gemini-3.5-flash, openrouter nemotron free, cerebras gpt-oss-120b); nomes antigos (llama-3.3, gemini-2.5) já não existiam para contas novas, então devem ser reconferidos de tempos em tempos.
 - Todos os provedores da lista recebem **somente campos públicos**; é a mesma barreira de antes, aplicada antes do roteador.
