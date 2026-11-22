@@ -12,10 +12,12 @@ import FilaPage from "./pages/Fila";
 import LlmPage from "./pages/Llm";
 import { OrganizacaoPage, OrganizacoesPage } from "./pages/Organizacoes";
 import PainelPage from "./pages/Painel";
+import PerguntarPage from "./pages/Perguntar";
 
 const MENU: [string, string][] = [
   ["/", "Painel"],
   ["/conjuntos", "Buscar"],
+  ["/perguntar", "Perguntar"],
   ["/curadoria", "Fila de curadoria"],
   ["/colecoes", "Coleções"],
   ["/organizacoes", "Organizações"],
@@ -58,6 +60,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<PainelPage />} />
         <Route path="/conjuntos" element={<BuscaPage />} />
+        <Route path="/perguntar" element={<PerguntarPage />} />
         <Route path="/conjuntos/:id" element={<ConjuntoPage />} />
         <Route path="/curadoria" element={<FilaPage />} />
         <Route path="/colecoes" element={<ColecoesPage />} />

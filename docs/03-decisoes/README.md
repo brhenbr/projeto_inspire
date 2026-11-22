@@ -6,7 +6,6 @@ decisão e as consequências. Modelo em [`kit/templates/adr.md`](../../kit/templ
 | # | Decisão | Quem decidiu |
 |---|---|---|
 | [0001](0001-premissas-de-processo-e-escopo-inicial.md) | Premissas de processo e escopo inicial | Cliente e Claude |
-| [0015](0015-formato-de-exportacao-dcat-br-dqv.md) | Exportação DCAT-BR/DQV em JSON-LD gerado em fluxo | Claude, em autonomia |
 | [0002](0002-seguranca-e-soberania.md) | Segurança e soberania como requisitos de projeto | Cliente e Claude |
 | [0003](0003-stack-tecnologica.md) | Stack: Python/FastAPI, React/TypeScript, PostgreSQL, Docker | Cliente e Claude |
 | [0004](0004-provedor-de-llm-externo-controlado.md) | API gratuita de LLM só com metadados públicos | Cliente e Claude |
@@ -20,5 +19,7 @@ decisão e as consequências. Modelo em [`kit/templates/adr.md`](../../kit/templ
 | [0012](0012-bibliotecas-do-frontend.md) | Frontend com React Router e componentes próprios | Claude, em autonomia |
 | [0013](0013-estrategia-de-testes-e2e.md) | E2E com portal falso executável | Claude, em autonomia |
 | [0014](0014-roteador-de-provedores-llm.md) | Roteador próprio de provedores gratuitos de LLM, com troca por cota | Cliente e Claude |
+| [0015](0015-formato-de-exportacao-dcat-br-dqv.md) | Exportação DCAT-BR/DQV em JSON-LD gerado em fluxo | Claude, em autonomia |
+| [0016](0016-chat-como-tradutor-de-filtros.md) | Chat em linguagem natural como tradutor de filtros (o LLM não vê os dados) | Claude, em autonomia |
 
 As decisões de 0007 a 0013 foram tomadas enquanto o cliente estava ausente, por delegação dele. Revisados e confirmados pelo cliente em 2026-11-21.

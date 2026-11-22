@@ -260,3 +260,16 @@ export type Regra = {
   fonte: string;
   ativa: boolean;
 };
+
+export type Interpretacao = {
+  filtros: Record<string, string | number | boolean>;
+  explicacao: string;
+  ignorados: string[];
+  organizacao: { slug: string; titulo: string } | null;
+};
+export type RespostaChat = Interpretacao & {
+  pergunta: string;
+  filtros_removidos: string[];
+  provedor: { nome: string; modelo: string; externo: boolean; simulado: boolean };
+  resultado: Omit<Busca, "facetas">;
+};

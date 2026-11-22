@@ -4,7 +4,16 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from inspire import __version__
-from inspire.api.routes import curadoria, descoberta, exportacao, extracoes, llm, qualidade, saude
+from inspire.api.routes import (
+    chat,
+    curadoria,
+    descoberta,
+    exportacao,
+    extracoes,
+    llm,
+    qualidade,
+    saude,
+)
 from inspire.config import get_settings
 from inspire.curation.service import CurationError, NotFoundError
 from inspire.logging import configure_logging
@@ -26,7 +35,7 @@ def create_app() -> FastAPI:
     async def _missing(_: Request, exc: NotFoundError) -> JSONResponse:
         return JSONResponse(status_code=404, content={"detail": f"Não encontrado: {exc}"})
 
-    for module in (saude, extracoes, descoberta, qualidade, curadoria, llm, exportacao):
+    for module in (saude, extracoes, descoberta, qualidade, curadoria, llm, chat, exportacao):
         app.include_router(module.router, prefix="/v1")
     return app
 

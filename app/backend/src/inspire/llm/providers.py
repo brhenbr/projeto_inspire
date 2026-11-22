@@ -247,6 +247,10 @@ class SimulatedProvider:
             out = {"tags": self._tags(c)}
         elif request.task == "sugerir-tema":
             out = {"temas": self._themes(c)}
+        elif request.task == "interpretar-pergunta":
+            from inspire.llm.interpret import simulate
+
+            out = simulate(c)
         else:
             raise LlmError(f"Tarefa desconhecida para o provedor simulado: {request.task}")
         return LlmResponse(text=json.dumps(out, ensure_ascii=False), model=self.info.modelo)
@@ -406,7 +410,7 @@ def build_provider(settings: Settings) -> LlmProvider:
     if settings.llm_provider == "simulado":
         return SimulatedProvider()
     if settings.llm_provider == "roteador":
-        return build_router(settings)
+        return _cached_router(settings)
     if settings.llm_provider != "openai-compatible":
         raise LlmDisabledError(f"Provedor de LLM desconhecido: {settings.llm_provider}")
     host = urlparse(settings.llm_base_url).hostname or ""
@@ -469,3 +473,15 @@ def build_router(settings: Settings) -> RouterProvider:
             )
         )
     return RouterProvider(built)
+
+
+_ROUTER_CACHE: dict[str, Any] = {}
+
+
+def _cached_router(settings: Settings) -> RouterProvider:
+    """Um roteador por configuração e por processo, para a pausa por cota valer entre as chamadas da API."""
+    if _ROUTER_CACHE.get("settings") is not settings:
+        _ROUTER_CACHE["settings"] = settings
+        _ROUTER_CACHE["router"] = build_router(settings)
+    router: RouterProvider = _ROUTER_CACHE["router"]
+    return router
