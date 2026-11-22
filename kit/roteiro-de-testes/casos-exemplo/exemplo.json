@@ -1,0 +1,33 @@
+{
+  "roteiro": "exemplo",
+  "titulo": "Roteiro de exemplo",
+  "versao": "2026-11-22",
+  "descricao": "Três casos de mentira para conhecer a ferramenta.",
+  "casos": [
+    {
+      "id": "EX-01",
+      "titulo": "Abrir a página inicial",
+      "objetivo": "Conferir que a página abre e mostra o nome do sistema.",
+      "preparacao": "Nenhuma.",
+      "passos": ["Abra o endereço do sistema no navegador.", "Espere a página carregar."],
+      "esperado": ["O nome do sistema aparece no topo.", "Não há mensagens de erro."],
+      "anotar": "Quanto tempo levou para carregar, se foi muito lento."
+    },
+    {
+      "id": "EX-02",
+      "titulo": "Fazer uma busca",
+      "objetivo": "Conferir que a busca devolve resultados.",
+      "preparacao": "Ter feito o EX-01.",
+      "passos": ["Digite uma palavra no campo de busca.", "Clique em Buscar."],
+      "esperado": ["Aparece uma lista de resultados.", "O total de resultados é mostrado."],
+      "anotar": "A palavra usada e quantos resultados vieram."
+    },
+    {
+      "id": "EX-03",
+      "titulo": "Sair do sistema",
+      "objetivo": "Conferir que dá para sair sem erro.",
+      "passos": ["Clique em Sair."],
+      "esperado": ["Volta para a tela inicial."]
+    }
+  ]
+}

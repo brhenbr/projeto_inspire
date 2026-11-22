@@ -55,7 +55,7 @@ Camada curada separada do espelho do portal, com histórico. Plano de trabalho: 
 - **US-032** (Story, High, mvp, curadoria) — Status de curadoria ✔ Concluído
 - **US-033** (Story, High, mvp, curadoria, web) — Criar e gerenciar coleções pela interface ✔ Concluído
 - **US-036** (Story, High, mvp, curadoria, web) — Coleções dinâmicas a partir de filtros salvos ✔ Concluído
-- **US-037** (Task, Medium, mvp, curadoria) — Criar a coleção inicial de bases sociais
+- **US-037** (Task, Medium, mvp, curadoria) — Criar a coleção inicial de bases sociais ✔ Em andamento (o sistema propõe a lista; também será caso de teste para os testadores)
 - **US-034** (Story, Medium, mvp, curadoria) — Histórico e auditoria de alterações ✔ Concluído
 - **US-035** (Story, Low, fase-2, curadoria) — Detecção de possíveis duplicados
 
@@ -99,6 +99,10 @@ Execução em Docker, testes, CI e documentação contínua.
 - **US-066** (Task, High, mvp, tecnico, seguranca) — Checklist de segurança e soberania (ADR-0002) ✔ Parcial (barreiras implementadas e testadas; falta varredura de dependências no CI)
 - **US-065** (Task, Medium, mvp, tecnico, doc) — Documentação de implementação, testes e deploy ✔ Concluído
 - **US-072** (Task, Low, mvp, doc) — Versão da arquitetura em linguagem acessível e revisão do C4 com o cliente
+- **US-160** (Story, High, mvp, teste, kit) — Ferramenta independente de roteiro de testes (SQLite, sem dependências) ✔ Concluído
+- **US-161** (Story, High, mvp, teste, doc) — Manual do usuário como roteiro de testes com dados reais
+- **US-162** (Task, High, mvp, teste, deploy) — Pacote de teste com a base já carregada (Docker)
+- **US-163** (Task, Medium, teste, doc, arquitetura) — Página 'como o sistema funciona' para os testadores
 
 ## EP-08 — Verificação de links dos recursos (link rot)
 
@@ -115,7 +119,7 @@ Worker separado que verifica disponibilidade dos recursos sem baixar dados.
 
 Perguntas em português sobre o catálogo curado, respondidas por um LLM que usa a API própria como ferramenta.
 
-- **US-080** (Story, Medium, fase-2, nl) — Busca semântica com embeddings
+- **US-080** (Story, Medium, fase-2, nl) — Busca semântica com embeddings ✔ Fora do MVP (decisão do cliente em 2026-11-22)
 - **US-081** (Story, Medium, fase-2, nl) — Chat sobre o catálogo ✔ Parcial (versão tradutor de filtros, ADR-0016: o LLM não vê os dados; sem respostas redigidas)
 - **US-151** (Story, High, mvp, nl, colecoes) — Criar coleção dinâmica descrevendo-a em texto ✔ Concluído
 - **US-152** (Story, High, mvp, nl) — Perguntar ao catálogo em linguagem natural ✔ Concluído

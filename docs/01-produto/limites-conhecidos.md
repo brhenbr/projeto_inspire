@@ -10,7 +10,7 @@ Cada item diz o que é, por que ficou assim e o que seria preciso para resolver.
 2. **O chat entende filtros, não perguntas analíticas.** "Dados de saúde em CSV" funciona; "qual órgão publica mais?" ou
    "resuma o que existe sobre educação" não. Foi escolha de segurança (o LLM não vê os dados; ADR-0016). Para ir além é
    preciso decidir quanto do catálogo pode ir ao provedor externo, ou usar um modelo local/soberano.
-3. **Sem busca semântica (US-080).** A busca é por palavras (com acento, plural e erro de digitação). Achar por significado
+3. **Sem busca semântica (US-080) — decisão do cliente: fora do MVP.** A busca é por palavras (com acento, plural e erro de digitação). Achar por significado
    ("evasão escolar" ≈ "abandono") exige embeddings: API externa (envia textos do catálogo), modelo local em CPU
    (lento nesta máquina) ou GPU futura. Sugestão: avaliar primeiro se o chat basta para a demonstração.
 4. **DCAT-BR incompleto de propósito.** Sem contato do responsável (dado pessoal, LGPD), sem os selos Bronze/Prata/Ouro do

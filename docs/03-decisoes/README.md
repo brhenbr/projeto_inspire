@@ -21,5 +21,6 @@ decisão e as consequências. Modelo em [`kit/templates/adr.md`](../../kit/templ
 | [0014](0014-roteador-de-provedores-llm.md) | Roteador próprio de provedores gratuitos de LLM, com troca por cota | Cliente e Claude |
 | [0015](0015-formato-de-exportacao-dcat-br-dqv.md) | Exportação DCAT-BR/DQV em JSON-LD gerado em fluxo | Claude, em autonomia |
 | [0016](0016-chat-como-tradutor-de-filtros.md) | Chat em linguagem natural como tradutor de filtros (o LLM não vê os dados) | Claude, em autonomia |
+| [0017](0017-ferramenta-roteiro-de-testes.md) | Ferramenta independente de roteiro de testes (SQLite, sem dependências) | Cliente e Claude |
 
 As decisões de 0007 a 0013 foram tomadas enquanto o cliente estava ausente, por delegação dele. Revisados e confirmados pelo cliente em 2026-11-21.
