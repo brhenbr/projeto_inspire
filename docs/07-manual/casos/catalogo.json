@@ -1,0 +1,656 @@
+{
+  "roteiro": "catalogo",
+  "titulo": "Catálogo de metadados: manual de testes",
+  "versao": "2026-11-22",
+  "descricao": "Passo a passo de todas as funcionalidades, com dados reais. Você executa no sistema e registra aqui o resultado.",
+  "casos": [
+    {
+      "id": "PAI-01",
+      "titulo": "Conhecer o Painel do catálogo",
+      "objetivo": "Ter a visão geral do que existe no catálogo espelhado.",
+      "passos": [
+        "Abra http://127.0.0.1:8080 no navegador.",
+        "No menu do topo, clique em “Painel”.",
+        "Leia os números do topo e percorra os cartões: “Última extração”, “Distribuição da qualidade”, “Andamento da curadoria”, “Formatos dos recursos”, “Por esfera” e “Temas mais frequentes”."
+      ],
+      "esperado": [
+        "O total de conjuntos é de cerca de 20.200 e há cerca de 256 organizações.",
+        "A nota média de qualidade é de cerca de 73.",
+        "Cada cartão mostra barras ou números, sem mensagem de erro."
+      ],
+      "preparacao": "Sistema no ar (http://127.0.0.1:8080) com a base carregada.",
+      "anotar": "O total de conjuntos e a nota média que apareceram. Algum número ou termo que você não entendeu?"
+    },
+    {
+      "id": "PAI-02",
+      "titulo": "Identificar-se como curador(a)",
+      "objetivo": "Informar o seu nome para que as alterações fiquem registradas em seu nome.",
+      "passos": [
+        "No canto direito do topo, localize o campo “Curador(a)”.",
+        "Digite o seu nome nesse campo (o texto deve ficar visível enquanto você digita).",
+        "Recarregue a página (tecla F5)."
+      ],
+      "esperado": [
+        "O nome digitado é legível no campo.",
+        "Depois de recarregar, o nome continua preenchido."
+      ],
+      "anotar": "Se o campo ficou difícil de ler ou se o nome sumiu ao recarregar."
+    },
+    {
+      "id": "BUS-01",
+      "titulo": "Buscar por palavras",
+      "objetivo": "Encontrar conjuntos por assunto.",
+      "passos": [
+        "Clique em “Buscar” no menu.",
+        "No campo de busca, digite: saúde população",
+        "Clique no botão “Buscar”.",
+        "Leia o total acima da lista e os três primeiros resultados."
+      ],
+      "esperado": [
+        "O total é de cerca de 86 conjuntos.",
+        "Entre os primeiros estão conjuntos como “[MGDI] Saúde da População Negra” (Ministério da Saúde) e “Pesquisa Nacional de Saúde do Escolar – PENSE” (IBGE).",
+        "Cada resultado mostra título, resumo, nota, órgão, formatos e quantidade de recursos."
+      ],
+      "anotar": "O total que apareceu e se os primeiros resultados tinham a ver com o que você buscou."
+    },
+    {
+      "id": "BUS-02",
+      "titulo": "A busca ignora acento e plural",
+      "objetivo": "Conferir que escrever sem acento ou no plural traz o mesmo resultado.",
+      "passos": [
+        "Em “Buscar”, pesquise: populações de saúde",
+        "Anote o total.",
+        "Pesquise agora: saude populacao (sem acentos)",
+        "Compare os totais e os primeiros resultados."
+      ],
+      "esperado": [
+        "Os dois totais são iguais ou muito parecidos (cerca de 86).",
+        "Os primeiros resultados são os mesmos."
+      ],
+      "anotar": "Os dois totais."
+    },
+    {
+      "id": "BUS-03",
+      "titulo": "Erro de digitação: títulos parecidos",
+      "objetivo": "Ver o que acontece quando a palavra digitada não existe.",
+      "passos": [
+        "Em “Buscar”, pesquise: educasao (com “s”, errado de propósito).",
+        "Leia a faixa de aviso acima da lista."
+      ],
+      "esperado": [
+        "Aparece o aviso “Nenhum resultado exato. Mostrando títulos parecidos com …”.",
+        "A lista traz poucos conjuntos com “Educação” no título (por exemplo, “Educação” do Estado do Rio de Janeiro)."
+      ],
+      "anotar": "Se o aviso foi claro e se os resultados parecidos ajudaram."
+    },
+    {
+      "id": "BUS-04",
+      "titulo": "Refinar com filtros",
+      "objetivo": "Combinar filtros para chegar a um conjunto menor e mais útil.",
+      "passos": [
+        "Em “Buscar”, deixe o campo de texto vazio e clique em “Buscar”: o total é de cerca de 20.200.",
+        "No painel de filtros à esquerda, escolha o formato “CSV” (cerca de 12.800 conjuntos).",
+        "Escolha também o tema “Saúde” e veja o total diminuir.",
+        "Escolha uma organização da lista.",
+        "Veja os filtros ativos acima dos resultados e clique em um deles para removê-lo.",
+        "Clique em “Limpar”."
+      ],
+      "esperado": [
+        "Cada filtro reduz o total e os filtros ativos aparecem como etiquetas.",
+        "Remover uma etiqueta amplia o total novamente.",
+        "“Limpar” volta a todos os conjuntos."
+      ],
+      "anotar": "Os totais depois de cada filtro e se algum filtro foi confuso."
+    },
+    {
+      "id": "BUS-05",
+      "titulo": "Ordenar e filtrar por qualidade",
+      "objetivo": "Achar os conjuntos mais bem avaliados e os piores.",
+      "passos": [
+        "Em “Buscar”, escolha “Ordenar por → Maior nota”.",
+        "Anote a nota dos três primeiros.",
+        "Use o filtro “Faixa de qualidade” para ver só a faixa mais alta e depois a mais baixa.",
+        "Na faixa mais baixa, ordene pela menor nota."
+      ],
+      "esperado": [
+        "No topo da lista as notas são decrescentes (por volta de 100).",
+        "A faixa mais alta tem mais de mil conjuntos.",
+        "A faixa mais baixa tem cerca de 180 conjuntos, com notas de poucos pontos (como “Convênios” do IFRR, nota 5,9)."
+      ],
+      "anotar": "As notas do topo e se a ordem estava correta."
+    },
+    {
+      "id": "BUS-06",
+      "titulo": "Compartilhar uma busca pelo endereço",
+      "objetivo": "Conferir que o endereço da página guarda a busca e os filtros.",
+      "passos": [
+        "Faça uma busca com um filtro (por exemplo: texto “bolsa família”, formato CSV).",
+        "Copie o endereço da barra do navegador.",
+        "Abra uma nova aba e cole o endereço."
+      ],
+      "esperado": [
+        "A nova aba mostra a mesma busca, com os mesmos filtros e o mesmo total."
+      ],
+      "anotar": "Se a nova aba reproduziu a busca."
+    },
+    {
+      "id": "BUS-07",
+      "titulo": "Paginação",
+      "objetivo": "Navegar por várias páginas de resultados sem repetição.",
+      "passos": [
+        "Em “Buscar”, deixe o texto vazio, ordene por “Título” e clique em “Buscar”.",
+        "Anote os três primeiros títulos da página 1.",
+        "Clique em “Próxima →” e anote os três primeiros da página 2.",
+        "Clique em “← Anterior”."
+      ],
+      "esperado": [
+        "Cada página tem 20 conjuntos.",
+        "Os títulos da página 2 são diferentes dos da página 1.",
+        "Voltar mostra a página 1 de novo."
+      ],
+      "anotar": "Se algum título apareceu repetido."
+    },
+    {
+      "id": "DET-01",
+      "titulo": "Abrir um conjunto e conhecer o detalhe",
+      "objetivo": "Ver todos os metadados de um conjunto e chegar ao portal de origem.",
+      "passos": [
+        "Em “Buscar”, pesquise: bolsa família",
+        "Abra o conjunto “Bolsa Família” do Ministério do Desenvolvimento e Assistência Social (nota por volta de 84).",
+        "No topo, veja a nota, o status de curadoria e o órgão.",
+        "Percorra os cartões “Dados do portal” e “Recursos (arquivos e APIs no portal de origem)”.",
+        "Clique no link para o conjunto no portal dados.gov.br (abre em outra aba)."
+      ],
+      "esperado": [
+        "O detalhe mostra título, descrição, licença, periodicidade, temas e palavras-chave.",
+        "Os recursos aparecem como links (o sistema nunca baixa os arquivos).",
+        "O link leva à página do conjunto no portal."
+      ],
+      "anotar": "Alguma informação importante que faltou nesta tela."
+    },
+    {
+      "id": "DET-02",
+      "titulo": "Entender a nota de qualidade",
+      "objetivo": "Saber por que um conjunto recebeu determinada nota.",
+      "passos": [
+        "No conjunto “Bolsa Família”, abra a aba “Qualidade”.",
+        "Veja o cartão “Por dimensão” e o cartão “Verificações”.",
+        "Localize uma verificação que não passou e leia a mensagem que a acompanha."
+      ],
+      "esperado": [
+        "A nota (0 a 100) é explicada por dimensões (como Completude, Atualidade e Conformidade).",
+        "Cada verificação indica se passou ou falhou e diz o motivo.",
+        "Dá para entender o que precisaria melhorar para a nota subir."
+      ],
+      "anotar": "Se a explicação foi compreensível para quem não é técnico."
+    },
+    {
+      "id": "DET-03",
+      "titulo": "Histórico e mudanças vindas do portal",
+      "objetivo": "Ver o histórico de alterações de um conjunto.",
+      "passos": [
+        "Ainda no conjunto, abra a aba “Histórico”.",
+        "Leia o que aparece."
+      ],
+      "esperado": [
+        "A aba mostra o histórico (pode estar vazia se nada mudou ainda), sem erro."
+      ],
+      "anotar": "Se ficou claro o que o histórico mostra."
+    },
+    {
+      "id": "ORG-01",
+      "titulo": "Explorar organizações",
+      "objetivo": "Encontrar as organizações publicadoras e comparar a qualidade.",
+      "passos": [
+        "Clique em “Organizações” no menu.",
+        "Use “Buscar organização” e digite: saúde",
+        "Use o filtro de “Esfera” e a ordenação para ver as de maior e menor nota média."
+      ],
+      "esperado": [
+        "A lista mostra, para cada órgão, a quantidade de conjuntos e a nota média (por exemplo, o Ministério da Saúde tem cerca de 150 conjuntos e nota média perto de 60).",
+        "A busca e a ordenação funcionam."
+      ],
+      "anotar": "Qual organização teve a maior nota média na sua lista."
+    },
+    {
+      "id": "ORG-02",
+      "titulo": "Página de uma organização",
+      "objetivo": "Ver o que mais precisa melhorar em um órgão.",
+      "passos": [
+        "Em “Organizações”, abra o Ministério do Desenvolvimento e Assistência Social (cerca de 44 conjuntos, nota média perto de 92).",
+        "Leia os cartões “Qualidade por dimensão” e “O que mais precisa melhorar”.",
+        "Clique em “Fila de curadoria” para ver os conjuntos desse órgão."
+      ],
+      "esperado": [
+        "Os cartões mostram a qualidade por dimensão e os conjuntos mais urgentes.",
+        "O botão leva à fila de curadoria já filtrada pelo órgão."
+      ],
+      "anotar": "Se o cartão de prioridades ajudaria a decidir por onde começar a curar."
+    },
+    {
+      "id": "CUR-01",
+      "titulo": "Editar os metadados de um conjunto",
+      "objetivo": "Melhorar um conjunto sem alterar o dado original do portal.",
+      "passos": [
+        "Em “Buscar”, pesquise: Convênios e abra “Convênios” do Instituto Federal de Roraima (nota perto de 5,9).",
+        "Anote a nota atual.",
+        "Na aba “Metadados e curadoria”, em “Editar metadados”, mude o campo “Título” (por exemplo: Convênios do IFRR) e preencha “Palavras-chave” e “Licença”.",
+        "Escreva um comentário e clique em “Salvar alterações”.",
+        "Veja a nota no topo e o texto “No portal: …” ao lado do campo."
+      ],
+      "esperado": [
+        "Aparece a mensagem “Salvo: …”.",
+        "O conjunto passa a aparecer como “Curado” e “Em revisão”.",
+        "A nota sobe.",
+        "O valor original do portal continua visível ao lado (“No portal: …”)."
+      ],
+      "preparacao": "Preencha o campo “Curador(a)” (PAI-02).",
+      "anotar": "A nota antes e depois, e se a mensagem de confirmação ficou visível."
+    },
+    {
+      "id": "CUR-02",
+      "titulo": "Reverter uma alteração",
+      "objetivo": "Desfazer uma edição e voltar ao valor do portal.",
+      "passos": [
+        "No mesmo conjunto, localize o campo que você alterou.",
+        "Clique em “Reverter ao valor do portal”.",
+        "Abra a aba “Histórico” e veja o registro."
+      ],
+      "esperado": [
+        "O campo volta ao valor do portal.",
+        "O histórico mantém o registro da alteração e da reversão (nada é apagado)."
+      ],
+      "anotar": "Se a reversão ficou clara."
+    },
+    {
+      "id": "CUR-03",
+      "titulo": "Mudar o status de revisão",
+      "objetivo": "Marcar um conjunto como aprovado depois de revisar.",
+      "passos": [
+        "No conjunto editado, role até o cartão “Status da curadoria”.",
+        "Escolha “Aprovado” e clique em “Salvar status”."
+      ],
+      "esperado": [
+        "O status no topo muda para “Aprovado” e a mensagem “Status: Aprovado.” aparece."
+      ],
+      "anotar": "Os status disponíveis e se os nomes fizeram sentido."
+    },
+    {
+      "id": "CUR-04",
+      "titulo": "Fila de curadoria e ação em lote",
+      "objetivo": "Revisar vários conjuntos de uma vez.",
+      "passos": [
+        "Clique em “Fila de curadoria” no menu.",
+        "Veja a lista de conjuntos pendentes, ordenados por prioridade (os que mais precisam de atenção primeiro).",
+        "Marque três conjuntos (ou use “Selecionar todos desta página”).",
+        "Clique em “Em revisão” e depois em “Aprovar”.",
+        "Troque o filtro “Mostrar” para ver os aprovados."
+      ],
+      "esperado": [
+        "A fila lista os pendentes por prioridade.",
+        "As ações em lote mudam o status dos selecionados.",
+        "Os aprovados aparecem ao escolher “Aprovado” em “Mostrar”."
+      ],
+      "anotar": "Se a ordem de prioridade fez sentido e se o lote funcionou."
+    },
+    {
+      "id": "COL-01",
+      "titulo": "Criar uma coleção manual",
+      "objetivo": "Agrupar conjuntos escolhendo um a um.",
+      "passos": [
+        "Clique em “Coleções” no menu.",
+        "No cartão “Nova coleção manual”, preencha “Nome” (ex.: Saúde da população) e “Descrição (opcional)” e clique em “Criar coleção”.",
+        "Vá em “Buscar”, pesquise: saúde população",
+        "Em “Adicionar a uma coleção manual”, escolha a coleção e clique em “Adicionar”.",
+        "Volte a “Coleções” e abra a coleção criada."
+      ],
+      "esperado": [
+        "A coleção aparece na lista como “Manual”.",
+        "Aparece a mensagem de quantos conjuntos foram adicionados (cerca de 20, a primeira página) e eles estão na coleção.",
+        "Tentar criar outra com o mesmo nome mostra uma mensagem clara."
+      ],
+      "anotar": "Quantos conjuntos entraram."
+    },
+    {
+      "id": "COL-02",
+      "titulo": "Salvar uma busca como coleção dinâmica",
+      "objetivo": "Criar uma coleção que se atualiza sozinha a cada extração.",
+      "passos": [
+        "Em “Buscar”, aplique o filtro de tema “Educação” e o formato “CSV”.",
+        "Em “Salvar esta busca como coleção dinâmica”, digite um nome e clique em “Salvar”.",
+        "Abra a coleção em “Coleções” e veja o cartão “Regra (filtros salvos)”."
+      ],
+      "esperado": [
+        "A coleção é criada como “Dinâmica”, com o mesmo total da busca.",
+        "A regra mostra os filtros que você aplicou."
+      ],
+      "anotar": "Se ficou claro que “dinâmica” se atualiza com a extração."
+    },
+    {
+      "id": "COL-03",
+      "titulo": "Criar uma coleção descrevendo-a em texto",
+      "objetivo": "Montar uma coleção em linguagem natural, sem conhecer os filtros.",
+      "passos": [
+        "Em “Coleções”, role até “Criar coleção descrevendo em texto”.",
+        "Digite: Bases de dados sociais do governo federal: saúde, assistência social e educação",
+        "Clique em “Propor filtros” e aguarde alguns segundos.",
+        "Leia as etiquetas de filtros e a contagem; remova uma etiqueta no “×” e veja a contagem mudar; use “Restaurar filtros propostos”.",
+        "Confira o nome sugerido e clique em “Criar coleção dinâmica”."
+      ],
+      "esperado": [
+        "Aparecem etiquetas de filtros (um tema por etiqueta, com o nome do tema) e uma contagem de conjuntos (centenas ou milhares).",
+        "Nada é criado até você confirmar.",
+        "Remover e restaurar filtros atualiza a contagem sem nova espera.",
+        "A coleção criada abre com o nome escolhido."
+      ],
+      "preparacao": "Para ver uma resposta de IA real é preciso ter o seu LLM configurado; no modo simulado a interpretação é feita por regras simples e é mais limitada.",
+      "anotar": "Os filtros propostos, a contagem, e se o que o sistema entendeu era o que você queria. Note que o resultado pode variar entre tentativas."
+    },
+    {
+      "id": "COL-04",
+      "titulo": "Editar uma coleção",
+      "objetivo": "Ajustar nome, descrição e filtros sem refazer a coleção.",
+      "passos": [
+        "Abra uma coleção dinâmica criada por você.",
+        "No cartão “Editar coleção”, mude o nome e a descrição.",
+        "Em “Filtros da coleção”, remova uma etiqueta com o “×”.",
+        "Clique em “Salvar alterações”."
+      ],
+      "esperado": [
+        "Aparece “Alterações salvas.”.",
+        "O título, a descrição, a regra e a contagem refletem as mudanças."
+      ],
+      "anotar": "O que você tentou mudar e se foi fácil."
+    },
+    {
+      "id": "COL-05",
+      "titulo": "Excluir um conjunto de uma coleção dinâmica",
+      "objetivo": "Abrir uma exceção na regra.",
+      "passos": [
+        "Abra uma coleção dinâmica.",
+        "Na lista “Conjuntos da coleção”, clique em “Excluir da coleção” em um conjunto."
+      ],
+      "esperado": [
+        "O conjunto some da coleção e o total diminui em um, sem mudar a regra."
+      ],
+      "anotar": "Se o texto do botão deixou claro o que ele faz."
+    },
+    {
+      "id": "COL-06",
+      "titulo": "Apagar uma coleção",
+      "objetivo": "Remover uma coleção que não serve mais.",
+      "passos": [
+        "Abra uma coleção de teste.",
+        "Clique em “Apagar coleção” e confirme.",
+        "Volte à lista de coleções."
+      ],
+      "esperado": [
+        "O sistema pede confirmação.",
+        "A coleção sai da lista; os conjuntos continuam no catálogo."
+      ]
+    },
+    {
+      "id": "COL-07",
+      "titulo": "Monte a sua lista de “bases sociais” (caso aberto)",
+      "objetivo": "Ver como cada pessoa monta a mesma coleção, para comparar os caminhos escolhidos.",
+      "passos": [
+        "Imagine que você precisa de uma coleção de “bases sociais”: dados sobre saúde, assistência social, educação, renda e benefícios que ajudem a estudar políticas sociais.",
+        "Monte essa coleção do jeito que achar melhor: por texto (COL-03), por busca com filtros (COL-02) ou escolhendo conjuntos à mão (COL-01).",
+        "Dê o nome “Bases sociais – <seu nome>”.",
+        "Ao terminar, escreva no comentário: qual caminho usou, quantos conjuntos ficaram, e quais órgãos ou conjuntos você considera essenciais."
+      ],
+      "esperado": [
+        "Você obtém uma coleção com o nome pedido.",
+        "Não existe lista “certa”: o objetivo é comparar as escolhas de cada testador."
+      ],
+      "anotar": "O caminho escolhido, o total de conjuntos e os órgãos ou conjuntos que você considera essenciais (por exemplo, CadÚnico, Bolsa Família, BPC, Censo Escolar, vacinação)."
+    },
+    {
+      "id": "PER-01",
+      "titulo": "Perguntar ao catálogo em português",
+      "objetivo": "Fazer um pedido em linguagem natural e receber conjuntos relevantes.",
+      "passos": [
+        "Clique em “Perguntar” no menu e leia o aviso sobre o provedor de LLM.",
+        "Digite: dados do CadÚnico sobre famílias por faixa de renda",
+        "Clique em “Perguntar” e aguarde.",
+        "Leia o cartão “Como entendi” e a lista de conjuntos."
+      ],
+      "esperado": [
+        "O cartão mostra como o sistema entendeu o pedido (etiquetas de filtros e uma frase).",
+        "Aparecem conjuntos como “Cadastro Único – Famílias/Pessoas por faixas de renda per capita” (MDS).",
+        "O texto digitado é enviado a um provedor externo apenas se houver LLM real configurado, e o aviso da tela diz isso."
+      ],
+      "anotar": "Se o sistema entendeu o pedido e se os resultados serviram."
+    },
+    {
+      "id": "PER-02",
+      "titulo": "Pedido que não acha nada: o sistema afrouxa os filtros",
+      "objetivo": "Ver o comportamento quando os filtros dão zero resultados.",
+      "passos": [
+        "Em “Perguntar”, digite: planilhas mensais do Ministério da Saúde sobre pesca de lagosta",
+        "Clique em “Perguntar” e leia o aviso abaixo de “Como entendi”."
+      ],
+      "esperado": [
+        "O sistema avisa quais filtros deixou de usar para conseguir mostrar algo, ou informa que nada foi encontrado, sem erro."
+      ],
+      "anotar": "Se o aviso foi claro."
+    },
+    {
+      "id": "PER-03",
+      "titulo": "Abrir o pedido na busca para refinar",
+      "objetivo": "Continuar o trabalho na busca com os mesmos filtros.",
+      "passos": [
+        "Depois de uma pergunta com resultados, clique em “Abrir na busca para refinar”."
+      ],
+      "esperado": [
+        "A página de busca abre com os mesmos filtros já aplicados e o mesmo total."
+      ]
+    },
+    {
+      "id": "LLM-01",
+      "titulo": "Entender qual LLM está em uso",
+      "objetivo": "Saber se os dados saem do computador.",
+      "passos": [
+        "Clique em “Sugestões de LLM” no menu.",
+        "Leia o cartão “Provedor em uso” e a faixa de aviso no topo da tela."
+      ],
+      "esperado": [
+        "A tela diz se o modo é simulado (sem IA, nada sai do computador) ou se há provedor externo, e quais dados são enviados (só campos públicos do conjunto, nunca contatos pessoais)."
+      ],
+      "anotar": "O que a tela informou e se ficou claro."
+    },
+    {
+      "id": "LLM-02",
+      "titulo": "Pedir sugestões para vários conjuntos",
+      "objetivo": "Gerar sugestões de palavras-chave para alguns conjuntos de uma vez.",
+      "passos": [
+        "Em “Sugestões de LLM”, no cartão “Nova execução”, escolha a tarefa “Sugerir palavras-chave”.",
+        "Escolha a fonte “Os primeiros da fila de curadoria” e a quantidade 3.",
+        "Clique em “Gerar sugestões” e acompanhe em “Execuções” até concluir."
+      ],
+      "esperado": [
+        "A execução aparece em “Execuções” e termina como “Concluída”.",
+        "Surgem propostas pendentes para revisão (nada muda no catálogo ainda)."
+      ],
+      "anotar": "O tempo que levou e quantas propostas surgiram."
+    },
+    {
+      "id": "LLM-03",
+      "titulo": "Revisar as sugestões: aprovar, editar e rejeitar",
+      "objetivo": "Decidir o que entra no catálogo, sempre com sua aprovação.",
+      "passos": [
+        "Na lista de propostas, veja o valor atual ao lado da sugestão.",
+        "Clique em “Aprovar” em uma, em “Editar” (ajuste e “Salvar edição e aplicar”) em outra, e em “Rejeitar” na terceira.",
+        "Abra o conjunto aprovado e veja o campo alterado e o histórico."
+      ],
+      "esperado": [
+        "Cada decisão muda o estado da proposta.",
+        "A proposta aprovada altera o conjunto e aparece no histórico como feita por LLM, com seu nome como quem aprovou.",
+        "A rejeitada não altera nada."
+      ],
+      "anotar": "Se foi fácil comparar o valor atual com a sugestão."
+    },
+    {
+      "id": "LLM-04",
+      "titulo": "Pedir uma sugestão dentro do conjunto",
+      "objetivo": "Usar o LLM para um único conjunto.",
+      "passos": [
+        "Abra qualquer conjunto de nota baixa.",
+        "No cartão “Pedir uma sugestão”, escolha a tarefa e clique em “Gerar sugestão”.",
+        "Aprove, edite ou rejeite o resultado."
+      ],
+      "esperado": [
+        "A sugestão aparece no próprio conjunto e só vale depois da sua decisão."
+      ]
+    },
+    {
+      "id": "EXP-01",
+      "titulo": "Exportar uma busca em CSV",
+      "objetivo": "Levar o resultado para uma planilha.",
+      "passos": [
+        "Em “Buscar”, pesquise: bolsa família",
+        "Clique em “Exportar CSV”.",
+        "Abra o arquivo no Excel ou no Bloco de Notas."
+      ],
+      "esperado": [
+        "O arquivo baixa com data no nome e os acentos aparecem corretos.",
+        "Há uma linha por conjunto, com título original e título curado, descrição, órgão, nota e status de curadoria.",
+        "Não há nenhum e-mail ou nome de pessoa responsável."
+      ],
+      "anotar": "O número de linhas e se os acentos abriram corretamente."
+    },
+    {
+      "id": "EXP-02",
+      "titulo": "Exportar em JSON",
+      "objetivo": "Obter os mesmos dados em formato para sistemas.",
+      "passos": [
+        "Na mesma busca, clique em “Exportar JSON” e abra o arquivo."
+      ],
+      "esperado": [
+        "O arquivo é uma lista de objetos, com os mesmos conjuntos do CSV."
+      ]
+    },
+    {
+      "id": "EXP-03",
+      "titulo": "Exportar no padrão do governo (DCAT-BR)",
+      "objetivo": "Obter os metadados no padrão DCAT-BR, com a qualidade em DQV.",
+      "passos": [
+        "Na mesma busca, clique em “Exportar DCAT-BR” e abra o arquivo (JSON-LD) no Bloco de Notas.",
+        "Procure por “dct:title”, “dcat:distribution” e “dqv:hasQualityMeasurement”.",
+        "Procure por “contactPoint” e por “@” de e-mail."
+      ],
+      "esperado": [
+        "O arquivo tem um catálogo e um conjunto por busca, com título, descrição, licença, periodicidade e distribuições.",
+        "Há medidas de qualidade (a nota geral e uma por dimensão).",
+        "Não existe contato de responsável."
+      ]
+    },
+    {
+      "id": "EXP-04",
+      "titulo": "Exportar uma coleção",
+      "objetivo": "Exportar só os conjuntos de uma coleção.",
+      "passos": [
+        "Abra uma coleção sua e clique em “Exportar CSV”, “Exportar JSON” e “Exportar DCAT-BR”."
+      ],
+      "esperado": [
+        "Cada arquivo traz somente os conjuntos da coleção (o mesmo número que a tela mostra)."
+      ]
+    },
+    {
+      "id": "CFG-01",
+      "titulo": "Ver e ajustar os pesos da nota de qualidade",
+      "objetivo": "Entender e alterar quanto cada regra vale na nota.",
+      "passos": [
+        "Clique em “Configurações” no menu e veja “Sobre o sistema” e a tabela de regras de qualidade.",
+        "Altere o peso de uma regra (por exemplo, aumente em 1) e clique em “Salvar alterações”.",
+        "Clique em “Recalcular notas” e espere terminar.",
+        "Volte a um conjunto e veja se a nota mudou. Depois restaure o peso original."
+      ],
+      "esperado": [
+        "As regras aparecem com dimensão, descrição e peso.",
+        "Depois de recalcular, as notas refletem o novo peso."
+      ],
+      "anotar": "A regra que você mudou e o efeito na nota."
+    },
+    {
+      "id": "EXT-01",
+      "titulo": "Ver a situação e o histórico da extração",
+      "objetivo": "Saber quando o catálogo foi atualizado pela última vez.",
+      "passos": [
+        "Clique em “Extração” no menu.",
+        "Leia o cartão “Situação” e o “Histórico”."
+      ],
+      "esperado": [
+        "A tela mostra a última extração (data, quantos conjuntos, quantos sem detalhe) sem erro."
+      ],
+      "anotar": "A data e o total da última extração."
+    },
+    {
+      "id": "EXT-02",
+      "titulo": "Atualizar o catálogo (opcional, só com chave do portal)",
+      "objetivo": "Trazer as mudanças recentes do portal dados.gov.br.",
+      "passos": [
+        "ATENÇÃO: só faça se você tem a sua chave do portal no arquivo .env. Peça combinação com os outros testadores para não rodar vários ao mesmo tempo.",
+        "Em “Extração”, clique em “Atualizar catálogo”.",
+        "Acompanhe o andamento. Se aparecer uma mensagem de que é preciso esperar um intervalo mínimo, leia-a."
+      ],
+      "esperado": [
+        "Ou a extração incremental começa e termina (traz só o que mudou), ou o sistema explica que é preciso aguardar o intervalo mínimo, ou informa que falta a chave.",
+        "Em nenhum caso o catálogo já carregado se perde."
+      ],
+      "anotar": "O que aconteceu e quanto tempo levou."
+    },
+    {
+      "id": "API-01",
+      "titulo": "Conhecer a documentação da API",
+      "objetivo": "Saber que tudo o que a tela faz também é possível por API.",
+      "passos": [
+        "Abra http://127.0.0.1:8080/api/docs no navegador.",
+        "Procure o grupo “conjuntos” e abra a operação de busca.",
+        "Se quiser, use “Try it out” para executar uma busca."
+      ],
+      "esperado": [
+        "A documentação interativa (OpenAPI) lista as operações do sistema e permite testá-las."
+      ]
+    },
+    {
+      "id": "SEG-01",
+      "titulo": "Conferir que não há contatos pessoais",
+      "objetivo": "Verificar que nome e e-mail de responsáveis não estão no sistema.",
+      "passos": [
+        "Abra três conjuntos diferentes e procure por nome ou e-mail de pessoa responsável.",
+        "No CSV exportado (EXP-01), procure por “@”."
+      ],
+      "esperado": [
+        "Não aparece nome nem e-mail de responsável em nenhuma tela. (Alguns textos de descrição podem citar e-mails institucionais, como ouvidoria; isso é texto público do portal.)"
+      ],
+      "anotar": "Se achou algum dado pessoal, anote onde."
+    },
+    {
+      "id": "GER-01",
+      "titulo": "Erros são tratados com clareza",
+      "objetivo": "Verificar que o sistema não quebra com endereços ou ações inválidos.",
+      "passos": [
+        "Abra http://127.0.0.1:8080/conjuntos/inexistente",
+        "Abra http://127.0.0.1:8080/pagina-que-nao-existe",
+        "Em “Buscar”, pesquise por um texto sem sentido, como: zxqwvk"
+      ],
+      "esperado": [
+        "Aparecem mensagens claras (conjunto não encontrado, página não encontrada, nenhum resultado) e a tela continua funcionando."
+      ]
+    },
+    {
+      "id": "FIN-01",
+      "titulo": "Impressões gerais",
+      "objetivo": "Registrar a sua opinião sobre o sistema como um todo.",
+      "passos": [
+        "Responda, no comentário abaixo: (1) o que foi mais útil; (2) o que mais confundiu; (3) o que faltou para o seu trabalho.",
+        "Marque “Passou” (este caso é só para o comentário)."
+      ],
+      "esperado": [
+        "Sua opinião fica registrada."
+      ],
+      "anotar": "Os três pontos acima."
+    }
+  ]
+}

@@ -53,7 +53,7 @@ nav ul{{columns:2}} section{{margin:32px 0}} .fonte{{color:#667;font-size:13px}}
 <header><h1>Diagramas do projeto ({total})</h1></header>
 <main><nav><ul>{''.join(indice)}</ul></nav>{''.join(secoes)}</main>
 <script src="assets/mermaid.min.js"></script>
-<script>mermaid.initialize({{startOnLoad:true,securityLevel:"strict",theme:"default",flowchart:{{useMaxWidth:false}}}});</script>
+<script>mermaid.initialize({{startOnLoad:true,securityLevel:"strict",theme:"default",flowchart:{{useMaxWidth:true}}}});</script>
 </body></html>"""
     saida_p.write_text(pagina, encoding="utf-8")
     print(f"{total} diagramas de {len(secoes)} arquivos -> {saida_p}")

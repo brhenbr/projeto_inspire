@@ -1,45 +1,49 @@
-# C4 — Nível 1: Contexto do sistema
+# C4 — Nível 1: Contexto
 
-**Em palavras simples:** quem usa o sistema, e com quais serviços de fora ele conversa. O sistema busca
-dados no portal dados.gov.br e, se ligado, pede ajuda a um LLM.
+**Em palavras simples:** quem usa o sistema e com quais serviços de fora ele conversa. Três tipos de pessoa usam a tela;
+o sistema busca as descrições no portal dados.gov.br e, se ligado, pede ajuda a um serviço de inteligência artificial.
+Os resultados saem em arquivos que podem ir para planilhas ou outros sistemas.
 
-Mostra o Inspire Catálogo, quem o usa e com quais sistemas externos ele conversa. Não depende de
-tecnologia. Linhas tracejadas são integrações previstas para depois do MVP.
+*Leia primeiro [Como o sistema funciona](00-como-o-sistema-funciona.md). Aqui aparece só o que está fora do sistema.*
 
 ```mermaid
 flowchart TB
-    curador["👤 <b>Curador(a)</b><br/>Revisa e melhora metadados"]
-    coord["👤 <b>Coordenação do projeto</b><br/>Acompanha a qualidade e a evolução"]
-    explorador["👤 <b>Explorador(a) de dados</b><br/>Busca dados para análise"]
+    pessoas["👤 <b>Pessoas</b><br/>Explorador(a), curador(a), coordenação"]
+    sistema["<b>Inspire Catálogo</b><br/>Cópia pesquisável do catálogo,<br/>com nota de qualidade e curadoria"]
+    portal["<b>Portal dados.gov.br</b><br/>Fonte das descrições<br/>(cerca de 20 mil conjuntos)"]
+    llm["<b>Serviços de LLM gratuitos</b><br/>Opcionais: Groq, Gemini e outros,<br/>com troca automática por cota"]
+    saidas["<b>Planilhas e outros sistemas</b><br/>Recebem arquivos CSV, JSON e DCAT-BR"]
 
-    sistema["<b>Inspire Catálogo</b><br/>[Sistema de software]<br/>Espelha o catálogo do dados.gov.br, permite explorá-lo,<br/>mede a qualidade dos metadados e organiza a curadoria<br/>com apoio de LLM"]
-
-    portal["<b>Portal dados.gov.br</b><br/>[Sistema externo]<br/>API REST com chave; fonte dos metadados<br/>(~20,7 mil conjuntos)"]
-    llm["<b>Provedor de LLM</b><br/>[Sistema externo opcional]<br/>API gratuita (ADR-0004) ou servidor soberano;<br/>troca por configuração"]
-    orgaos["<b>Servidores dos órgãos</b><br/>[Sistema externo]<br/>Hospedam os recursos (arquivos e APIs)"]
-    jira["<b>Jira</b><br/>[Ferramenta de gestão]<br/>Backlog do projeto"]
-
-    curador -->|"Cura metadados e aprova<br/>propostas do LLM [web]"| sistema
-    coord -->|"Consulta indicadores [web]"| sistema
-    explorador -->|"Busca e explora [web]"| sistema
-    sistema -->|"Extrai metadados<br/>[HTTPS, chave de API]"| portal
-    sistema -->|"Pede propostas de curadoria<br/>[API compatível com OpenAI]"| llm
-    sistema -.->|"Fase 2: verifica links<br/>(sem baixar dados)"| orgaos
-    sistema -.->|"Futuro: propõe alterações"| portal
-    jira -.->|"Backlog importado por CSV<br/>(manual, fora do sistema)"| sistema
+    pessoas -->|"1. Buscam, corrigem,<br/>organizam e exportam"| sistema
+    sistema -->|"2. Traz as descrições<br/>(com chave de API)"| portal
+    sistema -->|"3. Pede sugestões<br/>(só campos públicos)"| llm
+    sistema -->|"4. Gera arquivos"| saidas
 
     classDef pessoa fill:#08427b,stroke:#052e56,color:#fff
     classDef nosso fill:#1168bd,stroke:#0b4884,color:#fff
     classDef externo fill:#999,stroke:#6b6b6b,color:#fff
-    class curador,coord,explorador pessoa
+    classDef opc fill:#999,stroke:#6b6b6b,color:#fff,stroke-dasharray: 5 3
+    class pessoas pessoa
     class sistema nosso
-    class portal,llm,orgaos,jira externo
+    class portal,saidas externo
+    class llm opc
 ```
+*Tracejado = opcional.*
 
-## Notas
-- O Jira não integra com o sistema em tempo de execução; aparece só para situar o backlog.
-- A seta tracejada de volta ao portal exige perfil de administrador de organização e não está no
-  curto nem no médio prazo; o modelo de dados já separa espelho e curadoria para viabilizá-la.
-- Segurança e soberania ([ADR-0002](../03-decisoes/0002-seguranca-e-soberania.md)): o único sistema
-  externo que recebe dados do projeto é o provedor de LLM, e só recebe campos públicos do catálogo
-  ([ADR-0004](../03-decisoes/0004-provedor-de-llm-externo-controlado.md)).
+## Legenda das setas
+| # | O que acontece | Observações |
+|---|---|---|
+| 1 | As pessoas usam o sistema pelo navegador | Um usuário por vez; não há login |
+| 2 | O sistema copia as descrições do portal | Exige a chave de API do portal; ritmo limitado (4 chamadas por segundo) para não ser bloqueado |
+| 3 | O sistema pede sugestões a um LLM | Desligado ou simulado por padrão; só campos públicos; nunca contatos pessoais |
+| 4 | O sistema entrega arquivos | O que sai é só o que o usuário pede (uma busca ou uma coleção) |
+
+## Para engenharia
+- **Portal:** API REST com cabeçalho `chave-api-dados-abertos`. É intermitente (listas vazias ocasionais) e responde
+  HTTP 405 se chamado rápido demais; o cliente trata as duas coisas (ver [fluxos](fluxos.md), seção 1).
+- **LLM:** qualquer serviço compatível com a API "chat completions". Há provedor simulado (padrão) e um roteador de
+  provedores gratuitos ([ADR-0014](../03-decisoes/0014-roteador-de-provedores-llm.md)).
+- **Segurança e soberania** ([ADR-0002](../03-decisoes/0002-seguranca-e-soberania.md)): o único sistema externo que
+  recebe dados do projeto é o provedor de LLM, e só com campos públicos ([ADR-0004](../03-decisoes/0004-provedor-de-llm-externo-controlado.md)).
+- **Fora de escopo agora (fase 2):** verificar links dos recursos nos servidores dos órgãos e propor alterações de volta ao
+  portal. O modelo de dados já separa o espelho da curadoria para viabilizar isso depois.

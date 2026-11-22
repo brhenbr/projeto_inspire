@@ -1,74 +1,80 @@
-# C4 — Nível 3: Componentes do backend
+# C4 — Nível 3: Componentes do servidor
 
-**Em palavras simples:** por dentro, o sistema é dividido em módulos, cada um com uma função: buscar
-dados no portal, organizá-los, medir a qualidade, registrar a curadoria e conversar com o LLM. Os
-módulos não mexem nos dados uns dos outros diretamente: pedem uns aos outros. Tudo que fala com o
-mundo de fora (portal, banco, LLM) passa por uma peça trocável chamada **adaptador**. É isso que
-permite trocar o LLM ou, no futuro, escrever no portal sem reescrever o resto.
+**Em palavras simples:** por dentro, o servidor é dividido em **módulos**, cada um com uma função: trazer dados do
+portal, organizá-los, buscar, medir a qualidade, registrar a curadoria, conversar com o LLM e exportar. Cada módulo cuida
+da sua parte e pede aos outros o que não é dele. Tudo o que fala com o mundo de fora (portal, banco, LLM) passa por uma
+peça trocável; é isso que permite, por exemplo, trocar de LLM sem mexer no resto.
 
-A API e o Worker usam o mesmo código; mudam apenas o que os dispara (uma chamada web ou um job da fila).
+*O servidor (`api`) e o trabalhador (`worker`) usam o mesmo código. Muda só quem dispara: uma chamada da tela ou um
+pedido da fila.*
 
 ```mermaid
 flowchart TB
-    rest["<b>API REST /v1</b><br/>Recebe pedidos da interface web"]
-    jobs["<b>Tratadores de jobs</b><br/>Executam tarefas longas da fila"]
-    fila["<b>Fila de jobs</b><br/>No PostgreSQL"]
+    entradas["<b>Entradas</b><br/>API REST (chamadas da tela)<br/>e trabalhador (pedidos da fila)"]
 
-    subgraph modulos["Módulos de negócio"]
+    subgraph m1["Trazer, achar e medir"]
         direction LR
-        extracao["<b>Extração</b><br/>Coleta em duas fases,<br/>retomada e conferência"]
-        normal["<b>Normalização</b><br/>JSON bruto em tabelas,<br/>sem dados pessoais"]
-        catalogo["<b>Catálogo</b><br/>Busca, filtros e detalhe"]
-        qualidade["<b>Qualidade</b><br/>Regras DQV/FAIR/DMBOK,<br/>pontuação explicável"]
-        curadoria["<b>Curadoria</b><br/>Edições, status, coleções<br/>e histórico"]
-        assistente["<b>Assistente LLM</b><br/>Tarefas, lotes e propostas"]
-        exporta["<b>Exportação</b><br/>CSV e JSON"]
+        extracao["<b>Extração</b><br/>Copia e atualiza<br/>as descrições"]
+        descoberta["<b>Descoberta</b><br/>Busca, filtros,<br/>painel, organizações"]
+        qualidade["<b>Qualidade</b><br/>Nota explicada<br/>de 0 a 100"]
     end
 
-    subgraph adaptadores["Adaptadores: peças trocáveis que falam com o mundo de fora"]
+    subgraph m2["Melhorar, organizar e entregar"]
         direction LR
-        cliente["<b>Cliente do portal</b><br/>Retry e limite de taxa"]
-        repos["<b>Armazenamento</b><br/>PostgreSQL em camadas"]
-        filtro["<b>Filtro de campos públicos</b><br/>Barreira antes do LLM"]
-        llm["<b>Provedor de LLM</b><br/>Externo ou local"]
+        curadoria["<b>Curadoria</b><br/>Correções, status<br/>e coleções"]
+        assistente["<b>Assistente de LLM</b><br/>Sugestões e interpretação<br/>de pedidos"]
+        exporta["<b>Exportação</b><br/>CSV, JSON, DCAT-BR"]
     end
 
-    rest -->|"enfileira"| fila
-    fila -->|"entrega"| jobs
-    rest -->|"consulta e comanda"| modulos
-    jobs -->|"executa"| modulos
-    extracao -->|"pede dados"| cliente
-    assistente -->|"só passa por"| filtro
-    filtro --> llm
-    modulos -->|"lê e grava"| repos
+    subgraph fora["Peças que falam com o mundo de fora"]
+        direction LR
+        cliente["<b>Cliente do portal</b><br/>Ritmo limitado e<br/>nova tentativa"]
+        banco["<b>Banco em camadas</b><br/>raw, catalogo,<br/>curadoria, analitico"]
+        gate["<b>Roteador de LLM</b><br/>Só campos públicos; troca<br/>de provedor por cota"]
+    end
 
+    entradas -->|"chamam"| m1
+    entradas -->|"chamam"| m2
+    extracao -->|"1. pede ao portal"| cliente
+    assistente -->|"2. pede ao LLM"| gate
+    m1 -->|"3. leem e gravam"| banco
+    m2 -->|"3. leem e gravam"| banco
+
+    classDef ent fill:#08427b,stroke:#052e56,color:#fff
     classDef mod fill:#1168bd,stroke:#0b4884,color:#fff
     classDef ada fill:#5b9bd5,stroke:#3a6fa0,color:#fff
-    classDef ent fill:#08427b,stroke:#052e56,color:#fff
-    class extracao,normal,catalogo,qualidade,curadoria,assistente,exporta mod
-    class cliente,repos,filtro,llm ada
-    class rest,jobs,fila ent
+    class entradas ent
+    class extracao,descoberta,qualidade,curadoria,assistente,exporta mod
+    class cliente,banco,gate ada
 ```
 
-## Regras de dependência
-- Módulos só se conhecem pelas interfaces públicas uns dos outros. Nenhum módulo lê as tabelas de outro.
-- Dentro dos módulos: a Extração entrega ao Normalizador o que coletou; o Assistente LLM propõe por meio
-  da Curadoria; a Exportação lê Catálogo e Curadoria. O diagrama omite essas setas internas de propósito.
-- O **Assistente LLM** nunca fala com o provedor diretamente: tudo passa pelo **filtro de campos
-  públicos**, que é testado para garantir que contatos pessoais não saem (US-068).
-- O módulo **Curadoria** é o único que escreve no schema `curadoria`; o Assistente apenas **propõe**
-  por meio dele, e só a aprovação humana aplica a alteração.
+## O que cada módulo faz
+| Módulo | Função, em palavras simples | Pasta do código (`app/backend/src/inspire/`) | Quem o aciona |
+|---|---|---|---|
+| **Extração** | Copia as descrições do portal, tira os dados pessoais e transforma em tabelas; atualiza só o que mudou | `extraction/`, `worker/` | Botão "Atualizar catálogo" ou comando |
+| **Descoberta** | Busca em português, filtros, painel, organizações, detalhe do conjunto | `discovery/`, `analytics/` | Telas Buscar, Painel, Organizações |
+| **Qualidade** | Calcula a nota por regras e explica cada ponto | `quality/` | Depois de cada extração e ao editar os pesos |
+| **Curadoria** | Guarda as correções ao lado do original, o status de revisão e as coleções | `curation/` | Telas Detalhe, Fila, Coleções |
+| **Assistente de LLM** | Gera sugestões de curadoria; traduz pedidos em português em filtros; escolhe o provedor | `llm/` | Telas Sugestões de LLM, Perguntar, Coleções |
+| **Exportação** | Gera CSV, JSON e DCAT-BR com qualidade em DQV | `export/` | Botões "Exportar" |
+| *Entradas* | Rotas REST e laço do trabalhador | `api/`, `worker/` | Tela e fila |
 
-## Componentes do frontend (Web)
-| Tela | Função | Épico |
-|---|---|---|
-| Painel | Indicadores gerais do catálogo e da última extração | EP-02 |
-| Busca | Busca textual, filtros e lista de resultados | EP-02 |
-| Detalhe do conjunto | Original x curado, qualidade, recursos, histórico | EP-02, EP-04 |
-| Organizações | Lista e indicadores por órgão | EP-02 |
-| Fila de curadoria | Conjuntos priorizados e propostas do LLM para revisão | EP-04, EP-05 |
-| Coleções | Criar e gerenciar coleções (manuais e por filtros salvos) | EP-04 |
-| Extração | Disparar, acompanhar progresso e ver histórico e relatório | EP-01 |
-| Configurações | Regras de qualidade, tarefas de LLM e provedor ativo | EP-03, EP-05 |
+## Regras de dependência (para quem altera o código)
+- Cada módulo só usa as funções públicas dos outros; nenhum lê as tabelas de outro módulo por conta própria.
+- **Só a Curadoria escreve no schema `curadoria`.** O Assistente de LLM apenas **propõe**; a aplicação da proposta passa
+  pela Curadoria e só acontece com a aprovação de uma pessoa.
+- **O LLM nunca recebe dados sem passar pela barreira de campos públicos** (testada: contatos pessoais não saem).
+  O roteador de provedores fica atrás dessa barreira ([ADR-0014](../03-decisoes/0014-roteador-de-provedores-llm.md)).
+- A tela usa apenas a API REST; não acessa o banco nem o LLM.
+- O que depende de tecnologia concreta (Postgres, HTTP, provedor de LLM) fica nas peças de fora; trocar uma delas não
+  exige mexer nos módulos.
 
-O frontend usa apenas a API REST; não acessa o banco nem o LLM.
+## As telas (frontend)
+| Tela | Módulos que usa |
+|---|---|
+| Painel, Buscar, Organizações, Detalhe | Descoberta, Qualidade, Curadoria |
+| Perguntar | Assistente de LLM, Descoberta |
+| Fila de curadoria, Coleções | Curadoria, Descoberta, Assistente de LLM (coleção por texto) |
+| Sugestões de LLM | Assistente de LLM, Curadoria |
+| Extração | Extração |
+| Configurações | Qualidade |

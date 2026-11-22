@@ -1,9 +1,11 @@
 # C4 — Nível 4: Fluxos e estados
 
-**Em palavras simples:** estes diagramas contam o que acontece, passo a passo, nas duas operações mais
-importantes (trazer o catálogo do portal e curar com ajuda do LLM) e mostram por quais situações passam
-as coisas que têm ciclo de vida (uma extração, um conjunto em curadoria, uma proposta do LLM). Não há
-diagramas de classes, como combinado.
+**Em palavras simples:** estes diagramas contam o que acontece, passo a passo, nas operações mais importantes
+(trazer o catálogo do portal, curar com ajuda do LLM, perguntar em português e escolher qual LLM usar) e mostram por
+quais situações passam as coisas que têm ciclo de vida (uma extração, um conjunto em curadoria, uma proposta do LLM).
+Não há diagramas de classes, como combinado.
+
+Mapa: **1** Extração · **2** Curadoria com LLM · **3** Estados · **4** Perguntar e coleção por texto · **5** Roteador de LLM.
 
 ## 1. Extração do catálogo
 
@@ -180,3 +182,73 @@ stateDiagram-v2
     Editada --> [*]
     Rejeitada --> [*]
 ```
+
+## 4. Perguntar em linguagem natural e coleção por texto
+
+**Em palavras simples:** você escreve o que procura. O LLM só **traduz** o pedido em filtros; quem busca é o próprio
+catálogo, e você vê (e pode corrigir) os filtros usados. Na coleção por texto, nada é criado até você confirmar
+([ADR-0016](../03-decisoes/0016-chat-como-tradutor-de-filtros.md)).
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Pessoa
+    participant W as Tela
+    participant A as Servidor
+    participant D as Banco
+    participant R as Roteador de LLM
+
+    U->>W: Escreve o pedido
+    W->>A: Envia o texto
+    A->>D: Lê a lista de temas e formatos (vocabulário público)
+    A->>R: Texto + vocabulário (nada do catálogo curado, nenhum contato)
+    R-->>A: Filtros em JSON
+    Note over A: Valida cada filtro contra o vocabulário e descarta o que não existe
+    A->>D: Busca com os filtros válidos
+    alt Perguntar: nenhum resultado
+        Note over A: Solta filtros um a um (periodicidade, esfera, nota, formato...) e avisa quais
+    end
+    A-->>W: Filtros entendidos, o que foi descartado e os primeiros resultados
+    alt Coleção por texto
+        U->>W: Ajusta os filtros (×), confere a amostra e confirma
+        W->>A: Cria a coleção dinâmica com a regra
+    end
+```
+
+**Pontos importantes**
+- Só o **texto digitado** e o **vocabulário público** vão ao provedor; a tela avisa quando o provedor é externo.
+- Na coleção **não há afrouxamento**: ela precisa refletir exatamente o que foi pedido; coleção com zero conjuntos não é criada.
+
+## 5. Roteador de LLM: o que acontece quando um provedor falha ou acaba a cota
+
+**Em palavras simples:** há vários LLMs gratuitos, cada um com uma cota pequena. O sistema tenta o primeiro; se ele
+acabou a cota, passa para o próximo e volta a ele depois. Se tudo estiver indisponível, avisa em vez de travar
+([ADR-0014](../03-decisoes/0014-roteador-de-provedores-llm.md)).
+
+```mermaid
+flowchart TB
+    inicio(["Pedido de sugestão ou<br/>interpretação"]) --> prox{"Há provedor<br/>fora de pausa?"}
+    prox -->|"Sim, o próximo da lista"| chama["Chama o provedor"]
+    prox -->|"Não"| espera{"Alguma pausa termina<br/>em menos de 65 s?"}
+    espera -->|"Sim"| aguarda["Espera e tenta de novo"]
+    espera -->|"Não"| falha["Falha com mensagem clara:<br/>todos indisponíveis agora"]
+    aguarda --> prox
+    chama --> resp{"Resposta"}
+    resp -->|"Ok"| ok["Usa a resposta e registra<br/>qual provedor respondeu"]
+    resp -->|"Cota esgotada (429 ou 402)"| pausa["Pausa o provedor pelo tempo<br/>que ele informar"]
+    resp -->|"Credencial recusada (401 ou 403)"| desliga["Desativa o provedor por 24 h"]
+    resp -->|"Erro de rede ou 5xx"| curta["Pausa o provedor por 30 s"]
+    pausa --> prox
+    desliga --> prox
+    curta --> prox
+
+    classDef ok fill:#1168bd,stroke:#0b4884,color:#fff
+    classDef nao fill:#999,stroke:#6b6b6b,color:#fff
+    class ok,chama ok
+    class falha,pausa,desliga,curta nao
+```
+
+**Pontos importantes**
+- Provedor **sem chave** é ignorado. Cada proposta guarda **qual provedor respondeu**, para auditoria.
+- A pausa vive na memória de cada processo (servidor e trabalhador separados); aceitável no MVP
+  (ver [limites conhecidos](../01-produto/limites-conhecidos.md)).
