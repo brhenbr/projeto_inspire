@@ -15,13 +15,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "app"))
 import server  # noqa: E402
 
 EXEMPLO = Path(__file__).resolve().parents[1] / "casos-exemplo"
-PIN = "pin-de-teste"
 
 
 class Base(unittest.TestCase):
     def setUp(self) -> None:
         self.tmp = tempfile.TemporaryDirectory()
-        self.httpd = server.create_server("127.0.0.1", 0, str(Path(self.tmp.name) / "t.db"), str(EXEMPLO), PIN)
+        self.httpd = server.create_server("127.0.0.1", 0, str(Path(self.tmp.name) / "t.db"), str(EXEMPLO))
         self.base = f"http://127.0.0.1:{self.httpd.server_address[1]}"
         threading.Thread(target=self.httpd.serve_forever, daemon=True).start()
 
@@ -119,15 +118,15 @@ class TestResultados(Base):
         sid = self.start("=cmd|' /C calc'!A0")["sessao"]["id"]
         self.call("PUT", f"/api/sessoes/{sid}/respostas/EX-01", {"resultado": "falhou", "mensagem_erro": "+erro", "comentario": "@x"})
 
-    def test_pin_obrigatorio_e_correto(self):
-        self.assertEqual(self.call("GET", "/api/resultados")[0], 401)
-        self.assertEqual(self.call("GET", "/api/resultados", headers={"X-PIN": "errado"})[0], 401)
-        status, data, _ = self.call("GET", "/api/resultados", headers={"X-PIN": PIN})
+    def test_resultados_abrem_direto_sem_senha(self):
+        status, data, _ = self.call("GET", "/api/resultados")
         self.assertEqual((status, data), (200, {"sessoes": [], "respostas": []}))
+        self.populate()
+        self.assertEqual(len(self.call("GET", "/api/resultados")[1]["respostas"]), 1)
 
     def test_csv_protege_contra_formulas(self):
         self.populate()
-        status, body, headers = self.call("GET", "/api/resultados.csv", headers={"X-PIN": PIN}, raw=True)
+        status, body, headers = self.call("GET", "/api/resultados.csv", raw=True)
         self.assertEqual(status, 200)
         self.assertTrue(headers["Content-Type"].startswith("text/csv"))
         self.assertTrue(body.startswith(b"\xef\xbb\xbf"))
@@ -136,14 +135,6 @@ class TestResultados(Base):
         self.assertTrue(rows[0]["testador"].startswith("'="))
         self.assertTrue(rows[0]["mensagem_erro"].startswith("'+"))
         self.assertTrue(rows[0]["comentario"].startswith("'@"))
-
-    def test_sem_pin_configurado_a_area_fica_desligada(self):
-        self.httpd.shutdown()
-        self.httpd.server_close()
-        self.httpd = server.create_server("127.0.0.1", 0, str(Path(self.tmp.name) / "t2.db"), str(EXEMPLO), "")
-        self.base = f"http://127.0.0.1:{self.httpd.server_address[1]}"
-        threading.Thread(target=self.httpd.serve_forever, daemon=True).start()
-        self.assertEqual(self.call("GET", "/api/resultados", headers={"X-PIN": ""})[0], 403)
 
 
 class TestEstaticosEHeaders(Base):

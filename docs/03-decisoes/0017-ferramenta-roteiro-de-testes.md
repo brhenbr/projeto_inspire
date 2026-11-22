@@ -26,7 +26,7 @@ os casos vêm de arquivos JSON, então serve a qualquer sistema. Custo: manter o
   auditar ou atualizar, alinhado a ADR-0002.
 - Resultados: *Passou*, *Falhou* (mensagem de erro obrigatória) e *Não consegui executar*. Só o nome identifica a pessoa.
 - Mesmo nome retoma a sessão aberta; sessão finalizada não é retomada (a próxima vira uma nova rodada).
-- Área de resultados protegida por PIN do ambiente; CSV protegido contra fórmulas; texto sempre como texto.
+- Sem PIN nem login (decisão do cliente em 2026-11-22: não é necessário por ora); a área de resultados abre direto e a porta só é publicada em `127.0.0.1`. CSV protegido contra fórmulas; texto sempre como texto.
 - Sem login por usuário e sem anexos, de propósito. Não deve ser exposta à internet sem uma camada de acesso por cima.
 
 ## Consequências

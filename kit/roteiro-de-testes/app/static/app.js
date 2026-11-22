@@ -180,22 +180,19 @@ function resumo(d) {
 /* -------------------------------------------------------------- resultados */
 async function telaResultados() {
   quem.textContent = "";
-  const pin = h("input", { type: "password", id: "pin", value: sessionStorage.getItem("rt.pin") || "", autocomplete: "off" });
   const msg = h("p", { class: "erro" });
   const saida = h("div", {});
   async function carregar() {
     msg.textContent = "";
     try {
-      const d = await api("GET", "/resultados", null, { "X-PIN": pin.value });
-      sessionStorage.setItem("rt.pin", pin.value);
-      saida.replaceChildren(tabelaResultados(d));
+      saida.replaceChildren(tabelaResultados(await api("GET", "/resultados")));
     } catch (e) {
       msg.textContent = e.message;
       saida.replaceChildren();
     }
   }
   async function baixar() {
-    const r = await fetch("/api/resultados.csv", { headers: { "X-PIN": pin.value } });
+    const r = await fetch("/api/resultados.csv");
     if (!r.ok) { msg.textContent = (await r.json().catch(() => ({}))).detail || "Erro"; return; }
     const a = h("a", { href: URL.createObjectURL(await r.blob()), download: "resultados.csv" });
     document.body.append(a);
@@ -203,15 +200,13 @@ async function telaResultados() {
     a.remove();
   }
   montar(
-    h("h1", {}, "Resultados"), h("p", { class: "sub" }, "Área restrita: informe o PIN."),
-    h("div", { class: "card" }, h("label", { for: "pin" }, "PIN"), pin,
-      h("div", { class: "linha" },
-        h("button", { type: "button", onclick: carregar }, "Ver resultados"),
-        h("button", { class: "sec", type: "button", onclick: baixar }, "Baixar CSV")),
-      msg),
+    h("h1", {}, "Resultados"),
+    h("p", { class: "sub" }, "Todas as respostas dadas até agora, de todos os testadores."),
+    h("div", { class: "linha" }, h("button", { class: "sec", type: "button", onclick: carregar }, "Atualizar"), h("button", { type: "button", onclick: baixar }, "Baixar CSV")),
+    msg,
     saida,
   );
-  if (pin.value) carregar();
+  carregar();
 }
 
 function tabelaResultados(d) {

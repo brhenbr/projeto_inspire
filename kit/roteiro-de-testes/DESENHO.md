@@ -19,7 +19,7 @@ sabe nada sobre o sistema testado: os casos vêm de arquivos, então serve para 
 | **Início** | Escolhe o roteiro, informa o nome e (opcional) o papel. Se já testou antes com o mesmo nome, oferece **continuar de onde parou**. |
 | **Caso** | Mostra um caso por vez: objetivo, preparação, passos numerados, resultado esperado e o que anotar. Botões: **Passou**, **Falhou**, **Não consegui executar**. Em "Falhou" a mensagem de erro é obrigatória. Comentário sempre opcional. Barra de progresso ("12 de 30") e botão **Voltar**. |
 | **Resumo** | Ao terminar (ou a qualquer hora): quantos passou/falharam/pulou, com a lista dos que falharam. |
-| **Resultados** (protegida por PIN) | Quadro caso × testador, filtro por resultado, comentários e erros lado a lado, e **exportar CSV**. |
+| **Resultados** (abre direto, sem senha) | Quadro caso × testador, filtro por resultado, comentários e erros lado a lado, e **exportar CSV**. |
 
 Sem imagens: o erro é registrado em texto (não ocupa espaço de armazenamento).
 
@@ -60,10 +60,10 @@ informado; a ferramenta não pede e-mail.
 - **Um contêiner**, Python da biblioteca padrão (servidor HTTP, `sqlite3`) **sem dependências de terceiros**; páginas
   HTML e JavaScript simples, sem etapa de build. Escolha pensada para ser auditável e durar (nada para atualizar ou varrer).
 - **API mínima** (JSON): `GET /api/roteiros`, `POST /api/sessoes`, `GET /api/sessoes/{id}`, `PUT /api/sessoes/{id}/respostas/{caso}`,
-  `POST /api/sessoes/{id}/finalizar`, `GET /api/resultados` e `GET /api/resultados.csv` (PIN).
+  `POST /api/sessoes/{id}/finalizar`, `GET /api/resultados` e `GET /api/resultados.csv`.
 - **Volume** para o arquivo `.db` (não se perde ao recriar o contêiner) e **somente leitura** para a pasta de casos.
 - Escuta em `127.0.0.1` por padrão; para outras pessoas acessarem é preciso expor a porta de forma consciente.
-- **Segurança:** o PIN da área de resultados vem do ambiente (nunca no código); SQL sempre parametrizado; texto dos
+- **Segurança:** sem login nem senha (decisão do cliente: por ora não é necessário), então a porta só é publicada em `127.0.0.1`; SQL sempre parametrizado; texto dos
   comentários escapado na tela (sem HTML injetado); limites de tamanho nos campos; CSV protegido contra fórmulas de planilha.
 
 ## Fluxo de uma pessoa
@@ -75,5 +75,5 @@ Login por usuário, anexos e imagens, notificações, integração com ferrament
 pode ler o CSV ou a API.
 
 ## Testes da própria ferramenta
-Testes automatizados da API (criar sessão, responder, substituir, retomar, exigir erro em "falhou", PIN, CSV) e um teste
+Testes automatizados da API (criar sessão, responder, substituir, retomar, exigir erro em "falhou", CSV) e um teste
 ponta a ponta simples no navegador. A ferramenta se testa com um roteiro de exemplo incluído na pasta.

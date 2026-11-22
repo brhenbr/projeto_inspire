@@ -2,7 +2,6 @@
 import { chromium } from "playwright";
 
 const BASE = process.env.BASE_URL ?? "http://host.docker.internal:8090";
-const PIN = process.env.RESULTS_PIN ?? "pin-local-teste";
 const nome = "Testador " + Date.now();
 const falhas = [];
 const confere = (ok, msg) => { if (!ok) { falhas.push(msg); console.log("  FALHOU:", msg); } else console.log("  ok:", msg); };
@@ -11,8 +10,7 @@ const browser = await chromium.launch();
 const page = await browser.newPage();
 const erros = [];
 page.on("pageerror", (e) => erros.push(String(e)));
-// o 401 do PIN errado é esperado, então não conta como erro
-page.on("console", (m) => { if (m.type() === "error" && !m.text().includes("401")) erros.push(m.text()); });
+page.on("console", (m) => { if (m.type() === "error") erros.push(m.text()); });
 
 await page.goto(BASE);
 await page.getByLabel("Seu nome").fill(nome);
@@ -56,12 +54,6 @@ confere(true, "finaliza o teste");
 
 // HTML do comentário não pode virar elemento
 await page.goto(BASE + "/#/resultados");
-await page.getByLabel("PIN").fill("pin-errado");
-await page.getByRole("button", { name: "Ver resultados" }).click();
-await page.getByText("PIN incorreto").waitFor();
-confere(true, "PIN errado é recusado");
-await page.getByLabel("PIN").fill(PIN);
-await page.getByRole("button", { name: "Ver resultados" }).click();
 await page.getByRole("cell", { name: nome }).first().waitFor();
 confere(await page.getByText("<b>rápido</b>").first().isVisible(), "comentário aparece como texto, sem virar HTML");
 confere((await page.locator("td b").count()) === 0, "nenhum <b> foi injetado");

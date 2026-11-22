@@ -10,13 +10,12 @@ arquivo SQLite. Não cita nenhum produto: pode ser extraída deste repositório 
 ## Subir
 ```
 cd kit/roteiro-de-testes
-RESULTS_PIN=troque-este-pin docker compose up -d --build
+docker compose up -d --build
 ```
 Abra http://127.0.0.1:8090. Para testar outros casos: `CASOS_DIR_HOST=/caminho/dos/casos docker compose up -d`.
 
 | Variável | Para que serve | Padrão |
 |---|---|---|
-| `RESULTS_PIN` | PIN da área **Resultados** (e do CSV). Vazio = área desligada | vazio |
 | `CASOS_DIR_HOST` | Pasta com os roteiros `.json` (montada somente leitura) | `./casos-exemplo` |
 | `ROTEIRO_PORT` | Porta no seu computador | `8090` |
 
@@ -29,7 +28,7 @@ Mude a `versao` do roteiro: cada sessão guarda a versão que o testador viu. Ar
 motivo aparece no log do contêiner.
 
 ## Ver os resultados
-Menu **Resultados** (pede o PIN): tabela com testador, caso, resultado, erro e comentário. **Baixar CSV** exporta tudo
+Menu **Resultados** (abre direto): tabela com testador, caso, resultado, erro e comentário. **Baixar CSV** exporta tudo
 (células que começam com `=`, `+`, `-` ou `@` ganham um apóstrofo, para não virarem fórmula na planilha).
 
 ## Testes da ferramenta
@@ -39,6 +38,6 @@ bash testar.sh
 Roda os testes automatizados em um contêiner descartável (sem instalar nada no seu computador).
 
 ## Segurança, em resumo
-Escuta em `127.0.0.1` por padrão; PIN fora do código; SQL parametrizado; texto sempre como texto (sem HTML injetado);
+Escuta em `127.0.0.1` por padrão; SQL parametrizado; texto sempre como texto (sem HTML injetado);
 política de conteúdo restritiva; contêiner sem root, somente leitura e sem capacidades extras; limites de tamanho.
-**Não tem login por usuário**: o nome é só um rótulo. Não coloque na internet sem uma camada de acesso por cima.
+**Não tem login nem senha**: o nome é só um rótulo e qualquer pessoa que alcance a página vê todos os resultados. Não coloque na internet sem uma camada de acesso por cima.

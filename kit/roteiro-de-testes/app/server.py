@@ -3,14 +3,12 @@
 Variáveis de ambiente:
   DB_PATH      arquivo SQLite (padrão /data/roteiro.db)
   CASOS_DIR    pasta com os roteiros .json (padrão /casos)
-  RESULTS_PIN  PIN da área de resultados; vazio = área desligada
   HOST, PORT   onde escutar (padrão 0.0.0.0:8000; quem publica a porta decide quem acessa)
 """
 
 from __future__ import annotations
 
 import csv
-import hmac
 import io
 import json
 import os
@@ -21,7 +19,7 @@ from datetime import UTC, datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
-from urllib.parse import parse_qs, unquote, urlparse
+from urllib.parse import unquote, urlparse
 
 STATIC_DIR = Path(__file__).parent / "static"
 STATIC_FILES = {"/": "index.html", "/index.html": "index.html", "/app.js": "app.js", "/style.css": "style.css"}
@@ -136,8 +134,8 @@ class Roteiros:
 
 
 class App:
-    def __init__(self, store: Store, roteiros: Roteiros, pin: str) -> None:
-        self.store, self.roteiros, self.pin = store, roteiros, pin
+    def __init__(self, store: Store, roteiros: Roteiros) -> None:
+        self.store, self.roteiros = store, roteiros
 
     # ---------------------------------------------------------------- sessões
     def list_roteiros(self) -> list[dict[str, Any]]:
@@ -224,12 +222,6 @@ class App:
         return self.session(session_id)
 
     # ---------------------------------------------------------------- resultados
-    def check_pin(self, given: str) -> None:
-        if not self.pin:
-            raise ApiError(403, "A área de resultados está desligada (defina RESULTS_PIN)")
-        if not hmac.compare_digest(given.encode(), self.pin.encode()):
-            raise ApiError(401, "PIN incorreto")
-
     def results(self) -> dict[str, Any]:
         sessions = [dict(r) for r in self.store.run("SELECT * FROM sessao ORDER BY id")]
         answers = [dict(r) for r in self.store.run("SELECT * FROM resposta ORDER BY sessao_id, id")]
@@ -290,7 +282,6 @@ def make_handler(app: App) -> type[BaseHTTPRequestHandler]:
         def _route(self, method: str) -> None:
             url = urlparse(self.path)
             path = unquote(url.path)
-            query = parse_qs(url.query)
             if method == "GET" and path in STATIC_FILES:
                 name = STATIC_FILES[path]
                 self._send(200, (STATIC_DIR / name).read_bytes(), CONTENT_TYPES[Path(name).suffix])
@@ -309,7 +300,6 @@ def make_handler(app: App) -> type[BaseHTTPRequestHandler]:
             elif method == "POST" and len(parts) == 3 and parts[0] == "sessoes" and parts[1].isdigit() and parts[2] == "finalizar":
                 self._json(200, app.finish(int(parts[1])))
             elif method == "GET" and parts in (["resultados"], ["resultados.csv"]):
-                app.check_pin(self.headers.get("X-PIN") or (query.get("pin") or [""])[0])
                 if parts == ["resultados"]:
                     self._json(200, app.results())
                 else:
@@ -338,8 +328,8 @@ def make_handler(app: App) -> type[BaseHTTPRequestHandler]:
     return Handler
 
 
-def create_server(host: str, port: int, db_path: str, casos_dir: str, pin: str) -> ThreadingHTTPServer:
-    app = App(Store(db_path), Roteiros(casos_dir), pin)
+def create_server(host: str, port: int, db_path: str, casos_dir: str) -> ThreadingHTTPServer:
+    app = App(Store(db_path), Roteiros(casos_dir))
     return ThreadingHTTPServer((host, port), make_handler(app))
 
 
@@ -349,7 +339,6 @@ def main() -> None:
         int(os.environ.get("PORT", "8000")),
         os.environ.get("DB_PATH", "/data/roteiro.db"),
         os.environ.get("CASOS_DIR", "/casos"),
-        os.environ.get("RESULTS_PIN", ""),
     )
     print(f"[roteiro-de-testes] no ar em :{server.server_address[1]}", flush=True)
     server.serve_forever()

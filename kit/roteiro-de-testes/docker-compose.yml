@@ -1,12 +1,10 @@
 # Roteiro de Testes. Subir:  docker compose up -d --build   (abra http://127.0.0.1:8090)
 # Os roteiros vêm da pasta CASOS_DIR_HOST (padrão: ./casos-exemplo, somente leitura).
-# O PIN da área de resultados vem de RESULTS_PIN (no .env ou no ambiente); sem PIN a área fica desligada.
+# A área Resultados abre direto, sem senha: por isso a porta só é publicada em 127.0.0.1.
 name: roteiro-de-testes
 services:
   roteiro:
     build: .
-    environment:
-      RESULTS_PIN: ${RESULTS_PIN:-}
     ports:
       - "127.0.0.1:${ROTEIRO_PORT:-8090}:8000" # só esta máquina; para outras pessoas, troque 127.0.0.1 de forma consciente
     volumes:
