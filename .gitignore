@@ -28,3 +28,6 @@ docs/00-descoberta/restrito/
 # E2E
 app/e2e/node_modules/
 app/e2e/reports/
+
+# pacote de teste (base extraída, dezenas de MB)
+/pacote/
