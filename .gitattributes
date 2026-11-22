@@ -1,0 +1,6 @@
+# Fim de linha LF em tudo (scripts .sh quebram com CRLF no Windows).
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.png binary
+*.jpg binary
+*.dump binary
