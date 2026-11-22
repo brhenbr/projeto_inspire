@@ -56,10 +56,14 @@ test.describe("2. Descoberta (busca, filtros, detalhe)", () => {
     await page.getByLabel("Ordenar por").selectOption({ label: "Maior nota" });
     await expect(page).toHaveURL(/ordem=nota/);
 
-    const notas = await page.locator("article.resultado .badge", { hasText: /^Nota/ }).allTextContents();
-    const valores = notas.map(numeroDaNota);
-    expect(valores.length).toBeGreaterThan(5);
-    expect(valores).toEqual([...valores].sort((a, b) => b - a));
+    // espera a lista reordenada chegar (a URL muda antes de os resultados novos aparecerem)
+    await expect
+      .poll(async () => {
+        const notas = await page.locator("article.resultado .badge", { hasText: /^Nota/ }).allTextContents();
+        const valores = notas.map(numeroDaNota);
+        return valores.length > 5 && JSON.stringify(valores) === JSON.stringify([...valores].sort((a, b) => b - a));
+      })
+      .toBe(true);
   });
 
   test("a paginação navega entre páginas sem repetir resultados", async ({ page }) => {

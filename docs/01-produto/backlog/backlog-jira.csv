@@ -133,3 +133,6 @@ US-130,Story,Gerar pacote de propostas por organização,"Diferenças entre espe
 EP-15,Epic,"Multiusuário, acesso e escala","Login, papéis (curador, coordenação, explorador), publicação em nuvem.",Low,futuro,acesso,,,"Multiusuário, acesso e escala",
 US-140,Story,Autenticação e papéis,Login e permissões por papel. A API do MVP já não pressupõe usuário único.,Low,futuro,acesso,,,,EP-15
 US-141,Story,Implantação em nuvem,"Parte do ambiente fornecido pelo CPQD, conforme o plano de trabalho.",Low,futuro,acesso,tecnico,,,EP-15
+US-150,Story,Roteador de provedores gratuitos de LLM com troca automática por cota,Tenta os provedores na ordem; ao estourar a cota (429/402) pausa e usa o próximo; registra quem respondeu cada proposta. ADR-0014.,High,mvp,llm,seguranca,,,EP-05
+US-151,Story,Criar coleção dinâmica descrevendo-a em texto,"O LLM propõe os filtros; o usuário ajusta, vê a amostra e confirma. Nada é criado sem confirmação. ADR-0016.",High,mvp,nl,colecoes,,,EP-09
+US-152,Story,Perguntar ao catálogo em linguagem natural,"Traduz o pedido em filtros, mostra o que entendeu e afrouxa filtros especulativos quando não há resultado. ADR-0016.",High,mvp,nl,,,,EP-09

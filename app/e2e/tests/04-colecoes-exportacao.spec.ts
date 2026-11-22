@@ -18,8 +18,8 @@ test.describe("4. Coleções e exportação", () => {
     await expect(page.getByText("Nenhuma coleção ainda.")).toBeVisible();
 
     await page.getByLabel("Nome", { exact: true }).fill("Bases sociais");
-    await page.getByLabel(/^Descrição/).fill("Saúde, assistência e educação");
-    await page.getByRole("button", { name: "Criar coleção" }).click();
+    await page.getByLabel("Descrição (opcional)").fill("Saúde, assistência e educação");
+    await page.getByRole("button", { name: "Criar coleção", exact: true }).click();
     await expect(page.getByRole("link", { name: "Bases sociais" })).toBeVisible();
 
     await page.goto("/conjuntos?organizacao=orgao-1");
@@ -35,7 +35,7 @@ test.describe("4. Coleções e exportação", () => {
   test("não permite duas coleções com o mesmo nome", async ({ page }) => {
     await page.goto("/colecoes");
     await page.getByLabel("Nome", { exact: true }).fill("Bases sociais");
-    await page.getByRole("button", { name: "Criar coleção" }).click();
+    await page.getByRole("button", { name: "Criar coleção", exact: true }).click();
 
     await expect(page.getByRole("alert")).toContainText("Já existe uma coleção");
   });
@@ -99,7 +99,7 @@ test.describe("4. Coleções e exportação", () => {
   test("renomear e apagar uma coleção (com confirmação) sem apagar os conjuntos", async ({ page }) => {
     await page.goto("/colecoes");
     await page.getByLabel("Nome", { exact: true }).fill("Temporária");
-    await page.getByRole("button", { name: "Criar coleção" }).click();
+    await page.getByRole("button", { name: "Criar coleção", exact: true }).click();
     await page.getByRole("link", { name: "Temporária" }).click();
 
     await page.getByLabel("Novo nome").fill("Temporária renomeada");

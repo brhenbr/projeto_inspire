@@ -353,3 +353,19 @@ def test_simulado_escolhe_tema_pelo_texto_ou_mantem_o_atual() -> None:
 def test_simulado_recusa_tarefa_desconhecida() -> None:
     with pytest.raises(LlmError):
         SimulatedProvider().complete(LlmRequest("s", "u", "x", {}))
+
+
+def test_descricao_que_diz_que_faltam_informacoes_e_recusada() -> None:
+    sem_info = json.dumps(
+        {
+            "descricao": "A descrição do conjunto de dados não foi informada. Não há detalhes adicionais."
+        }
+    )
+    with pytest.raises(ValueError, match="faltam informações"):
+        tasks.parse_output("melhorar-descricao", sem_info, {}, set())
+    bom = json.dumps({"descricao": "Reúne os convênios do Instituto Federal, publicados em CSV."})
+    assert tasks.parse_output("melhorar-descricao", bom, {}, set()).startswith("Reúne")
+    atualizado = json.dumps(
+        {"descricao": "Dados que não foram atualizados desde 2020, em CSV mensal."}
+    )
+    assert tasks.parse_output("melhorar-descricao", atualizado, {}, set()).startswith("Dados que")

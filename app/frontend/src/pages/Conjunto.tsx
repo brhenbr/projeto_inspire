@@ -14,6 +14,7 @@ export default function ConjuntoPage() {
   const { id = "" } = useParams();
   const dados = useApi(() => api.get<ConjuntoDetalhe>(`/conjuntos/${id}`), [id]);
   const [aba, setAba] = useState<Aba>("metadados");
+  const [aviso, setAviso] = useState<string | null>(null); // fica aqui: o formulário remonta ao recarregar
   const d = dados.data;
 
   if (dados.loading) return <main className="pagina"><Loading /></main>;
@@ -53,7 +54,7 @@ export default function ConjuntoPage() {
           { key: "llm", label: `Sugestões de LLM${d.propostas_pendentes ? ` (${d.propostas_pendentes})` : ""}` },
         ]}
       />
-      {aba === "metadados" && <Metadados key={JSON.stringify([d.efetivo, d.estado_curadoria])} d={d} onChanged={dados.reload} />}
+      {aba === "metadados" && <Metadados key={JSON.stringify([d.efetivo, d.estado_curadoria])} d={d} onChanged={dados.reload} ok={aviso} setOk={setAviso} />}
       {aba === "qualidade" && <Qualidade d={d} />}
       {aba === "recursos" && <Recursos d={d} />}
       {aba === "historico" && <Historico d={d} />}
@@ -64,7 +65,7 @@ export default function ConjuntoPage() {
 
 // ---------------------------------------------------------------- metadados e edição
 
-function Metadados({ d, onChanged }: { d: ConjuntoDetalhe; onChanged: () => void }) {
+function Metadados({ d, onChanged, ok, setOk }: { d: ConjuntoDetalhe; onChanged: () => void; ok: string | null; setOk: (m: string | null) => void }) {
   const ef = d.efetivo;
   const temas = useApi(() => api.get<Tema[]>("/temas"), []);
   const [titulo, setTitulo] = useState(ef?.titulo ?? "");
@@ -74,7 +75,6 @@ function Metadados({ d, onChanged }: { d: ConjuntoDetalhe; onChanged: () => void
   const [periodicidade, setPeriodicidade] = useState(ef?.periodicidade ?? "");
   const [licenca, setLicenca] = useState(ef?.licenca ?? "");
   const [comentario, setComentario] = useState("");
-  const [ok, setOk] = useState<string | null>(null);
   const acao = useAction();
   const status = useAction();
   const [estado, setEstado] = useState(d.estado_curadoria);

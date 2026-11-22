@@ -40,7 +40,7 @@ Explorar o catálogo espelhado com busca e filtros.
 Avaliar metadados por regras explicáveis. Pesos e critérios definidos com o time; alinhar com DCAT-BR/DQV quando o padrão for definido.
 
 - **US-020** (Story, Highest, mvp, qualidade) — Motor de regras de qualidade configurável ✔ Concluído
-- **US-023** (Task, Highest, mvp, qualidade, padroes) — Matriz de qualidade: DQV x FAIR x DMBOK ✔ Parcial (matriz gerada; falta ler a especificação oficial do DCAT-BR)
+- **US-023** (Task, Highest, mvp, qualidade, padroes) — Matriz de qualidade: DQV x FAIR x DMBOK ✔ Concluído (especificação oficial do DCAT-BR lida em 2026-11-21)
 - **US-021** (Story, High, mvp, qualidade) — Pontuação por conjunto e agregada por organização/tema ✔ Concluído (organização; por tema: só contagem no painel)
 - **US-022** (Story, High, mvp, qualidade, curadoria) — Lista priorizada de conjuntos a curar ✔ Concluído
 
@@ -71,9 +71,10 @@ Humano parametriza, LLM executa, humano aprova. Provedor gratuito/local por trá
 - **US-043** (Story, High, mvp, llm, governanca) — Registro de execução e proveniência ✔ Concluído
 - **US-044** (Spike, High, mvp, llm, spike) — Avaliar modelos gratuitos/locais para português
 - **US-045** (Story, Medium, mvp, llm, curadoria) — Marcar propostas desatualizadas quando o conjunto mudar no portal ✔ Concluído
-- **US-067** (Spike, High, mvp, llm, seguranca, spike) — Selecionar provedores gratuitos de LLM e validar condições de uso
+- **US-067** (Spike, High, mvp, llm, seguranca, spike) — Selecionar provedores gratuitos de LLM e validar condições de uso ✔ Parcial (4 provedores gratuitos validados com chaves reais em 2026-11-21; termos de uso a conferir)
 - **US-068** (Task, High, mvp, llm, seguranca) — Salvaguardas do LLM externo (ADR-0004) ✔ Concluído
 - **US-069** (Task, Low, futuro, llm, tecnico) — Perfil Docker 'llm-local' para rodar LLM em GPU (preparado, desativado)
+- **US-150** (Story, High, mvp, llm, seguranca) — Roteador de provedores gratuitos de LLM com troca automática por cota ✔ Concluído
 
 ## EP-06 — API própria e exportação
 
@@ -115,7 +116,9 @@ Worker separado que verifica disponibilidade dos recursos sem baixar dados.
 Perguntas em português sobre o catálogo curado, respondidas por um LLM que usa a API própria como ferramenta.
 
 - **US-080** (Story, Medium, fase-2, nl) — Busca semântica com embeddings
-- **US-081** (Story, Medium, fase-2, nl) — Chat sobre o catálogo
+- **US-081** (Story, Medium, fase-2, nl) — Chat sobre o catálogo ✔ Parcial (versão tradutor de filtros, ADR-0016: o LLM não vê os dados; sem respostas redigidas)
+- **US-151** (Story, High, mvp, nl, colecoes) — Criar coleção dinâmica descrevendo-a em texto ✔ Concluído
+- **US-152** (Story, High, mvp, nl) — Perguntar ao catálogo em linguagem natural ✔ Concluído
 
 ## EP-10 — Governança de IA e conformidade
 
@@ -132,8 +135,8 @@ Requisitos do GuIA/MGI que podem ser exigidos quando o produto for para órgãos
 
 Exportar e mapear o catálogo conforme DCAT-BR v1.0 e a qualidade conforme DQV (padrões já definidos pelo projeto). O modelo de dados já nasce alinhado; esta fase entrega a exportação e a validação.
 
-- **US-100** (Story, Medium, fase-2, padroes) — Mapear o modelo curado para DCAT-BR
-- **US-101** (Story, Medium, fase-2, padroes) — Exportar catálogo em DCAT (JSON-LD) e qualidade em DQV
+- **US-100** (Story, Medium, fase-2, padroes) — Mapear o modelo curado para DCAT-BR ✔ Concluído (docs/02-arquitetura/mapeamento-dcat-br.md)
+- **US-101** (Story, Medium, fase-2, padroes) — Exportar catálogo em DCAT (JSON-LD) e qualidade em DQV ✔ Concluído (ADR-0015; JSON-LD, antecipada para o MVP)
 
 ## EP-12 — Evolução automática de taxonomias
 

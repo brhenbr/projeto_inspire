@@ -184,6 +184,13 @@ def extract_json(raw: str) -> dict[str, Any]:
     return data
 
 
+NO_INFO = re.compile(
+    r"(descri[cç][aã]o|informa[cç][oõ]es)[^.]{0,40}\bn[aã]o\b[^.]{0,30}(informad|dispon[ií]ve|fornecid)"
+    r"|\bn[aã]o (h[aá]|foram?|foi)\b[^.]{0,30}(informa[cç]|detalhes)",
+    re.IGNORECASE,
+)
+
+
 def parse_output(task_key: str, raw: str, context: dict[str, Any], valid_themes: set[str]) -> Any:
     """Valida a saída do modelo (não confiável) e devolve o valor proposto para o campo-alvo."""
     data = extract_json(raw)
@@ -191,6 +198,8 @@ def parse_output(task_key: str, raw: str, context: dict[str, Any], valid_themes:
         value = data.get("descricao")
         if not isinstance(value, str) or not 40 <= len(value.strip()) <= 2000:
             raise ValueError("Descrição ausente ou fora do tamanho esperado (40 a 2000 caracteres)")
+        if NO_INFO.search(value):
+            raise ValueError("O modelo disse que faltam informações em vez de descrever o conjunto")
         return value.strip()
     if task_key == "sugerir-tags":
         tags = data.get("tags")

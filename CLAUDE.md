@@ -68,11 +68,14 @@ Protótipo web, monousuário porém com arquitetura desacoplada, para **extraç�
 - E2E: `bash scripts/e2e.sh` (Playwright + portal falso, pilha descartável em `docker-compose.e2e.yml`). Ver docs/05-testes/e2e.md.
 - Parâmetro de saída da exportação é `saida` (não `formato`, que é filtro de recurso).
 - LLM: modo `simulado` (sem IA, sem rede) por padrão no compose; provedor real só por configuração (ADR-0011).
+- LLM real: `LLM_PROVIDER=roteador` + `<NOME>_API_KEY` no `.env` (groq, gemini, openrouter, cerebras, mistral, deepseek; ADR-0014). Os nomes de modelo das camadas gratuitas mudam: conferir com chamada real (`/models`) antes de confiar. Chat e coleção por texto só enviam o texto do usuário e o vocabulário público (ADR-0016). Exportação DCAT-BR: `saida=jsonld` (ADR-0015).
 
 ## Armadilhas já vividas
 - Nunca editar migração já aplicada: criar uma nova (a 0006 reconcilia bancos migrados com a 0004 intermediária).
 - nginx precisa resolver o nome da API dinamicamente (resolver do Docker), senão devolve 502 quando a API é recriada.
 - `docker compose run` não reconstrói imagem: o `scripts/e2e.sh` faz `build` antes.
+- Em Python, não gerar código com `\b` dentro de string normal via script: vira backspace. E nos testes, `curl` com acentos no Windows quebra o JSON (usar Python/urllib com UTF-8).
+- E2E: esperar o estado final com `expect.poll` (a URL muda antes de a lista atualizar); `getByRole(..., {name})` casa por substring: usar `exact: true` quando há botões parecidos.
 
 ## Regras de trabalho
 - Documentação em **português**; código e identificadores em inglês. O cliente achou os C4 técnicos demais:
