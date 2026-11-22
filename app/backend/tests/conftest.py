@@ -40,7 +40,9 @@ def _use_test_database() -> None:
 def _hermetic_environment() -> None:
     """O compose define LLM_* e PORTAL_* no contêiner; os testes devem enxergar os PADRÕES do código."""
     for key in [
-        k for k in os.environ if k.startswith(("LLM_", "PORTAL_", "EXTRACTION_", "DADOS_GOV_"))
+        k
+        for k in os.environ
+        if k.startswith(("LLM_", "PORTAL_", "EXTRACTION_", "DADOS_GOV_")) or k.endswith("_API_KEY")
     ]:
         del os.environ[key]
 
