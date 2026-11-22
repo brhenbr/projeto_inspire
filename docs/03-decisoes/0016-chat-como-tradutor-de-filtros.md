@@ -38,3 +38,11 @@ semântica, avaliada à parte com o catálogo real.
 - Nenhum dado do catálogo sai da infraestrutura por causa do chat; só a pergunta do usuário.
 - A qualidade depende do modelo; por isso o usuário sempre vê e pode corrigir os filtros.
 - Perguntas como "qual órgão publica mais?" não são atendidas (são analíticas); o painel cobre parte disso.
+
+## Complemento: coleções por texto e vários temas
+- `POST /v1/chat/colecao` usa o mesmo interpretador para **propor** os filtros de uma coleção dinâmica. Não cria nada:
+  o usuário remove filtros (a contagem atualiza na hora), confere uma amostra e só então confirma. Aqui **não há
+  afrouxamento**, porque uma coleção deve refletir exatamente o que foi pedido.
+- O filtro `tema` passou a aceitar vários slugs separados por vírgula (casa qualquer um), pois "saúde, assistência e
+  educação" é o caso típico de coleção. Antes, o pedido virava uma busca de palavras que dava poucos resultados.
+- O prompt manda não deduzir tema a partir do nome do órgão (o que gerava "Ministério da Saúde + tema saúde + CSV" = 0).

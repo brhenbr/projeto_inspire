@@ -49,7 +49,7 @@ def test_simulado_entende_tema_e_palavras_e_a_busca_executa(chat: TestClient) ->
 def test_valida_a_saida_do_modelo_e_informa_o_que_descartou(populated: Engine) -> None:
     raw = {
         "q": "vacinas",
-        "tema": "tema-inventado",
+        "tema": "saude, educacao, tema-inventado",
         "formato": ".csv",
         "esfera": "Federal",
         "uf": "xx",
@@ -63,8 +63,10 @@ def test_valida_a_saida_do_modelo_e_informa_o_que_descartou(populated: Engine) -
 
     assert result.filtros["esfera"] == "federal" and result.filtros["nota_min"] == 100.0
     assert result.filtros["organizacao"] == "orgao-2" and result.filtros["q"] == "vacinas"
-    assert "tema" not in result.filtros and "uf" not in result.filtros
-    assert any("tema" in i for i in result.ignorados) and any("uf" in i for i in result.ignorados)
+    assert result.filtros["tema"] == "saude,educacao" and "uf" not in result.filtros
+    assert any("tema-inventado" in i for i in result.ignorados) and any(
+        "uf" in i for i in result.ignorados
+    )
 
 
 def test_so_o_texto_e_o_vocabulario_vao_ao_provedor(populated: Engine) -> None:
@@ -140,3 +142,27 @@ def test_sem_resultado_solta_filtros_especulativos_e_informa(
     assert r["filtros_pedidos"].keys() == {"organizacao", "esfera", "periodicidade"}
     assert r["filtros_removidos"] == ["periodicidade", "esfera"]  # nessa ordem; o órgão fica
     assert r["filtros"] == {"organizacao": "orgao-1"} and r["resultado"]["total"] > 0
+
+
+def test_propor_colecao_nao_cria_nada_e_nao_afrouxa(
+    populated: Engine, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    app = create_app()
+    app.dependency_overrides[get_db] = lambda: populated
+    app.dependency_overrides[get_settings] = lambda: SIM
+    answer = {"organizacao": "orgao-1", "esfera": "municipal"}
+    monkeypatch.setattr(providers, "build_provider", lambda _s: Canned(json.dumps(answer)))
+    client = TestClient(app)
+    before = len(client.get("/v1/colecoes").json())
+
+    r = client.post("/v1/chat/colecao", json={"descricao": "bases do órgão 1 municipais, só isso"})
+
+    body = r.json()
+    assert r.status_code == 200 and body["filtros"] == {
+        "organizacao": "orgao-1",
+        "esfera": "municipal",
+    }
+    assert body["resultado"]["total"] == 0  # sem afrouxar: reflete exatamente o pedido
+    assert body["nome_sugerido"].startswith("Bases do órgão 1")
+    assert len(client.get("/v1/colecoes").json()) == before  # nada foi criado
+    assert client.post("/v1/chat/colecao", json={"descricao": "x"}).status_code == 422

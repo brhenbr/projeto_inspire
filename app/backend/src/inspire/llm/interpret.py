@@ -51,7 +51,7 @@ USER = """Pedido do usuário: {pergunta}
 
 Campos possíveis do JSON:
 - "q": só termos específicos do assunto que NÃO estejam cobertos pelos outros campos (não repita o tema, o órgão nem o estado; não use "dados" nem "conjunto"); omita se não houver
-- "tema": um slug de tema, entre: {temas}
+- "tema": um ou mais slugs de tema separados por vírgula (basta casar um deles), entre: {temas}. Use só se o pedido citar o assunto; não deduza tema a partir do nome do órgão
 - "formato": um formato de arquivo, entre: {formatos}
 - "esfera": {esferas} (só se o pedido disser explicitamente)
 - "uf": sigla de estado (ex.: SP)
@@ -114,12 +114,14 @@ def simulate(context: dict[str, Any]) -> dict[str, Any]:
     words = re.findall(r"[a-z0-9]+", question)
     out: dict[str, Any] = {}
     used: set[str] = set()
+    found_themes = []
     for theme in context.get("temas") or []:
         title = normalize(theme["titulo"])
         if title in question or theme["slug"].replace("-", " ") in question:
-            out["tema"] = theme["slug"]
+            found_themes.append(theme["slug"])
             used.update(re.findall(r"[a-z0-9]+", title))
-            break
+    if found_themes:
+        out["tema"] = ",".join(found_themes)
     for fmt in context.get("formatos") or []:
         if normalize(fmt) in words:
             out["formato"] = fmt.upper()
@@ -183,7 +185,13 @@ def validate(engine: Engine, raw: dict[str, Any], vocab: dict[str, Any]) -> Inte
         else:
             ignored.append(f"{key}: “{raw.get(key)}” não existe no catálogo")
 
-    pick("tema", themes, lambda v: str(v).strip().lower())
+    wanted = [t.strip().lower() for t in re.split(r"[,;]", str(raw.get("tema") or "")) if t.strip()]
+    valid = [t for t in dict.fromkeys(wanted) if t in themes]
+    if valid:
+        filters["tema"] = ",".join(valid)
+    ignored += [
+        f"tema: “{t}” não existe no catálogo" for t in dict.fromkeys(wanted) if t not in themes
+    ]
     pick("formato", formats, lambda v: str(v).strip().upper().lstrip("."))
     pick("esfera", set(ESFERAS), lambda v: str(v).strip().lower())
     pick("uf", set(UFS), lambda v: str(v).strip().upper())
@@ -238,7 +246,8 @@ def search_relaxed(
     """Busca; se vier vazia, solta um filtro por vez (na ordem acima) e informa quais foram soltos."""
     from inspire.discovery.search import SearchService
 
-    current, removed = dict(filters), []
+    current = dict(filters)
+    removed: list[str] = []
     service = SearchService(engine)
     while True:
         found = service.search(Filters.from_dict(current), size=size)

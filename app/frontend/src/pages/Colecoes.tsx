@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
-import { api, type Busca, type Colecao } from "../api";
+import { api, type Busca, type Colecao, type LlmEstado, type PropostaColecao } from "../api";
 import { fmtNum } from "../format";
 import { useAction, useApi } from "../hooks";
 import { Badge, Card, Empty, ErrorBox, Field, Loading, Nota, Pagination } from "../ui";
+import { FiltrosEntendidos } from "./Perguntar";
 
 export function ColecoesPage() {
   const lista = useApi(() => api.get<Colecao[]>("/colecoes"), []);
@@ -50,7 +51,64 @@ export function ColecoesPage() {
           </p>
         </Card>
       </div>
+      <ColecaoPorTexto onCreated={lista.reload} />
     </main>
+  );
+}
+
+/** Descreva a coleção em texto; o LLM propõe os filtros, você ajusta, confere a amostra e só então cria. */
+function ColecaoPorTexto({ onCreated }: { onCreated: () => void }) {
+  const llm = useApi(() => api.get<LlmEstado>("/llm/estado"), []);
+  const navigate = useNavigate();
+  const [texto, setTexto] = useState("");
+  const [proposta, setProposta] = useState<PropostaColecao | null>(null);
+  const [filtros, setFiltros] = useState<Record<string, string | number | boolean>>({});
+  const [nome, setNome] = useState("");
+  const [resultado, setResultado] = useState<PropostaColecao["resultado"] | null>(null);
+  const propor = useAction();
+  const criar = useAction();
+  const e = llm.data;
+
+  async function enviar() {
+    const p = await propor.run(() => api.post<PropostaColecao>("/chat/colecao", { descricao: texto }));
+    if (p) { setProposta(p); setFiltros(p.filtros); setNome(p.nome_sugerido); setResultado(p.resultado); }
+  }
+  async function remover(chave: string) {
+    const novos = { ...filtros };
+    delete novos[chave];
+    setFiltros(novos);
+    setResultado(await api.get<Busca>("/conjuntos", { ...novos, tamanho: 5 }).catch(() => null));
+  }
+  async function confirmar() {
+    const c = await criar.run(() => api.post<Colecao>("/colecoes", { nome, descricao: texto, tipo: "dinamica", regra_filtro: filtros }));
+    if (c) { onCreated(); navigate(`/colecoes/${c.id}`); }
+  }
+
+  if (!e?.habilitado) return null;
+  return (
+    <Card title="Criar coleção descrevendo em texto">
+      <p className="subtitulo">
+        Descreva a coleção (ex.: “bases sociais de saúde e educação do governo federal”). O modelo propõe filtros; <strong>nada é criado até você confirmar</strong>.
+        {e.externo && <> Seu texto é enviado ao provedor externo <strong>{e.host}</strong>; não escreva dados pessoais.</>}
+      </p>
+      <div className="linha">
+        <input type="text" aria-label="Descrição da coleção" style={{ flex: 1 }} maxLength={500} value={texto} onChange={(ev) => setTexto(ev.target.value)} placeholder="Descreva a coleção" />
+        <button className="botao" type="button" disabled={texto.trim().length < 2 || propor.pending} onClick={enviar}>{propor.pending ? "Interpretando…" : "Propor filtros"}</button>
+      </div>
+      <ErrorBox error={propor.error} />
+      {proposta && resultado && (
+        <div style={{ marginTop: 12 }}>
+          <FiltrosEntendidos i={{ ...proposta, filtros }} onRemove={remover} />
+          <p><strong data-testid="total-proposta">{fmtNum(resultado.total)} conjunto(s)</strong> entrariam agora; a coleção se atualiza a cada extração.</p>
+          <ul>{resultado.itens.map((c) => <li key={c.id}><Link to={`/conjuntos/${c.id}`}>{c.titulo}</Link></li>)}</ul>
+          <ErrorBox error={criar.error} />
+          <div className="linha">
+            <input type="text" aria-label="Nome da nova coleção" value={nome} onChange={(ev) => setNome(ev.target.value)} />
+            <button className="botao" type="button" disabled={!nome.trim() || Object.keys(filtros).length === 0 || criar.pending} onClick={confirmar}>Criar coleção dinâmica</button>
+          </div>
+        </div>
+      )}
+    </Card>
   );
 }
 

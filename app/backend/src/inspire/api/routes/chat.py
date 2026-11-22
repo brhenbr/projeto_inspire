@@ -8,6 +8,7 @@ from sqlalchemy import Engine
 
 from inspire.api.deps import get_db
 from inspire.config import Settings, get_settings
+from inspire.discovery.search import SearchService
 from inspire.llm import interpret, providers
 
 router = APIRouter(prefix="/chat", tags=["chat"])
@@ -18,6 +19,46 @@ Cfg = Annotated[Settings, Depends(get_settings)]
 class Pergunta(BaseModel):
     pergunta: str = Field(min_length=2, max_length=interpret.MAX_TEXT)
     tamanho: int = Field(default=10, ge=1, le=50)
+
+
+class PedidoColecao(BaseModel):
+    descricao: str = Field(min_length=2, max_length=interpret.MAX_TEXT)
+
+
+def _suggest_name(description: str) -> str:
+    words = description.split()
+    name = " ".join(words[:8])
+    return (name[:1].upper() + name[1:])[:80].rstrip(" ,;:.")
+
+
+@router.post("/colecao")
+def propor_colecao(body: PedidoColecao, db: Db, cfg: Cfg) -> dict[str, Any]:
+    """Propõe os filtros de uma coleção dinâmica a partir de uma descrição. NÃO cria nada: quem cria é o usuário.
+
+    Diferente do chat, não afrouxa filtros: uma coleção precisa refletir exatamente o que foi pedido.
+    """
+    try:
+        provider = providers.build_provider(cfg)
+        result = interpret.interpret(db, provider, body.descricao)
+    except providers.LlmDisabledError as exc:
+        raise HTTPException(status.HTTP_409_CONFLICT, str(exc)) from exc
+    except providers.LlmError as exc:
+        raise HTTPException(status.HTTP_502_BAD_GATEWAY, str(exc)) from exc
+    found = SearchService(db).search(interpret.to_filters(result), size=5)
+    found.pop("facetas", None)
+    return {
+        "nome_sugerido": _suggest_name(body.descricao),
+        "filtros": result.filtros,
+        "explicacao": result.explicacao,
+        "ignorados": result.ignorados,
+        "organizacao": result.organizacao,
+        "provedor": {
+            "nome": provider.info.nome,
+            "externo": provider.info.externo,
+            "simulado": provider.info.simulado,
+        },
+        "resultado": found,
+    }
 
 
 @router.post("/perguntar")

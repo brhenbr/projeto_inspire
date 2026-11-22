@@ -19,14 +19,17 @@ const ROTULOS: Record<string, string> = {
 };
 
 /** Mostra os filtros entendidos como etiquetas; o usuário sempre vê o que foi usado. */
-export function FiltrosEntendidos({ i }: { i: Interpretacao }) {
+export function FiltrosEntendidos({ i, onRemove }: { i: Pick<Interpretacao, "filtros" | "explicacao" | "ignorados" | "organizacao">; onRemove?: (chave: string) => void }) {
   const itens = Object.entries(i.filtros);
   return (
     <div>
       <div className="chips" aria-label="Filtros entendidos">
         {itens.length === 0 && <Badge>nenhum filtro</Badge>}
         {itens.map(([k, v]) => (
-          <Badge key={k} tone="azul">{ROTULOS[k] ?? k}: {k === "organizacao" && i.organizacao ? i.organizacao.titulo : String(v)}</Badge>
+          <Badge key={k} tone="azul">
+            {ROTULOS[k] ?? k}: {k === "organizacao" && i.organizacao ? i.organizacao.titulo : String(v)}
+            {onRemove && <button type="button" className="chip-x" aria-label={`Remover filtro ${ROTULOS[k] ?? k}`} onClick={() => onRemove(k)}>×</button>}
+          </Badge>
         ))}
       </div>
       {i.explicacao && <p className="subtitulo">{i.explicacao}</p>}

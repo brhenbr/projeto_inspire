@@ -273,3 +273,8 @@ export type RespostaChat = Interpretacao & {
   provedor: { nome: string; modelo: string; externo: boolean; simulado: boolean };
   resultado: Omit<Busca, "facetas">;
 };
+export type PropostaColecao = Interpretacao & {
+  nome_sugerido: string;
+  provedor: { nome: string; externo: boolean; simulado: boolean };
+  resultado: Omit<Busca, "facetas">;
+};

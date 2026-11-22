@@ -242,3 +242,11 @@ def test_api_temas(api: TestClient) -> None:
 
     assert {t["slug"] for t in temas} == {"saude", "educacao", "trabalho"}
     assert sum(t["conjuntos"] for t in temas) == 61
+
+
+def test_filtro_de_varios_temas_casa_qualquer_um(populated: Engine) -> None:
+    s = SearchService(populated)
+    one = s.search(Filters(tema="saude"))["total"]
+    both = s.search(Filters(tema="saude,educacao"))["total"]
+    assert 0 < one <= both
+    assert s.search(Filters(tema="tema-que-nao-existe"))["total"] == 0

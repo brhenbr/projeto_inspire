@@ -66,7 +66,7 @@ _SCALAR = {
     "selo": "b.selo_portal = :selo",
     "estado_curadoria": "b.estado_curadoria = :estado_curadoria",
     "atualizado_portal": "b.atualizado_portal = :atualizado_portal",
-    "tema": ":tema = ANY(b.temas)",
+    "tema": "b.temas && string_to_array(:tema, ',')",  # vários temas separados por vírgula: qualquer um deles
     "tag": ":tag = ANY(b.tags)",
     "formato": "upper(:formato) = ANY(b.formatos)",
 }
