@@ -25,7 +25,7 @@ Leia [**Como o sistema funciona**](docs/02-arquitetura/00-como-o-sistema-funcion
 
 ```
 git clone https://github.com/brhenbr/projeto_inspire.git && cd projeto_inspire
-bash scripts/pacote-de-teste.sh carregar pacote/inspire-base-AAAAMMDD.dump   # pacote fornecido pela equipe
+bash scripts/pacote-de-teste.sh carregar pacote/inspire-base-AAAAMMDD.dump   # baixe o .dump em https://github.com/brhenbr/projeto_inspire/releases
 # abra http://127.0.0.1:8080
 ```
 Detalhes, requisitos (Docker, 4 GB de memória, 6 GB de disco) e solução de problemas estão no

@@ -12,7 +12,7 @@ Desktop precisa estar aberto.*
 2. Crie a pasta `pacote` dentro do projeto e coloque os dois arquivos nela.
 3. Carregue e suba tudo com **um comando**:
    ```
-   bash scripts/pacote-de-teste.sh carregar pacote/inspire-base-AAAAMMDD.dump
+   bash scripts/pacote-de-teste.sh carregar pacote/inspire-base-AAAAMMDD.dump   # o .dump está em https://github.com/brhenbr/projeto_inspire/releases
    ```
    Na primeira vez leva uns 3 a 5 minutos (baixa e constrói as imagens). O comando confere a integridade do arquivo,
    carrega a base e sobe o sistema.
