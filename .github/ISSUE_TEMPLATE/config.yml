@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Guia do pesquisador (comece por aqui)
+    url: https://github.com/brhenbr/projeto_inspire/blob/main/docs/guia/README.md
+    about: Como preparar o ambiente, rodar, testar e resolver problemas comuns.

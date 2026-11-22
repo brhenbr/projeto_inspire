@@ -1,0 +1,28 @@
+name: Melhoria ou ideia
+description: Algo que faltou, que confundiu ou que poderia ser melhor.
+labels: ["melhoria"]
+body:
+  - type: markdown
+    attributes:
+      value: Conte **o problema que você tem**; não precisa propor a solução. Isso entra no backlog do projeto.
+  - type: textarea
+    id: problema
+    attributes:
+      label: Qual é o problema ou a necessidade?
+      placeholder: Quando faço X, não consigo Y, e isso atrapalha porque Z.
+    validations:
+      required: true
+  - type: textarea
+    id: quem
+    attributes:
+      label: Quem se beneficia e com que frequência?
+      placeholder: Pesquisadores que montam coleções, toda semana.
+  - type: textarea
+    id: ideia
+    attributes:
+      label: Se tiver uma ideia de como seria (opcional)
+  - type: input
+    id: caso
+    attributes:
+      label: Caso do manual relacionado (opcional)
+      placeholder: BUS-04

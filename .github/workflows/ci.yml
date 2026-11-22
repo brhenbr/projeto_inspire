@@ -1,0 +1,60 @@
+# Integração contínua: a cada envio de código e a cada pedido de mudança, roda os mesmos testes e varreduras
+# que rodamos à mão. Explicação em docs/06-deploy/ci-explicado.md.
+# As ações de terceiros estão fixadas pelo identificador exato (hash), não por versão móvel (regra de dependências do projeto).
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qualidade:
+    name: Qualidade (lint, tipos, testes)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Backend e frontend
+        run: bash scripts/qualidade.sh
+      - name: Casos do manual de testes são válidos
+        run: bash scripts/validar-casos.sh
+      - name: Testes da ferramenta de roteiro de testes
+        run: bash kit/roteiro-de-testes/testar.sh
+
+  seguranca:
+    name: Segurança (segredos e dependências)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # histórico inteiro, para procurar segredos em qualquer commit
+      - name: Segredos no histórico
+        run: python3 scripts/varrer_segredos.py
+      - name: Vulnerabilidades nas dependências
+        run: bash scripts/auditar-dependencias.sh
+
+  e2e:
+    name: Testes de ponta a ponta (navegador)
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Playwright contra a pilha descartável
+        run: bash scripts/e2e.sh
+      - name: Guardar relatório se falhar
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: relatorio-e2e
+          path: app/e2e/reports
+          retention-days: 7

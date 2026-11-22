@@ -1,0 +1,53 @@
+name: Defeito (algo não funciona como deveria)
+description: Conte o que aconteceu para podermos reproduzir e corrigir.
+labels: ["defeito"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por reportar! Quanto mais exato, mais rápido resolvemos. **Não cole chaves de API, senhas nem o conteúdo do seu `.env`.**
+  - type: input
+    id: caso
+    attributes:
+      label: Caso do manual (se houver)
+      description: Se achou o problema fazendo o manual de testes, informe o código do caso. Exemplo, COL-03.
+      placeholder: COL-03
+  - type: textarea
+    id: passos
+    attributes:
+      label: O que você fez (passo a passo)
+      placeholder: |
+        1. Abri a tela Coleções
+        2. Digitei ...
+        3. Cliquei em ...
+    validations:
+      required: true
+  - type: textarea
+    id: esperado
+    attributes:
+      label: O que você esperava que acontecesse
+    validations:
+      required: true
+  - type: textarea
+    id: aconteceu
+    attributes:
+      label: O que aconteceu de fato
+      description: Cole a mensagem de erro, se houver.
+    validations:
+      required: true
+  - type: dropdown
+    id: modo
+    attributes:
+      label: Modo do LLM
+      options:
+        - Simulado (padrão)
+        - Real (roteador de provedores)
+        - Não sei
+    validations:
+      required: true
+  - type: input
+    id: sistema
+    attributes:
+      label: Seu sistema
+      description: Windows, macOS ou Linux, e a versão do Docker (`docker --version`).
+      placeholder: Windows 11, Docker 27.x

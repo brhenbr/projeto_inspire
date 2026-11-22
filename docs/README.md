@@ -2,6 +2,7 @@
 
 | Pasta | Conteúdo |
 |---|---|
+| [guia](guia/README.md) | **Guia do pesquisador:** preparar o ambiente, rodar, testar e avaliar, problemas comuns, evoluir o projeto |
 | [00-descoberta](00-descoberta/) | Especificações recebidas e achados da investigação |
 | [01-produto](01-produto/) | Visão e escopo, backlog, limites conhecidos, proposta de bases sociais |
 | [02-arquitetura](02-arquitetura/00-como-o-sistema-funciona.md) | **Comece por aqui:** como o sistema funciona (sem jargão); diagramas C4, modelo de dados, mapeamento DCAT-BR |

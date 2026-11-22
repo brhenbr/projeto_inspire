@@ -93,7 +93,7 @@ Execução em Docker, testes, CI e documentação contínua.
 
 - **US-060** (Task, Highest, mvp, tecnico, adr) — Conversa e ADR de tecnologias (stack, banco, busca, fila, front) ✔ Concluído (ADR-0003)
 - **US-061** (Task, Highest, mvp, tecnico) — Esqueleto do projeto com Docker Compose ✔ Concluído
-- **US-062** (Task, High, mvp, tecnico) — Portão local de qualidade e, depois do primeiro push, CI ✔ Parcial (portão local pronto; CI proposto em docs/06-deploy/ci-proposta.md, ativar após o push)
+- **US-062** (Task, High, mvp, tecnico) — Portão local de qualidade e, depois do primeiro push, CI ✔ Concluído (portão local e CI no GitHub Actions: .github/workflows/ci.yml; docs/06-deploy/ci-explicado.md)
 - **US-063** (Task, High, mvp, tecnico, teste) — Testes E2E dos fluxos principais ✔ Concluído
 - **US-064** (Task, Medium, mvp, tecnico, governanca) — Definir licença e preparar repositório para publicação ✔ Fase 2 (decisão do cliente em 2026-11-22)
 - **US-066** (Task, High, mvp, tecnico, seguranca) — Checklist de segurança e soberania (ADR-0002) ✔ Concluído (docs/05-testes/seguranca-e-soberania.md; varreduras manuais até haver CI)
