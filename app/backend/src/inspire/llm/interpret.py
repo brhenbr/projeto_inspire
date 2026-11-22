@@ -196,7 +196,10 @@ def validate(engine: Engine, raw: dict[str, Any], vocab: dict[str, Any]) -> Inte
     pick("esfera", set(ESFERAS), lambda v: str(v).strip().lower())
     pick("uf", set(UFS), lambda v: str(v).strip().upper())
     pick("periodicidade", set(PERIODICIDADES), lambda v: str(v).strip().upper())
-    if (q := str(raw.get("q") or "").strip()[:200]) and not re.fullmatch(r"\W*", q):
+    q = " ".join(re.sub(r"[,;]", " ", str(raw.get("q") or "")).split())[
+        :200
+    ]  # vírgula não é parte do termo
+    if q and not re.fullmatch(r"\W*", q):
         filters["q"] = q
     organization = None
     if name := str(raw.get("organizacao") or "").strip():

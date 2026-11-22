@@ -48,7 +48,7 @@ def test_simulado_entende_tema_e_palavras_e_a_busca_executa(chat: TestClient) ->
 
 def test_valida_a_saida_do_modelo_e_informa_o_que_descartou(populated: Engine) -> None:
     raw = {
-        "q": "vacinas",
+        "q": "vacinas, benefícios;  sociais",
         "tema": "saude, educacao, tema-inventado",
         "formato": ".csv",
         "esfera": "Federal",
@@ -62,7 +62,10 @@ def test_valida_a_saida_do_modelo_e_informa_o_que_descartou(populated: Engine) -
     result = interpret.validate(populated, raw, vocab)
 
     assert result.filtros["esfera"] == "federal" and result.filtros["nota_min"] == 100.0
-    assert result.filtros["organizacao"] == "orgao-2" and result.filtros["q"] == "vacinas"
+    assert (
+        result.filtros["organizacao"] == "orgao-2"
+        and result.filtros["q"] == "vacinas benefícios sociais"
+    )
     assert result.filtros["tema"] == "saude,educacao" and "uf" not in result.filtros
     assert any("tema-inventado" in i for i in result.ignorados) and any(
         "uf" in i for i in result.ignorados
