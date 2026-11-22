@@ -260,6 +260,7 @@ def _propose(
         response.text,
         canonical_hash(original),
         None,
+        f"{response.provider}/{response.model}" if response.provider else response.model,
     )
 
 
@@ -278,13 +279,14 @@ def _record(
     raw: str | None,
     base_hash: str | None,
     error: str | None,
+    answered_by: str | None = None,
 ) -> str:
     with engine.begin() as conn:
         conn.execute(
             text(
                 "INSERT INTO curadoria.llm_proposta (execucao_id, conjunto_id, campo, valor_original, valor_proposto, "
-                "estado, hash_base, prompt, resposta_bruta, erro) VALUES (:e, :c, :f, CAST(:o AS jsonb), CAST(:p AS jsonb), "
-                ":s, :h, :pr, :r, :er)"
+                "estado, hash_base, prompt, resposta_bruta, erro, provedor) VALUES (:e, :c, :f, CAST(:o AS jsonb), CAST(:p AS jsonb), "
+                ":s, :h, :pr, :r, :er, :pv)"
             ),
             {
                 "e": execution_id,
@@ -297,6 +299,7 @@ def _record(
                 "pr": prompt,
                 "r": (raw or "")[:RAW_LIMIT] or None,
                 "er": error,
+                "pv": answered_by,
             },
         )
     return "erros" if error else "propostas"

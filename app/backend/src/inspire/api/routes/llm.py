@@ -148,7 +148,7 @@ def listar_propostas(
             text(
                 "SELECT p.id, p.execucao_id, p.conjunto_id, c.titulo AS conjunto_titulo, p.campo, p.valor_original, "
                 "p.valor_proposto, p.valor_final, p.estado, p.erro, p.criada_em, p.decidida_em, p.decidida_por, "
-                "e.provedor, e.modelo, e.externo, e.tarefa_chave FROM curadoria.llm_proposta p "
+                "e.provedor, COALESCE(p.provedor, e.modelo) AS modelo, e.externo, e.tarefa_chave FROM curadoria.llm_proposta p "
                 "JOIN curadoria.llm_execucao e ON e.id = p.execucao_id "
                 "LEFT JOIN analitico.conjunto_busca c ON c.id = p.conjunto_id "
                 f"WHERE {clause} ORDER BY p.id DESC LIMIT :n OFFSET :o"
@@ -169,7 +169,7 @@ def detalhar_proposta(proposta_id: int, db: Db) -> dict[str, Any]:
     with db.connect() as conn:
         row = conn.execute(
             text(
-                "SELECT p.*, e.provedor, e.modelo, e.externo, e.tarefa_chave, e.tarefa_versao "
+                "SELECT p.*, p.provedor AS respondido_por, e.provedor, e.modelo, e.externo, e.tarefa_chave, e.tarefa_versao "
                 "FROM curadoria.llm_proposta p JOIN curadoria.llm_execucao e ON e.id = p.execucao_id WHERE p.id = :i"
             ),
             {"i": proposta_id},

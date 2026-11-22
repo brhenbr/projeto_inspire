@@ -76,6 +76,18 @@ class LlmError(Exception):
     """Falha ao obter resposta do provedor (rede, limite de uso, resposta inválida)."""
 
 
+class LlmQuotaError(LlmError):
+    """Limite de uso ou cota esgotada no provedor (HTTP 429/402); `retry_after_s` indica quando voltar."""
+
+    def __init__(self, message: str, retry_after_s: float | None = None) -> None:
+        super().__init__(message)
+        self.retry_after_s = retry_after_s
+
+
+class LlmAuthError(LlmError):
+    """Credencial recusada pelo provedor (HTTP 401/403)."""
+
+
 class LlmDisabledError(LlmError):
     """O recurso está desligado ou mal configurado."""
 
@@ -94,6 +106,7 @@ class LlmResponse:
     model: str
     prompt_tokens: int | None = None
     completion_tokens: int | None = None
+    provider: str | None = None  # quem de fato respondeu (relevante no roteador)
 
 
 @dataclass(frozen=True)
@@ -122,10 +135,11 @@ class OpenAICompatibleProvider:
         max_retries: int = 3,
         transport: httpx.BaseTransport | None = None,
         sleep: Callable[[float], None] = time.sleep,
+        name: str = "openai-compatible",
     ) -> None:
         host = urlparse(base_url).hostname or ""
         self.info = ProviderInfo(
-            nome="openai-compatible",
+            nome=name,
             modelo=model,
             externo=host not in LOCAL_HOSTS,
             simulado=False,
@@ -155,6 +169,7 @@ class OpenAICompatibleProvider:
         }
         log = structlog.get_logger("llm")
         last = "sem tentativas"
+        quota: LlmQuotaError | None = None
         for attempt in range(self._max_retries + 1):
             try:
                 response = self._http.post("/chat/completions", json=payload)
@@ -162,9 +177,20 @@ class OpenAICompatibleProvider:
                 last = type(exc).__name__
             else:
                 if response.status_code in (401, 403):
-                    raise LlmError(f"Provedor recusou a credencial (HTTP {response.status_code})")
+                    raise LlmAuthError(
+                        f"Provedor recusou a credencial (HTTP {response.status_code})"
+                    )
+                if response.status_code == 402:  # saldo/cota esgotados: esperar não adianta
+                    raise LlmQuotaError("Provedor sem saldo ou cota (HTTP 402)", 3600.0)
                 if response.status_code in (429, 500, 502, 503, 504):
                     last = f"HTTP {response.status_code}"
+                    if response.status_code == 429:
+                        quota = LlmQuotaError(
+                            "Limite de uso do provedor atingido (HTTP 429)",
+                            _retry_after(response),
+                        )
+                        if self._max_retries == 0 or (quota.retry_after_s or 0) > 30.0:
+                            raise quota  # espera longa: quem chama decide (ex.: roteador troca de provedor)
                 elif response.status_code >= 400:
                     raise LlmError(f"Provedor recusou o pedido (HTTP {response.status_code})")
                 else:
@@ -175,6 +201,8 @@ class OpenAICompatibleProvider:
                     "llm_nova_tentativa", tentativa=attempt + 1, motivo=last, espera_s=delay
                 )
                 self._sleep(delay)
+        if quota is not None and last == "HTTP 429":
+            raise quota
         raise LlmError(f"Provedor sem resposta utilizável ({last})")
 
     def _parse(self, response: httpx.Response) -> LlmResponse:
@@ -190,6 +218,14 @@ class OpenAICompatibleProvider:
             prompt_tokens=usage.get("prompt_tokens"),
             completion_tokens=usage.get("completion_tokens"),
         )
+
+
+def _retry_after(response: httpx.Response) -> float | None:
+    raw = response.headers.get("retry-after")
+    try:
+        return max(0.0, float(raw)) if raw is not None else None
+    except ValueError:
+        return None
 
 
 def _words(text: str) -> list[str]:
@@ -260,12 +296,117 @@ class SimulatedProvider:
         return sorted(set(hits)) or list(c.get("temas") or [])
 
 
+# ----------------------------------------------------------------- roteador (ADR-0014)
+
+# Provedores com camada gratuita que falam o protocolo "chat completions". O nome na lista LLM_ROUTER_PROVIDERS
+# É a aprovação do provedor (ADR-0004): o host vem fixo daqui, não do ambiente. Modelos podem ser trocados por
+# LLM_ROUTER_MODELS, pois as camadas gratuitas mudam com frequência.
+ROUTER_PRESETS: dict[str, tuple[str, str]] = {
+    "groq": ("https://api.groq.com/openai/v1", "llama-3.3-70b-versatile"),
+    "gemini": ("https://generativelanguage.googleapis.com/v1beta/openai", "gemini-2.5-flash"),
+    "openrouter": ("https://openrouter.ai/api/v1", "meta-llama/llama-3.3-70b-instruct:free"),
+    "cerebras": ("https://api.cerebras.ai/v1", "llama-3.3-70b"),
+    "mistral": ("https://api.mistral.ai/v1", "mistral-small-latest"),
+    "deepseek": ("https://api.deepseek.com", "deepseek-chat"),
+}
+SHORT_COOLDOWN_S = 30.0  # falha transitória (rede, 5xx)
+DEFAULT_QUOTA_COOLDOWN_S = 60.0  # 429 sem Retry-After
+MAX_WAIT_S = 65.0  # se todos estão em pausa por menos que isso, espera; senão falha o item
+
+
+class RouterProvider:
+    """Tenta os provedores na ordem; ao estourar a cota (ou falhar) de um, pausa-o e usa o próximo."""
+
+    def __init__(
+        self,
+        providers: list[LlmProvider],
+        *,
+        clock: Callable[[], float] = time.monotonic,
+        sleep: Callable[[float], None] = time.sleep,
+    ) -> None:
+        if not providers:
+            raise LlmDisabledError("Nenhum provedor do roteador tem chave configurada")
+        self._providers = providers
+        self._blocked_until: dict[str, float] = {}
+        self._clock = clock
+        self._sleep = sleep
+        self.info = ProviderInfo(
+            nome="roteador",
+            modelo="auto: " + ", ".join(p.info.nome for p in providers),
+            externo=any(p.info.externo for p in providers),
+            simulado=False,
+            host=", ".join(str(p.info.host) for p in providers),
+        )
+
+    def estado(self) -> list[dict[str, Any]]:
+        now = self._clock()
+        return [
+            {
+                "provedor": p.info.nome,
+                "modelo": p.info.modelo,
+                "em_pausa_s": max(0.0, round(self._blocked_until.get(p.info.nome, 0.0) - now, 1)),
+            }
+            for p in self._providers
+        ]
+
+    def complete(self, request: LlmRequest) -> LlmResponse:
+        log = structlog.get_logger("llm")
+        errors: list[str] = []
+        for _ in range(2):  # a segunda volta só ocorre depois de uma espera curta
+            tried = 0
+            for p in self._providers:
+                name = p.info.nome
+                if self._blocked_until.get(name, 0.0) > self._clock():
+                    continue
+                tried += 1
+                try:
+                    response = p.complete(request)
+                except LlmQuotaError as exc:
+                    wait = (
+                        exc.retry_after_s
+                        if exc.retry_after_s is not None
+                        else DEFAULT_QUOTA_COOLDOWN_S
+                    )
+                    self._blocked_until[name] = self._clock() + wait
+                    errors.append(f"{name}: cota")
+                    log.warning("llm_roteador_cota", provedor=name, pausa_s=wait)
+                except LlmAuthError:
+                    self._blocked_until[name] = self._clock() + 86400.0
+                    errors.append(f"{name}: credencial recusada")
+                    log.error("llm_roteador_credencial", provedor=name)
+                except LlmError as exc:
+                    errors.append(f"{name}: {exc}")
+                    if "fora do formato" not in str(exc) and "recusou o pedido" not in str(exc):
+                        self._blocked_until[name] = self._clock() + SHORT_COOLDOWN_S
+                else:
+                    return LlmResponse(
+                        text=response.text,
+                        model=response.model,
+                        prompt_tokens=response.prompt_tokens,
+                        completion_tokens=response.completion_tokens,
+                        provider=name,
+                    )
+            if tried:
+                break  # havia provedores disponíveis e todos falharam: não insistir
+            earliest = (
+                min(self._blocked_until.get(p.info.nome, 0.0) for p in self._providers)
+                - self._clock()
+            )
+            if earliest > MAX_WAIT_S:
+                break
+            self._sleep(max(0.0, earliest))
+        detail = "; ".join(errors or ["todos em pausa por cota"])
+        raise LlmError(f"Todos os provedores indisponíveis agora ({detail})")
+
+
 def build_provider(settings: Settings) -> LlmProvider:
     """Cria o provedor configurado, aplicando as barreiras do ADR-0004."""
     if not settings.llm_enabled:
         raise LlmDisabledError("O recurso de LLM está desligado (LLM_ENABLED=false)")
     if settings.llm_provider == "simulado":
         return SimulatedProvider()
+    if settings.llm_provider == "roteador":
+        return build_router(settings)
     if settings.llm_provider != "openai-compatible":
         raise LlmDisabledError(f"Provedor de LLM desconhecido: {settings.llm_provider}")
     host = urlparse(settings.llm_base_url).hostname or ""
@@ -307,3 +448,24 @@ def describe(settings: Settings) -> dict[str, Any]:
         "modelo": info.modelo,
         "host": info.host,
     }
+
+
+def build_router(settings: Settings) -> RouterProvider:
+    names = [n.strip().lower() for n in settings.llm_router_providers.split(",") if n.strip()]
+    unknown = [n for n in names if n not in ROUTER_PRESETS]
+    if unknown:
+        raise LlmDisabledError(f"Provedor desconhecido no roteador: {', '.join(unknown)}")
+    keys = {n: k.get_secret_value() for n, k in settings.router_keys().items()}
+    built: list[LlmProvider] = []
+    for name in names:
+        key = keys.get(name, "")
+        if not key:
+            continue  # sem chave: o provedor é ignorado (não é erro)
+        base_url, default_model = ROUTER_PRESETS[name]
+        model = settings.router_models().get(name) or default_model
+        built.append(
+            OpenAICompatibleProvider(
+                base_url, key, model, timeout_s=settings.llm_timeout_s, max_retries=0, name=name
+            )
+        )
+    return RouterProvider(built)

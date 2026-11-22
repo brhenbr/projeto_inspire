@@ -38,6 +38,7 @@ services:
       LLM_BASE_URL: ${LLM_BASE_URL:-}
       LLM_MODEL: ${LLM_MODEL:-}
       LLM_ALLOWED_HOSTS: ${LLM_ALLOWED_HOSTS:-localhost,127.0.0.1,llm-local}
+      LLM_ROUTER_PROVIDERS: ${LLM_ROUTER_PROVIDERS:-groq,gemini,openrouter,cerebras,mistral,deepseek}
     depends_on:
       db:
         condition: service_healthy
@@ -45,7 +46,15 @@ services:
 
   api:
     <<: [*backend, *hardening]
-    environment: *db-env
+    environment:
+      <<: *db-env
+      # O roteador de LLM precisa das chaves também na API (valida o provedor ao criar a execução).
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      CEREBRAS_API_KEY: ${CEREBRAS_API_KEY:-}
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY:-}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -70,6 +79,13 @@ services:
       DADOS_GOV_BASE_URL: ${DADOS_GOV_BASE_URL:-https://dados.gov.br}
       PORTAL_MAX_RPS: ${PORTAL_MAX_RPS:-4}
       LLM_API_KEY: ${LLM_API_KEY:-}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      CEREBRAS_API_KEY: ${CEREBRAS_API_KEY:-}
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY:-}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      LLM_ROUTER_PROVIDERS: ${LLM_ROUTER_PROVIDERS:-groq,gemini,openrouter,cerebras,mistral,deepseek}
     depends_on:
       migrate:
         condition: service_completed_successfully

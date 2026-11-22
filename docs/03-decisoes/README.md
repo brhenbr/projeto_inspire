@@ -18,5 +18,6 @@ decisão e as consequências. Modelo em [`kit/templates/adr.md`](../../kit/templ
 | [0011](0011-integracao-com-llm.md) | LLM: protocolo compatível com OpenAI e modo simulado | Claude, em autonomia |
 | [0012](0012-bibliotecas-do-frontend.md) | Frontend com React Router e componentes próprios | Claude, em autonomia |
 | [0013](0013-estrategia-de-testes-e2e.md) | E2E com portal falso executável | Claude, em autonomia |
+| [0014](0014-roteador-de-provedores-llm.md) | Roteador próprio de provedores gratuitos de LLM, com troca por cota | Cliente e Claude |
 
-As decisões de 0007 a 0013 foram tomadas enquanto o cliente estava ausente, por delegação dele. **Revisão do cliente pendente.**
+As decisões de 0007 a 0013 foram tomadas enquanto o cliente estava ausente, por delegação dele. Revisados e confirmados pelo cliente em 2026-11-21.

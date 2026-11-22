@@ -43,6 +43,41 @@ class Settings(BaseSettings):
     llm_timeout_s: float = 60.0
     llm_request_interval_s: float = 1.0
 
+    # Roteador de provedores gratuitos (ADR-0014): ordem de preferência; provedor sem chave é ignorado
+    llm_router_providers: str = "groq,gemini,openrouter,cerebras,mistral,deepseek"
+    groq_api_key: SecretStr = SecretStr("")
+    gemini_api_key: SecretStr = SecretStr("")
+    openrouter_api_key: SecretStr = SecretStr("")
+    cerebras_api_key: SecretStr = SecretStr("")
+    mistral_api_key: SecretStr = SecretStr("")
+    deepseek_api_key: SecretStr = SecretStr("")
+    llm_groq_model: str = ""
+    llm_gemini_model: str = ""
+    llm_openrouter_model: str = ""
+    llm_cerebras_model: str = ""
+    llm_mistral_model: str = ""
+    llm_deepseek_model: str = ""
+
+    def router_keys(self) -> dict[str, SecretStr]:
+        return {
+            "groq": self.groq_api_key,
+            "gemini": self.gemini_api_key,
+            "openrouter": self.openrouter_api_key,
+            "cerebras": self.cerebras_api_key,
+            "mistral": self.mistral_api_key,
+            "deepseek": self.deepseek_api_key,
+        }
+
+    def router_models(self) -> dict[str, str]:
+        return {
+            "groq": self.llm_groq_model,
+            "gemini": self.llm_gemini_model,
+            "openrouter": self.llm_openrouter_model,
+            "cerebras": self.llm_cerebras_model,
+            "mistral": self.llm_mistral_model,
+            "deepseek": self.llm_deepseek_model,
+        }
+
 
 @lru_cache
 def get_settings() -> Settings:
